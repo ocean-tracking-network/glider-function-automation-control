@@ -1,0 +1,15 @@
+@import './base.css';
+
+#app {
+  max-width: 1850px;
+  margin: auto;
+  padding: 1rem;
+}
+
+.border {
+  border-width: 2px;
+  border-color: white;
+  border-radius: 5px;
+  border-style: solid;
+  padding: 0.5rem;
+}
