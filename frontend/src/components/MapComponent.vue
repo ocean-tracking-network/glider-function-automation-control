@@ -21,6 +21,8 @@ const glider_track_points = ref(null)
 const glider_current_location = ref(null)
 const glider_next_waypoint = ref(null)
 
+const all_glider_markers = ref([])
+
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
@@ -64,23 +66,29 @@ function set_glider_track() {
   if (glider_next_waypoint.value != null) {
     glider_next_waypoint.value.removeFrom(initialMap.value)
   }
+  if (all_glider_markers.value.length > 0) {
+    all_glider_markers.value.forEach((glider_marker) => {
+      glider_marker.removeFrom(initialMap.value)
+    })
+    all_glider_markers.value = []
+  }
   let tracks = []
   glider_track_points.value = []
   console.log(typeof (selected_glider.value.track[0]))
-  // for(let i=0; i < )
   selected_glider.value.track.forEach((element) => {
     tracks.push([element[0] / 100, element[1] / 100])
     glider_track_points.value.push(
       L.circle([element[0] / 100, element[1] / 100], { radius: 100, stroke: false, color: 'red' })
         .addTo(initialMap.value).bindPopup("<b>100 meters</b>")
-
     )
   })
+
   let slocum_icon = L.icon({
     iconUrl: slocum1,
     iconSize: [37, 61],
     iconAnchor: [18, 61],
   })
+
   glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
   glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
   initialMap.value.setView(tracks[tracks.length - 1])
@@ -92,6 +100,13 @@ function set_glider_track() {
     })
     glider_next_waypoint.value = L.marker(selected_glider.value.next_waypoint, { icon: waypoint_icon }).addTo(initialMap.value)
   }
+  gliderStore.gliders.forEach((glider) => {
+    if (glider._id != selected_glider._id) {
+      const current_pos = [glider.track[glider.track.length - 1][0] / 100, glider.track[glider.track.length - 1][1] / 100]
+      const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 }).addTo(initialMap.value)
+      all_glider_markers.value.push(new_marker)
+    }
+  })
 }
 
 function map_click(e) {
@@ -190,6 +205,12 @@ const geofences_filtered = computed(() => {
     ret.push({ key: key, latlons: lat_lon_filtered })
   })
   return ret
+})
+
+watch(gliders, (new_val) => {
+  if (new_val.length > 0) {
+    gliderStore.select_glider(0)
+  }
 })
 
 </script>

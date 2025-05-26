@@ -2,7 +2,7 @@
 </script>
 <template>
   <div>
-    <h1>Ocean Tracking Network Geofence Slocum File Automation (OTNGSFA)</h1>
+    <h1>Glider File Automation Control (GFAC)</h1>
     <!-- (GAS Geofence Automation for Slocum) (GLAfS
     Geofence Location Automation for Slocums) () -->
     <!-- <div id="checkbox-div">
