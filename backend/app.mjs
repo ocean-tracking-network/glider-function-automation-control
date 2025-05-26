@@ -111,7 +111,7 @@ async function update_glider_positions() {
 }
 
 // Schedule
-const backend_schedule = scheduleJob('*/5 * * * * *', async () => {
+const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })
