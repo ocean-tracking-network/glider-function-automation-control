@@ -32,3 +32,12 @@ services:
       - 3000:3000
     depends_on:
       - mongo
+
+  frontend:
+    image: glider-automation-frontend
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: ./docker/frontend.dockerfile
+    ports:
+      - 8080:8080

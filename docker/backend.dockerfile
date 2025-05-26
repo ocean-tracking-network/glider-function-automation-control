@@ -1,4 +1,5 @@
 ARG NODE_VERSION=22
+ARG VUE_API_BASE_URL=localhost:3000
 
 FROM node:${NODE_VERSION}-alpine
 

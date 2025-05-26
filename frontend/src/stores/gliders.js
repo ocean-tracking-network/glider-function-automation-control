@@ -1,13 +1,13 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import apiClient from '@/apiClient'
 
 export const useGlidersStore = defineStore('gliders', () => {
   const gliders = ref([])
   const selected_glider_idx = ref({})
 
   const get_gliders = () => {
-    axios.get('http://localhost:3000/glider').then((res) => {
+    apiClient.get('/glider').then((res) => {
       gliders.value = res.data
     })
   }
@@ -20,7 +20,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     data = {
       name: g.name,
     }
-    axios.post('http://localhost:3000/glider', data).then((res) => {
+    apiClient.post('/glider', data).then((res) => {
       console.log(res)
       get_gliders()
     })

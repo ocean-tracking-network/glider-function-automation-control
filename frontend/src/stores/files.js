@@ -1,4 +1,4 @@
-import axios from 'axios'
+import apiClient from '@/apiClient'
 import { defineStore } from 'pinia'
 import { computed, onMounted, ref } from 'vue'
 
@@ -10,13 +10,13 @@ export const useFilesStore = defineStore('files', () => {
   })
 
   const get_files = () => {
-    axios.get('http://localhost:3000/files').then((res) => {
+    apiClient.get('/files').then((res) => {
       files_raw.value = res.data
     })
   }
 
   const delete_file = (id) => {
-    axios.delete('http://localhost:3000/files/' + id).then((res) => {
+    apiClient.delete('/files/' + id).then((res) => {
       get_files()
     })
   }
@@ -30,8 +30,8 @@ export const useFilesStore = defineStore('files', () => {
       'Content-Type': 'multipart/form-data',
     }
 
-    axios
-      .post('http://localhost:3000/files', formData, {
+    apiClient
+      .post('/files', formData, {
         headers: headers,
       })
       .then((res) => {

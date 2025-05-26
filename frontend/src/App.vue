@@ -5,13 +5,12 @@ import MapComponent from './components/MapComponent.vue';
 import LogComponent from './components/LogComponent.vue';
 import GeoFenceComponent from './components/GeoFenceComponent.vue';
 import GliderTabComponent from './components/GliderTabComponent.vue';
-import { computed, onMounted, ref, useTemplateRef } from 'vue';
+import { computed, useTemplateRef } from 'vue';
 import { useEventsStore } from './stores/events';
 import { useFilesStore } from './stores/files';
 import { useGeoFencesStore } from './stores/geofences';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from './stores/gliders';
-import axios from 'axios';
 
 
 const eventsStore = useEventsStore()

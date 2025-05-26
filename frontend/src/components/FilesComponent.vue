@@ -1,12 +1,12 @@
 <script setup>
-// import axios from 'axios';
+// import apiClient from '@/apiClientClient';
 import { onMounted, ref } from 'vue';
 import FileComponent from './FileComponent.vue'
 
 const files = ref([]);
 
 onMounted(() => {
-  //axios.get()
+  //apiClient.get()
   files.value = [
     {
       filename: "file1"

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import apiClient from '@/apiClient'
 import { defineStore } from 'pinia'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useGlidersStore } from './gliders'
@@ -21,7 +21,7 @@ export const useEventsStore = defineStore('events', () => {
       glider: gliderStore.selected_glider._id,
       event_type: event_type,
     }
-    axios.post('http://localhost:3000/events', data).then((res) => {
+    apiClient.post('/events', data).then((res) => {
       console.log('Added event')
       console.log(data)
       get_events()
@@ -33,8 +33,8 @@ export const useEventsStore = defineStore('events', () => {
       return ele._id == id
     })
     if (event) {
-      axios
-        .delete('http://localhost:3000/events/' + id)
+      apiClient
+        .delete('/events/' + id)
         .then((res) => {
           console.log('deleted!')
           get_events()
@@ -48,8 +48,8 @@ export const useEventsStore = defineStore('events', () => {
   }
 
   const get_events = () => {
-    axios
-      .get('http://localhost:3000/events')
+    apiClient
+      .get('/events')
       .then((res) => {
         events.value = res.data
       })

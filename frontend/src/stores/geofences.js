@@ -1,6 +1,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import apiClient from '@/apiClient'
 import { useEventsStore } from './events'
 
 export const useGeoFencesStore = defineStore('geofences', () => {
@@ -19,8 +19,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
   const getGeofences = () => {
     geofences.value = {}
-    const url = 'http://localhost:3000/geofence'
-    axios.get(url).then((res) => {
+    const url = '/geofence'
+    apiClient.get(url).then((res) => {
       res.data.forEach((ele) => {
         geofences.value[ele._id] = {
           latlons: ele.latlons,
@@ -35,7 +35,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
   const saveGeoFence = () => {
     const geofence = geofences.value[temp_fence_key]
-    const url = 'http://localhost:3000/geofence'
+    const url = '/geofence'
     if (!geofence.name && geofence.latlons.length == 1) {
       return false
     }
@@ -43,7 +43,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       name: geofence.name,
       latlons: geofence.latlons,
     }
-    axios.post(url, data).then((res) => {
+    apiClient.post(url, data).then((res) => {
       getGeofences()
     })
     return true
@@ -72,16 +72,16 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       name: geofence.name,
     }
     console.log(data)
-    const url = 'http://localhost:3000/geofence/' + selected_fence_key.value
-    axios.patch(url, data).then((res) => {
+    const url = '/geofence/' + selected_fence_key.value
+    apiClient.patch(url, data).then((res) => {
       //console.log(res)
       getGeofences()
     })
   }
 
   const deleteGeofence = (id) => {
-    const url = 'http://localhost:3000/geofence/' + id
-    axios.delete(url).then((res) => {
+    const url = '/geofence/' + id
+    apiClient.delete(url).then((res) => {
       getGeofences()
       eventsStore.get_events()
     })

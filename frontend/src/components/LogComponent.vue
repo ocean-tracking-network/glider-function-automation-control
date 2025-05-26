@@ -1,6 +1,6 @@
 <script setup>
 import { useGlidersStore } from '@/stores/gliders';
-import axios from 'axios';
+import apiClient from '@/apiClient';
 import { computed, onMounted, ref } from 'vue';
 
 const gliderStore = useGlidersStore()
@@ -11,7 +11,7 @@ const filter_by_glider = ref(false)
 
 onMounted(() => {
   // placeholder logs. Not sure how or what they'll look like ye.
-  axios.get("http://localhost:3000/logs/").then((res) => {
+  apiClient.get("/logs/").then((res) => {
     logs.value = res.data
     logs.value.sort((a, b) => {
       return new Date(b.date) - new Date(a.date)

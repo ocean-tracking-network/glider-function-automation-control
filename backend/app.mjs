@@ -16,6 +16,7 @@ import {
 import { get_files, post_files, delete_files } from './views/files.mjs'
 import { delete_events, get_events, patch_events, post_events } from './views/events.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
+import { send_slack_message } from './utils/slack.mjs'
 
 const app = express()
 app.use(cors())
@@ -102,6 +103,7 @@ async function update_glider_positions() {
         $set: { track: tracks },
       })
       console.log('updated track')
+      send_slack_message(`${glider.name} has a new GPS position!`)
     } else {
       console.log('gps is the same')
     }
@@ -109,7 +111,7 @@ async function update_glider_positions() {
 }
 
 // Schedule
-const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
+const backend_schedule = scheduleJob('*/5 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })
@@ -117,6 +119,7 @@ const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
 // app start
 app.listen(port, () => {
   console.log(`example app listening on port ${port}`)
+  send_slack_message('debug: Backend started and listening')
 })
 
 // const glider_name = 'pascal_978'

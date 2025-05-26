@@ -31,3 +31,5 @@ coverage
 
 local.json
 uploads/
+
+backend/.env
