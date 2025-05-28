@@ -26,6 +26,7 @@ onBeforeMount(() => {
   }
   else {
     console.log("NO FENCE KEY")
+    lock_fence.value = false
     fence_key.value = store.add("")
     store.select(fence_key.value)
     geofences.value[fence_key.value].latlons.push([,])
