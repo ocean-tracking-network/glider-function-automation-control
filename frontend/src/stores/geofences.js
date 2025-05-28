@@ -26,8 +26,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
           latlons: ele.latlons,
           name: ele.name,
           selected: false,
+          notify: ele.notify,
         }
-        // //console.log(ele)
       })
       set_force_map_update(true)
     })
@@ -70,6 +70,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     const data = {
       latlons: geofence.latlons,
       name: geofence.name,
+      notify: geofence.notify,
     }
     console.log(data)
     const url = '/geofence/' + selected_fence_key.value
@@ -110,6 +111,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       name: name,
       selected: false,
       latlons: [],
+      notify: false,
     }
     return temp_fence_key
   }
@@ -137,7 +139,10 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     set_force_map_update(true)
   }
 
-  function append_cord_selected_fence() {}
+  function append_cord_selected_fence(lat_lon) {
+    const key = selected_fence_key.value
+    geofences.value[key].latlons[geofences.value[key].latlons.length - 1] = lat_lon
+  }
 
   onMounted(() => {
     getGeofences()

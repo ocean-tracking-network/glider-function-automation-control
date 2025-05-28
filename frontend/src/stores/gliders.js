@@ -16,6 +16,19 @@ export const useGlidersStore = defineStore('gliders', () => {
     selected_glider_idx.value = glider_index
   }
 
+  const enable_disable_selected_glider = () => {
+    const data = {
+      enabled: selected_glider.value.enabled,
+    }
+    const url = `/glider/${selected_glider.value._id}`
+    apiClient
+      .patch(url, data)
+      .then()
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
   const save_glider = (g) => {
     data = {
       name: g.name,
@@ -44,6 +57,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     save_glider,
     get_gliders,
     select_glider,
+    enable_disable_selected_glider,
     gliders_obj,
     selected_glider_idx,
     selected_glider,

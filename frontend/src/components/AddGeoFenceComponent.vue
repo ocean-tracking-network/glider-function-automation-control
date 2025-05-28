@@ -88,28 +88,30 @@ watch(fence_key, () => {
     <div id="name">
       <div>
         <button id="back-btn" class="border" @click="emit('back', !lock_fence)">{{ back_display }}</button>
-        <input :disabled="lock_fence" class="text-input" id="name-input" v-model="selected_fence.name"
-          placeholder="Name" type="text">
+        <input v-model="lock_fence" id="lock" type="checkbox" class="label">
+        <label for="lock">Lock</label>
       </div>
+      <input :disabled="lock_fence" class="text-input" id="name-input" v-model="selected_fence.name" placeholder="Name"
+        type="text">
       <div>
         <div>
-          <input v-model="interactive_map" id="map-interact" class="label" type="checkbox">
-          <label for="map-interact">Enable interactive map</label>
+          <input :disabled="lock_fence" v-model="selected_fence.notify" id="notify" type="checkbox">
+          <label class="label" for="map-interact">Notify when glider enters/leaves</label>
+        </div>
+        <div>
+          <input :disabled="lock_fence" v-model="interactive_map" id="map-interact" type="checkbox">
+          <label class="label" for="map-interact">Enable interactive map</label>
         </div>
 
-        <div>
-          <input v-model="lock_fence" id="lock" type="checkbox" class="label">
-          <label for="lock">Lock</label>
-        </div>
       </div>
     </div>
     <div id="main-container" :class="{ overflow: overflowed }">
       <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons">
         <p id="index">{{ index }}</p>
-        <input :disabled="lock_fence" class="text-input" @focusout="focus_out(index)" @focusin="focus_in(index)"
+        <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)" @focusin="focus_in(index)"
           @input="on_input()" v-model="lat_lon[0]" placeholder="lon" type="text" name="" id="" />
         <p>:</p>
-        <input :disabled="lock_fence" class="text-input" @focusout="focus_out(index)" @focusin="focus_in(index)"
+        <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)" @focusin="focus_in(index)"
           @input="on_input()" v-model="lat_lon[1]" placeholder="lat" type="text" name="" id="" />
         <button class="x-btn" @click="remove_idx(index)" v-if="index < selected_fence.latlons.length - 1">x</button>
       </div>
@@ -133,7 +135,10 @@ watch(fence_key, () => {
 
 #index {
   min-width: 1rem;
+}
 
+.latlon {
+  width: 8rem;
 }
 
 #main-container {
@@ -150,16 +155,21 @@ watch(fence_key, () => {
 }
 
 .label {
-  margin-right: .5rem;
+  margin: .5rem;
 }
 
 .text-input {
-  width: 8rem;
-  padding: .1rem;
-  border-radius: 3px;
+  /* width: 8rem;
   background-color: lightgray;
   color: black;
+  */
   margin-bottom: .5rem;
+  padding: .1rem;
+  background-color: black;
+  border-radius: 3px;
+  color: lightgray;
+  border-color: lightgray;
+  border-width: 1px;
 }
 
 #name input {
@@ -181,6 +191,10 @@ button {
   border-color: lightblue;
 }
 
+#back-btn {
+  width: 6rem;
+}
+
 .x-btn:hover {
   transition: .2s;
   color: red;
@@ -191,10 +205,10 @@ button {
 }
 
 #name-input {
-  background-color: black;
-  color: lightgray;
-  border-color: lightgray;
-  border-width: 1px;
+  /* height: 100%; */
+  min-width: 12rem;
+  font-size: x-large;
+  text-align: center;
 }
 
 .overflow-child {

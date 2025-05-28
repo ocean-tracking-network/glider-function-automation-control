@@ -10,15 +10,21 @@ onMounted(() => {
   gliderStore.get_gliders()
 })
 
+function enable_disable_glider() {
+  gliderStore.enable_disable_selected_glider()
+}
+
 </script>
 <template>
   <div class="border">
     <div id="button-div">
       <div v-for="(glider, index) in gliders">
         <button :class="{ selected: selected_glider_idx == index, gliders: true }"
-          @click="gliderStore.select_glider(index)">{{
-            glider.name
-          }}</button>
+          @click="gliderStore.select_glider(index)">
+          <input v-model="glider.enabled" @change="enable_disable_glider" :disabled="selected_glider_idx != index"
+            class="enable" type="checkbox">
+          {{ glider.name }}
+        </button>
       </div>
     </div>
     <button id="add">+</button>
@@ -73,6 +79,10 @@ button {
   border-right-width: 2px;
   border-right-color: white;
   padding: .5rem;
-  width: 100px;
+  width: 150px;
+}
+
+.enable {
+  margin-right: .5rem;
 }
 </style>

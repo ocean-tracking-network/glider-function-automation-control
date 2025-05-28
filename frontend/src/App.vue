@@ -74,7 +74,7 @@ function delete_file(idx) {
         <FilesBoxComponent @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
           :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
         <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
-          <h2 class="unselected-text">Please select and <strong>glider</strong> and <strong>geofence</strong></h2>
+          <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
         </div>
         <FilesBoxComponent @add_btn="add_file" @delete="delete_file" :move="fileMoveCallback" :sort="false"
           :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files"

@@ -5,6 +5,7 @@ import { upload_files } from './sfmc_api.mjs'
 import os from 'os'
 import fs from 'fs'
 import { create_log } from './log_utils.mjs'
+import { send_slack_message } from './slack.mjs'
 
 function is_in_polygon(point, polygon) {
   let in_polygon = false
@@ -134,6 +135,9 @@ async function upload_event_files(glider, geofence, event_type) {
   // glider: geofence obj
   // geofence: geofence obj
   // event_type: "enter" ? "exit"
+  if (glider.enabled == false || glider.enabled == undefined) {
+    return
+  }
   let collection = await db.collection('events')
   const files_collection = await db.collection('files')
   let events = await collection
@@ -159,7 +163,7 @@ async function upload_event_files(glider, geofence, event_type) {
 
         try {
           console.log('trying to upload file')
-          await upload_files('adam', 'to-glider', [temp_file_location])
+          await upload_files(glider.name, 'to-glider', [temp_file_location])
           await create_log(
             glider.name +
               ' has ' +
@@ -170,7 +174,7 @@ async function upload_event_files(glider, geofence, event_type) {
               '. Sent file: ' +
               file.filename,
             'info',
-            glider._id.toHexString()
+            glider._id
           )
         } catch (error) {
           console.log(error)
@@ -219,17 +223,23 @@ const update_geofences = async () => {
         try {
           if (in_geofence) {
             //glider entered
+            if (geofence.notify) {
+              send_slack_message(`${glider.name} has entered geofence ${geofence.name}`)
+            }
             await upload_event_files(glider, geofence, 'enter')
             gliders_in_geofence.push(glider_id)
           } else {
             //glider exited
+            if (geofence.notify) {
+              send_slack_message(`${glider.name} has exited geofence ${geofence.name}`)
+            }
             const idx = gliders_in_geofence.indexOf(glider_id)
             await upload_event_files(glider, geofence, 'exit')
             gliders_in_geofence.splice(idx, 1)
           }
         } catch (error) {
           create_log(
-            `Failed to upload files to ${glider.name} - Will try again next refresh (60 seconds) ---- ${error}`,
+            `Failed to upload files to ${glider._id} - Will try again next refresh (60 seconds) ---- ${error}`,
             'error',
             glider._id.toHexString()
           )

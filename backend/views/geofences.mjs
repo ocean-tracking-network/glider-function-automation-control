@@ -10,6 +10,7 @@ const get_geofences = async (req, res) => {
 const post_geofences = async (req, res, next) => {
   const latlons = req.body.latlons
   const name = req.body.name
+  const notify = req.body.notify
 
   if (!latlons || !name) {
     res.send({ error: 'need to provide latlons and name' })
@@ -20,6 +21,7 @@ const post_geofences = async (req, res, next) => {
     name: name,
     latlons: latlons,
     gliders_inside: [],
+    notify: notify,
   }
   const result = await collection.insertOne(newdocument)
 
@@ -40,10 +42,7 @@ const delete_geofences = async (req, res) => {
 
 const patch_geofences = async (req, res) => {
   const id = req.params.id
-  const data = {
-    name: req.body.name,
-    latlons: req.body.latlons,
-  }
+  const data = req.body
   let result = await updateOne('geofences', id, data)
   res.send(result).status(200)
 }

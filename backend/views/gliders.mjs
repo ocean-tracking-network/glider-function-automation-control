@@ -1,4 +1,5 @@
 import db from '../db/conn.mjs'
+import { updateOne } from '../utils/db_utils.mjs'
 
 const get_gliders = async (req, res) => {
   let collection = await db.collection('gliders')
@@ -17,8 +18,16 @@ const post_gliders = async (req, res) => {
   const new_doc = {
     name: glider_name,
     track: [],
+    enabled: false,
   }
   let result = await collection.insertOne(new_doc)
+  res.send(result).status(200)
+}
+
+const update_gliders = async (req, res) => {
+  const id = req.params.id
+  const update_dict = req.body
+  const result = await updateOne('gliders', id, update_dict)
   res.send(result).status(200)
 }
 
@@ -34,4 +43,4 @@ const post_gliders_track = async (req, res) => {
   res.send(update_result).status(200)
 }
 
-export { get_gliders, post_gliders, post_gliders_track }
+export { get_gliders, post_gliders, post_gliders_track, update_gliders }

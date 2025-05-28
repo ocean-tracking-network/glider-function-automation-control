@@ -6,7 +6,7 @@ import cors from 'cors'
 import { get_active_deployment_details } from './utils/sfmc_api.mjs'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
-import { get_gliders, post_gliders, post_gliders_track } from './views/gliders.mjs'
+import { get_gliders, post_gliders, post_gliders_track, update_gliders } from './views/gliders.mjs'
 import {
   delete_geofences,
   get_geofences,
@@ -31,6 +31,7 @@ const port = 3000
 app.post('/glider', post_gliders)
 app.get('/glider', get_gliders)
 app.post('/glider/:id/add-track', post_gliders_track)
+app.patch('/glider/:id', update_gliders)
 
 // geofence
 app.get('/geofence', get_geofences)
@@ -105,7 +106,7 @@ async function update_glider_positions() {
       })
       console.log('updated track')
       send_slack_message(`${glider.name} has a new GPS position!`)
-      create_log(`${glider.name} as a new GPS position`, 'info', glider.name)
+      create_log(`${glider._id} as a new GPS position`, 'info', glider.name)
     } else {
       console.log('gps is the same')
     }

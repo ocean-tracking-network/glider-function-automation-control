@@ -176,19 +176,23 @@ watch(selected_glider, () => {
 
 watch(selected_fence, () => {
   if (selected_fence.value) {
-    let avg_lat = 0
-    let avg_lon = 0
-    selected_fence.value.latlons.forEach((ele) => {
-      if (ele[0] && ele[1]) {
-        avg_lat += ele[0]
-        avg_lon += ele[1]
-      }
-    })
-    avg_lat = avg_lat / (selected_fence.value.latlons.length - 1)
-    avg_lon = avg_lon / (selected_fence.value.latlons.length - 1)
-    console.log(avg_lat)
-    console.log(avg_lon)
-    initialMap.value.setView([avg_lat, avg_lon])
+    try {
+      let avg_lat = 0
+      let avg_lon = 0
+      selected_fence.value.latlons.forEach((ele) => {
+        if (ele[0] && ele[1]) {
+          avg_lat += ele[0]
+          avg_lon += ele[1]
+        }
+      })
+      avg_lat = avg_lat / (selected_fence.value.latlons.length - 1)
+      avg_lon = avg_lon / (selected_fence.value.latlons.length - 1)
+      console.log(avg_lat)
+      console.log(avg_lon)
+      initialMap.value.setView([avg_lat, avg_lon])
+    } catch {
+      console.log("Failed to center view on geofence")
+    }
   }
 })
 
