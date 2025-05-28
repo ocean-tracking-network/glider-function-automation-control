@@ -29,8 +29,8 @@ async function upload_files(glider_name, glider_folder, file_paths) {
   if (process.env.SEND_FILES_TO_DUMMY_GLIDER) {
     glider_name = 'adam'
   }
-  // let token = await sfmc.accessToken.getAccessToken()
-  // const result = await sfmc.glider.uploadFiles(token.token, glider_name, glider_folder, file_paths)
+  let token = await sfmc.accessToken.getAccessToken()
+  const result = await sfmc.glider.uploadFiles(token.token, glider_name, glider_folder, file_paths)
   // send a slack notification whenever a file get's sent
   send_slack_message(`Sending file: ${file_paths} to ${glider_name}`)
 }

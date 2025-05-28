@@ -42,6 +42,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     const data = {
       name: geofence.name,
       latlons: geofence.latlons,
+      notify: geofence.notify,
     }
     apiClient.post(url, data).then((res) => {
       getGeofences()
