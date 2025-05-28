@@ -106,7 +106,7 @@ async function update_glider_positions() {
       })
       console.log('updated track')
       send_slack_message(`${glider.name} has a new GPS position!`)
-      create_log(`${glider._id} as a new GPS position`, 'info', glider.name)
+      create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
     } else {
       console.log('gps is the same')
     }
