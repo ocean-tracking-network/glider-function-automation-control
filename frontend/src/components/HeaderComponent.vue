@@ -14,12 +14,8 @@
   </div>
 </template>
 <style scoped>
-h2 {
-  font-size: x-large;
-}
-
 h1 {
-  font-size: xx-large;
+  font-size: x-large;
 }
 
 #checkbox-div {

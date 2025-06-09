@@ -5,7 +5,7 @@ import MapComponent from './components/MapComponent.vue';
 import LogComponent from './components/LogComponent.vue';
 import GeoFenceComponent from './components/GeoFenceComponent.vue';
 import GliderTabComponent from './components/GliderTabComponent.vue';
-import { computed, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 import { useEventsStore } from './stores/events';
 import { useFilesStore } from './stores/files';
 import { useGeoFencesStore } from './stores/geofences';
@@ -23,6 +23,8 @@ const { selected_fence } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
 const fileUpload = useTemplateRef('fileUpload')
+
+const temp_file_categories = ref([])
 
 function fileMoveCallback(evt, originalEvent) {
   console.log(evt)
@@ -51,6 +53,22 @@ function delete_file(idx) {
   filesStore.delete_file(file_id)
 }
 
+function show_send_now_btn(list) {
+  // returns string ["Send Now"] if it should be sent
+  if (list.length > 0) {
+    return ["Send Now"]
+  }
+  return undefined
+}
+
+function send_file() {
+  let send = window.confirm("Are you sure you want to send the file now?")
+}
+
+const all_categories = computed(() => {
+  return [...filesStore.categories, ...temp_file_categories.value]
+})
+
 </script>
 <template>
   <header>
@@ -63,22 +81,24 @@ function delete_file(idx) {
       <!-- <div id="map"> -->
       <!-- </div> -->
       <div>
-        <MapComponent />
+        <MapComponent id="map" />
       </div>
       <div id="side">
         <GliderTabComponent />
         <GeoFenceComponent id="geo" />
 
-        <FilesBoxComponent @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
-          :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
-        <FilesBoxComponent @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
-          :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
+        <FilesBoxComponent @tab_click="send_file" :tabs="show_send_now_btn(enter_files_ref)" :add_btn="false"
+          @delete="delete_event_enter" :standard_delete="false" v-if="display_events" :list="enter_files_ref"
+          group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
+        <FilesBoxComponent @tab_click="send_file" :tabs="show_send_now_btn(exit_files_ref)" :add_btn="false"
+          @delete="delete_event_exit" :standard_delete="false" v-if="display_events" :list="exit_files_ref"
+          group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
         <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
           <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
         </div>
-        <FilesBoxComponent @add_btn="add_file" @delete="delete_file" :move="fileMoveCallback" :sort="false"
-          :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files"
-          id="total" />
+        <FilesBoxComponent :tabs="all_categories" :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file"
+          :move="fileMoveCallback" :sort="false" :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }"
+          :draggable="true" title="All Files" id="total" />
         <input multiple type="file" id="file-upload" ref="fileUpload" @change="filesStore.upload_files">
       </div>
     </div>
@@ -94,24 +114,27 @@ function delete_file(idx) {
 
 #main-flex {
   display: flex;
-  padding: 1rem;
   gap: 1rem;
-  /* flex-wrap: wrap; */
+  margin-top: 1rem;
+  height: 575px;
 }
 
 #side {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  /* gap: 1rem; */
 }
 
 #geo {
   width: 100%;
   height: 15rem;
+  margin-bottom: .5rem;
 }
 
 #total {
   width: 100%;
+  height: 7rem;
+  margin-top: .5rem;
 }
 
 .middle {
@@ -122,7 +145,6 @@ function delete_file(idx) {
   height: 10rem;
   flex-basis: 48%;
   max-width: 50%;
-
 }
 
 #middle-placeholder {
@@ -130,6 +152,9 @@ function delete_file(idx) {
 
 }
 
+#exit {
+  margin-left: .5rem;
+}
 
 header {
   width: 100%;
@@ -137,11 +162,9 @@ header {
 
 #logs {
   width: 100%;
-  margin-top: 1rem;
 }
 
 .unselected-text {
-  font-size: xx-large;
   text-align: center;
 }
 

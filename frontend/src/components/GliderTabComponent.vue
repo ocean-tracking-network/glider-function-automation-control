@@ -18,16 +18,17 @@ function enable_disable_glider() {
 <template>
   <div class="border">
     <div id="button-div">
-      <div v-for="(glider, index) in gliders">
-        <button :class="{ selected: selected_glider_idx == index, gliders: true }"
-          @click="gliderStore.select_glider(index)">
-          <input v-model="glider.enabled" @change="enable_disable_glider" :disabled="selected_glider_idx != index"
-            class="enable" type="checkbox">
-          {{ glider.name }}
-        </button>
-      </div>
+      <button v-for="(glider, index) in gliders" :class="{ selected: selected_glider_idx == index, gliders: true }"
+        @click="gliderStore.select_glider(index)">
+        <input v-model="glider.enabled" @change="enable_disable_glider" :disabled="selected_glider_idx != index"
+          class="enable" type="checkbox">
+        {{ glider.name }}
+      </button>
+      <button class="gliders" id="add">
+        +
+      </button>
     </div>
-    <button id="add">+</button>
+    <!-- <button id="add">+</button> -->
   </div>
 </template>
 <style scoped>
@@ -53,33 +54,40 @@ function enable_disable_glider() {
 }
 
 #add {
-  border-color: white;
+  width: 2rem;
+  font-size: x-large;
+  padding-top: 0;
+  padding-bottom: 0;
+  /* border-color: white;
   border-width: 2px;
   width: 2rem;
   border-radius: 5px;
-  margin: .5rem;
+  margin: .5rem; */
 }
 
 #add:hover {
   border-color: limegreen;
 }
 
-button {
-  /* margin-right: .5rem;
-  margin-left: .5rem; */
-}
-
 .selected {
-  color: white;
+  /* color: white; */
   font-weight: bold;
 
 }
 
 .gliders {
   border-right-width: 2px;
-  border-right-color: white;
+  /* border-right-color: white; */
+  border-right-color: var(--color-text);
   padding: .5rem;
-  width: 150px;
+  width: 110px;
+  /* width: ; */
+}
+
+.gliders:hover {
+  /* color: lightgray; */
+  color: var(--color-border-hover);
+  transition: .2s;
 }
 
 .enable {

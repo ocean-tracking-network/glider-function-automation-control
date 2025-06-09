@@ -150,40 +150,7 @@ async function upload_event_files(glider, geofence, event_type) {
   if (events.length > 0) {
     console.log('Found event')
     for (const event of events) {
-      const file = await files_collection.findOne({ _id: ObjectId.createFromHexString(event.file) })
-      if (file != null) {
-        const tmp_dir = os.tmpdir()
-        const temp_file_location = tmp_dir + '/' + file.filename
-        try {
-          fs.copyFileSync(file.path, temp_file_location)
-        } catch (err) {
-          console.log('ERROR CERATING THE TEMP FILE!')
-          continue
-        }
-
-        try {
-          console.log('trying to upload file')
-          await upload_files(glider.name, 'to-glider', [temp_file_location])
-          await create_log(
-            glider.name +
-              ' has ' +
-              event_type +
-              'ed' +
-              ' the geofence ' +
-              geofence.name +
-              '. Sent file: ' +
-              file.filename,
-            'info',
-            glider._id
-          )
-        } catch (error) {
-          console.log(error)
-          throw new Error(error)
-        }
-        fs.rmSync(temp_file_location)
-      } else {
-        console.log('File object not found!')
-      }
+      trigger_event(event, geofence, glider)
     }
   } else {
     console.log('not found')
@@ -239,7 +206,7 @@ const update_geofences = async () => {
           }
         } catch (error) {
           create_log(
-            `Failed to upload files to ${glider._id} - Will try again next refresh (60 seconds) ---- ${error}`,
+            `Failed to upload files to ${glider.name} - Will try again next refresh (60 seconds) ---- ${error}`,
             'error',
             glider._id.toHexString()
           )

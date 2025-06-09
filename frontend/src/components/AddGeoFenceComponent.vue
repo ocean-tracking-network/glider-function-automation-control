@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { useGeoFencesStore } from '@/stores/geofences';
 import { storeToRefs } from 'pinia';
 
@@ -16,8 +16,6 @@ const lock_fence = ref(true)
 
 onBeforeMount(() => {
   if (props.fenceKey) {
-    console.log("BEFORE MOUNT")
-    //console.log("FENCE KEY FOUND")
     fence_key.value = props.fenceKey
     let latlons = selected_fence.value.latlons
     if (latlons.length == 0 || (latlons[latlons.length - 1][0] || latlons[latlons.length - 1][1])) {
@@ -25,7 +23,6 @@ onBeforeMount(() => {
     }
   }
   else {
-    console.log("NO FENCE KEY")
     lock_fence.value = false
     fence_key.value = store.add("")
     store.select(fence_key.value)
@@ -59,11 +56,13 @@ function focus_in(idx) {
 }
 
 function remove_idx(idx) {
-  selected_fence.value.latlons.splice(idx, 1)
+  if (!lock_fence.value) {
+    selected_fence.value.latlons.splice(idx, 1)
+  }
 }
 
 const overflowed = computed(() => {
-  if (selected_fence.value.latlons.length >= 9) {
+  if (selected_fence.value.latlons.length >= 6) {
     return true
   }
   return false
@@ -74,12 +73,10 @@ const back_display = computed(() => {
 })
 
 watch(geofences.value, async (new_fence, old_fence) => {
-  //console.log("HELLO?")
   on_input()
 })
 
 watch(fence_key, () => {
-  console.log("FENCE KEY CHANGED!!!")
   console.log(fence_key.value)
 })
 
@@ -116,11 +113,6 @@ watch(fence_key, () => {
           @input="on_input()" v-model="lat_lon[1]" placeholder="lat" type="text" name="" id="" />
         <button class="x-btn" @click="remove_idx(index)" v-if="index < selected_fence.latlons.length - 1">x</button>
       </div>
-      <!-- <div class="inputs">
-      <input @input="on_input()" v-model="current_lat" placeholder="lon" type="text" name="" id="" />
-      <p>:</p>
-      <input v-model="current_lon" placeholder="lat" type="text" name="" id="" />
-    </div> -->
     </div>
   </div>
 </template>
@@ -128,8 +120,8 @@ watch(fence_key, () => {
 .inputs {
   display: flex;
   flex-wrap: nowrap;
-  gap: .5rem;
-  width: 20rem;
+  gap: .3rem;
+  width: 16rem;
   flex-basis: 20%;
   margin-right: 1rem;
 }
@@ -139,7 +131,7 @@ watch(fence_key, () => {
 }
 
 .latlon {
-  width: 8rem;
+  width: 6rem;
 }
 
 #main-container {
@@ -166,9 +158,11 @@ watch(fence_key, () => {
   */
   margin-bottom: .5rem;
   padding: .1rem;
-  background-color: black;
+  /* background-color: black; */
+  background-color: var(--color-background-soft);
   border-radius: 3px;
-  color: lightgray;
+  /* color: lightgray; */
+  color: var(--color-text);
   border-color: lightgray;
   border-width: 1px;
 }
@@ -193,7 +187,7 @@ button {
 }
 
 #back-btn {
-  width: 6rem;
+  width: 5rem;
 }
 
 .x-btn:hover {
@@ -208,11 +202,15 @@ button {
 #name-input {
   /* height: 100%; */
   min-width: 12rem;
-  font-size: x-large;
+  /* font-size: x-large; */
   text-align: center;
 }
 
 .overflow-child {
   height: 40rem;
+}
+
+input:disabled {
+  background-color: var(--color-background);
 }
 </style>

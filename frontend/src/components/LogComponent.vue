@@ -93,7 +93,8 @@ function is_log_glider_selected(log) {
 
 .message {
   border-left-width: 2px;
-  border-left-color: white;
+  /* border-left-color: white; */
+  border-left-color: var(--color-text);
   padding-left: 1rem;
 }
 

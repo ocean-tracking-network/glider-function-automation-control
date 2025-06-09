@@ -1,7 +1,8 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import FileComponent from './FileComponent.vue';
 import draggable from 'vuedraggable'
+import FileBoxTabs from './FileBoxTabs.vue';
 
 const props = defineProps({
   title: String,
@@ -10,10 +11,19 @@ const props = defineProps({
   list: Array,
   sort: true,
   standard_delete: true,
-  move: Function
+  move: Function,
+  tabs: Array,
+  tab_sort_key: String,
+  add_btn: {
+    type: Boolean,
+    default(rawProps) {
+      return true
+    }
+  }
 })
 
-const emit = defineEmits(['add_btn', 'click', 'delete'])
+const emit = defineEmits(['add_btn', 'click', 'delete', 'tab_click'])
+const selected_tab = ref("")
 
 const sort = ref()
 const group = ref()
@@ -41,25 +51,47 @@ onMounted(() => {
 
 
 function delete_element(element_id) {
-  // const index = props.list.findIndex(ele => ele.id == element_id)
   emit("delete", element_id)
   if (props.standard_delete) {
     props.list.splice(element_id, 1)
   }
 }
 
+function tab_select(value) {
+  selected_tab.value = value
+  emit("tab_click", value)
+}
+
+const filtered_list = computed(() => {
+  if (selected_tab.value && props.tab_sort_key) {
+    let ret = []
+    props.list.forEach((element) => {
+      if (selected_tab.value == element[props.tab_sort_key]) {
+        ret.push(element)
+      }
+    })
+    return ret
+  }
+  else {
+    return props.list
+  }
+})
+
+
 </script>
 <template>
   <div>
     <div class="border files-box">
       <div class="box-top">
-        <!-- <h1>Files - To Glider</h1> -->
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
-        <button @click="emit('add_btn')" class="border add-btn">Add</button>
+        <FileBoxTabs :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
+          :tabs="tabs" />
+        <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
       </div>
-      <draggable :sort="sort" :list="list" :group="group" itemKey="id" class="list-group files-container">
+      <hr v-if="tabs">
+      <draggable :sort="sort" :list="filtered_list" :group="group" itemKey="id" class="list-group files-container">
         <template #item="{ element, index }">
           <a class="clickable" href="#" @click="emit('click', element)">
             <FileComponent @remove="delete_element(index)" :element="element" class="files list-group-item" />
@@ -88,13 +120,13 @@ function delete_element(element_id) {
   overflow-x: scroll;
   /* height: 10rem; */
   height: 80%;
+  margin-top: .5rem;
 }
 
 .box-top {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 1rem;
 }
 
 .box-top * {
@@ -107,20 +139,31 @@ function delete_element(element_id) {
   /* width: 200px; */
   /* width: 50%; */
   width: auto;
+  padding: .3rem;
   /* height: 2.5rem; */
 }
 
 .add-btn {
   transition: .2s;
-  padding: .5rem;
+  padding: .3rem;
+  padding-top: .2rem;
+  padding-bottom: .2rem;
 }
 
 h2 {
-  font-size: x-large;
+  font-size: large;
 }
 
 .add-btn:hover {
   transition: .2s;
   border-color: limegreen;
+}
+
+hr {
+  width: 100%;
+}
+
+.hidden {
+  display: none !important
 }
 </style>

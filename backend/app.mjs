@@ -14,10 +14,17 @@ import {
   post_geofences,
 } from './views/geofences.mjs'
 import { get_files, post_files, delete_files } from './views/files.mjs'
-import { delete_events, get_events, patch_events, post_events } from './views/events.mjs'
+import {
+  delete_events,
+  get_events,
+  patch_events,
+  post_events,
+  trigger_events,
+} from './views/events.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import { create_log } from './utils/log_utils.mjs'
+import './loadEnvironment.mjs'
 
 const app = express()
 app.use(cors())
@@ -43,13 +50,14 @@ app.patch('/geofence/:id', patch_geofences)
 app.get('/files', get_files)
 app.post('/files', upload.array('files', 100), post_files)
 app.delete('/files/:id', delete_files)
+app.patch('/files', async (req, res) => {})
 
 // Events
 app.get('/events', get_events)
 app.post('/events', post_events)
 app.patch('/events/:id', patch_events)
 app.delete('/events/:id', delete_events)
-app.patch('/files', async (req, res) => {})
+app.post('/events/:id/trigger', trigger_events)
 
 // logs
 app.get('/logs', get_logs)
@@ -114,13 +122,21 @@ async function update_glider_positions() {
 }
 
 // Schedule
-const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
+const backend_schedule = scheduleJob('* */60 * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })
 
 // app start
-app.listen(port, () => {
+app.listen(port, async () => {
+  const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
+  if (pause == 'false') {
+    for (let i = 0; i < 20; i++) {
+      console.log('CAUTION: SENDING FLIES TO REAL GLIDERS IS ENABLED! ONLY USE THIS IN PRODUCTION!')
+    }
+    console.log('pausing for 5 seconds to make sure you want to do this')
+    await new Promise((r) => setTimeout(r, 5000))
+  }
   console.log(`example app listening on port ${port}`)
   send_slack_message('debug: Backend started and listening')
 })

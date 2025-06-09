@@ -32,7 +32,7 @@ p {
 
 .buttons button {
   margin-left: .5rem;
-  font-size: larger;
+  /* font-size: larger; */
 }
 
 .border:hover {

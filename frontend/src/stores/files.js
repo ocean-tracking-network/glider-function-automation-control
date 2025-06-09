@@ -60,11 +60,21 @@ export const useFilesStore = defineStore('files', () => {
     })
     return ret
   })
+  const categories = computed(() => {
+    let cats = []
+    files_raw.value.forEach((ele) => {
+      if (!cats.includes(ele.category)) {
+        cats.push(ele.category)
+      }
+    })
+    return cats
+  })
 
   return {
     files_obj,
     files_arr,
     files_raw,
+    categories,
     upload_files,
     delete_file,
     get_files,

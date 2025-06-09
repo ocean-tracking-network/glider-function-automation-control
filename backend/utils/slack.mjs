@@ -2,6 +2,9 @@ import axios from 'axios'
 import '../loadEnvironment.mjs'
 
 async function send_slack_message(text) {
+  if (process.env.SEND_SLACK_MESSAGES.toLowerCase() == 'false') {
+    return
+  }
   const data = {
     text: text,
   }

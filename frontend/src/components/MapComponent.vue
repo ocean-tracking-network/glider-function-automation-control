@@ -22,6 +22,7 @@ const glider_current_location = ref(null)
 const glider_next_waypoint = ref(null)
 
 const all_glider_markers = ref([])
+const glider_to_leaflet_id_map = ref({})
 
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
@@ -45,8 +46,11 @@ function create_polygons() {
 }
 
 const on_polygon_click = (e) => {
-  console.log(e)
   store.select(polygon_to_geofence_map.value[e.target._leaflet_id])
+}
+
+const on_glider_glick = (e) => {
+  gliderStore.select_glider(glider_to_leaflet_id_map.value[e.target._leaflet_id])
 }
 
 function set_glider_track() {
@@ -89,9 +93,11 @@ function set_glider_track() {
     iconAnchor: [18, 61],
   })
 
-  glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
-  glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
-  initialMap.value.setView(tracks[tracks.length - 1])
+  if (glider_has_track(selected_glider.value)) {
+    glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
+    glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
+    initialMap.value.setView(tracks[tracks.length - 1])
+  }
   if (selected_glider.value.next_waypoint) {
     let waypoint_icon = L.icon({
       iconUrl: waypointIcon,
@@ -100,12 +106,17 @@ function set_glider_track() {
     })
     glider_next_waypoint.value = L.marker(selected_glider.value.next_waypoint, { icon: waypoint_icon }).addTo(initialMap.value)
   }
+  let i = 0
   gliderStore.gliders.forEach((glider) => {
-    if (glider._id != selected_glider._id) {
+    if (glider._id != selected_glider._id && glider_has_track(glider)) {
       const current_pos = [glider.track[glider.track.length - 1][0] / 100, glider.track[glider.track.length - 1][1] / 100]
-      const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 }).addTo(initialMap.value)
+      const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
+        .on("click", on_glider_glick)
+        .addTo(initialMap.value)
       all_glider_markers.value.push(new_marker)
+      glider_to_leaflet_id_map.value[new_marker._leaflet_id] = i
     }
+    i++
   })
 }
 
@@ -113,7 +124,9 @@ function map_click(e) {
   if (store.selected_fence && interactive_map.value) {
     // store.selected_fence
     // //console.log(e.latlng)
-    geofences.value[store.selected_fence_key].latlons[geofences.value[store.selected_fence_key].latlons.length - 1] = [e.latlng.lat, e.latlng.lng]
+    const lat = e.latlng.lat.toFixed(4)
+    const lon = e.latlng.lng.toFixed(4)
+    geofences.value[store.selected_fence_key].latlons[geofences.value[store.selected_fence_key].latlons.length - 1] = [lat, lon]
   }
 
 }
@@ -128,8 +141,6 @@ onMounted(() => {
   create_polygons()
 
 
-  // draggable_marker.value = L.marker([47, -60], { draggable: true }).addTo(initialMap.value)
-  // draggable_marker.value.on('drag', on_marker_drag)
 })
 
 function update_map() {
@@ -139,6 +150,10 @@ function update_map() {
   })
   polygons.value = []
   create_polygons()
+}
+
+function glider_has_track(glider) {
+  return (glider.track && glider.track.length > 0)
 }
 
 watch(geofences, async (new_fence, old_fence) => {
@@ -181,8 +196,8 @@ watch(selected_fence, () => {
       let avg_lon = 0
       selected_fence.value.latlons.forEach((ele) => {
         if (ele[0] && ele[1]) {
-          avg_lat += ele[0]
-          avg_lon += ele[1]
+          avg_lat += parseFloat(ele[0])
+          avg_lon += parseFloat(ele[1])
         }
       })
       avg_lat = avg_lat / (selected_fence.value.latlons.length - 1)
@@ -190,8 +205,9 @@ watch(selected_fence, () => {
       console.log(avg_lat)
       console.log(avg_lon)
       initialMap.value.setView([avg_lat, avg_lon])
-    } catch {
+    } catch (error) {
       console.log("Failed to center view on geofence")
+      console.log(error)
     }
   }
 })
@@ -219,7 +235,13 @@ watch(gliders, (new_val) => {
 
 </script>
 <template>
-  <div>
-    <div style="height: 750px; width: 800px;" id="map"></div>
-  </div>
+  <div id="map"></div>
 </template>
+
+<style scoped>
+#map {
+  width: 500px;
+  height: 567px;
+  /* height: 300px; */
+}
+</style>

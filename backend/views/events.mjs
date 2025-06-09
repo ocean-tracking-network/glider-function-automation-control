@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
 import { updateOne, deleteOne } from '../utils/db_utils.mjs'
 
@@ -43,4 +44,15 @@ const patch_events = async (req, res) => {
   res.send(result).status(200)
 }
 
-export { get_events, post_events, delete_events, patch_events }
+const trigger_events = async (req, res) => {
+  const id = req.params.id
+  const collection = await db.collection('events')
+  const result = await collection.findOne({ _id: ObjectId.createFromHexString(id) })
+  if (!result) {
+    return { error: 'Object not found' }.status(404)
+  }
+
+  res.send(result).status(200)
+}
+
+export { get_events, post_events, delete_events, patch_events, trigger_events }
