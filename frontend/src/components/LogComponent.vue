@@ -154,4 +154,8 @@ span {
   pointer-events: none;
   /* Allows scrolling underneath */
 }
+
+label {
+  margin-right: .5rem;
+}
 </style>

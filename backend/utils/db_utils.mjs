@@ -7,6 +7,14 @@ const deleteOne = async (collection_name, id) => {
   return result
 }
 
+const deleteMany = async (collection_name, ids) => {
+  results = []
+  for (let id of ids) {
+    results.push(await deleteOne(collection_name, id))
+  }
+  return results
+}
+
 const updateOne = async (collection_name, id, update_dict) => {
   let collection = await db.collection(collection_name)
   const filter = { _id: ObjectId.createFromHexString(id) }
@@ -19,4 +27,4 @@ const updateOne = async (collection_name, id, update_dict) => {
   return result
 }
 
-export { deleteOne, updateOne }
+export { deleteOne, updateOne, deleteMany }

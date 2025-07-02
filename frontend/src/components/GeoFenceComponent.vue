@@ -45,10 +45,9 @@ function on_click(e) {
 }
 
 function remove(element) {
-  const id = Object.keys(geofences.value)[element]
   back(false)
   just_removed.value = true
-  store.deleteGeofence(id)
+  store.deleteGeofence(element.key)
 }
 
 const latlons = computed(() => {
@@ -91,7 +90,6 @@ watch(selected_fence, (new_val) => {
 <style scoped>
 .border2 {
   height: 15rem;
-  /* overflow-y: scroll; */
 }
 
 #geo {

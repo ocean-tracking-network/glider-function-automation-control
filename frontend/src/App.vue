@@ -24,7 +24,7 @@ const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
 const fileUpload = useTemplateRef('fileUpload')
 
-const temp_file_categories = ref([])
+const file_tab_select = ref("")
 
 function fileMoveCallback(evt, originalEvent) {
   console.log(evt)
@@ -48,9 +48,9 @@ function add_file() {
   fileUpload.value.click()
 }
 
-function delete_file(idx) {
-  const file_id = files_arr.value[idx]._id
-  filesStore.delete_file(file_id)
+function delete_file(file) {
+  // const file_id = files_arr.value[idx]._id
+  filesStore.delete_file(file._id)
 }
 
 function show_send_now_btn(list) {
@@ -61,8 +61,39 @@ function show_send_now_btn(list) {
   return undefined
 }
 
-function send_file() {
+function upload_files_wrapper(event) {
+  let category = file_tab_select.value
+  if (category == "") {
+    category = undefined
+  }
+  filesStore.upload_files(event, category)
+}
+
+function trigger_events(event_type) {
   let send = window.confirm("Are you sure you want to send the file now?")
+  if (send) {
+    const events = event_type == "enter" ? eventsStore.enter_files : eventsStore.exit_files
+    for (const event of events)
+      eventsStore.trigger_event(event)
+  }
+}
+
+function rename_tab_category(vals) {
+  let files_to_update = []
+  for (let file of filesStore.files_arr) {
+    if (file.category == vals.old) {
+      files_to_update.push({
+        _id: file._id,
+        category: vals.new
+      })
+    }
+  }
+  console.log(files_to_update)
+  filesStore.update_files_category(files_to_update)
+}
+
+function select_file_tab(file_tab) {
+  file_tab_select.value = file_tab
 }
 
 const all_categories = computed(() => {
@@ -87,19 +118,20 @@ const all_categories = computed(() => {
         <GliderTabComponent />
         <GeoFenceComponent id="geo" />
 
-        <FilesBoxComponent @tab_click="send_file" :tabs="show_send_now_btn(enter_files_ref)" :add_btn="false"
-          @delete="delete_event_enter" :standard_delete="false" v-if="display_events" :list="enter_files_ref"
-          group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
-        <FilesBoxComponent @tab_click="send_file" :tabs="show_send_now_btn(exit_files_ref)" :add_btn="false"
-          @delete="delete_event_exit" :standard_delete="false" v-if="display_events" :list="exit_files_ref"
-          group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
+        <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
+          :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
+          :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
+        <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
+          :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
+          :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
         <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
           <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
         </div>
-        <FilesBoxComponent :tabs="all_categories" :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file"
-          :move="fileMoveCallback" :sort="false" :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }"
-          :draggable="true" title="All Files" id="total" />
-        <input multiple type="file" id="file-upload" ref="fileUpload" @change="filesStore.upload_files">
+        <FilesBoxComponent @tab_rename="rename_tab_category" @tab_select="select_file_tab" :tabs="filesStore.categories"
+          :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file" :move="fileMoveCallback" :sort="false"
+          :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files"
+          id="total" />
+        <input multiple type="file" id="file-upload" ref="fileUpload" @change="upload_files_wrapper">
       </div>
     </div>
     <LogComponent id="logs" />

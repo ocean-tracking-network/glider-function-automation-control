@@ -11,7 +11,7 @@ async function send_slack_message(text) {
   const url = process.env.SLACK_URL
   axios
     .post(url, data)
-    .then()
+    .then(console.log('Slack Message sent ' + text))
     .catch((err) => console.log(err))
 }
 

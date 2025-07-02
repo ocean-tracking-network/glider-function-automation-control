@@ -28,6 +28,17 @@ const glider_to_leaflet_id_map = ref({})
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
 
+// SFMC outputs in an annoying format compared to what leaflet wants
+//  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
+function convert_gps(val) {
+  const degrees = Number((val / 100).toFixed(0))
+  const deci_minutes = Number((((val / 100) - degrees) * 100).toFixed(3))
+  const ret = degrees + (deci_minutes / 60)
+  console.log(ret)
+  console.log(typeof (ret))
+  return ret
+}
+
 function create_polygons() {
   let index = 0
   geofences_filtered.value.forEach((geofence) => {
@@ -80,9 +91,9 @@ function set_glider_track() {
   glider_track_points.value = []
   console.log(typeof (selected_glider.value.track[0]))
   selected_glider.value.track.forEach((element) => {
-    tracks.push([element[0] / 100, element[1] / 100])
+    tracks.push([convert_gps(element[0]), convert_gps(element[1])])
     glider_track_points.value.push(
-      L.circle([element[0] / 100, element[1] / 100], { radius: 100, stroke: false, color: 'red' })
+      L.circle([convert_gps(element[0]), convert_gps(element[1])], { radius: 100, stroke: false, color: 'red' })
         .addTo(initialMap.value).bindPopup("<b>100 meters</b>")
     )
   })
@@ -109,7 +120,7 @@ function set_glider_track() {
   let i = 0
   gliderStore.gliders.forEach((glider) => {
     if (glider._id != selected_glider._id && glider_has_track(glider)) {
-      const current_pos = [glider.track[glider.track.length - 1][0] / 100, glider.track[glider.track.length - 1][1] / 100]
+      const current_pos = [convert_gps(glider.track[glider.track.length - 1][0]), convert_gps(glider.track[glider.track.length - 1][1])]
       const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
         .on("click", on_glider_glick)
         .addTo(initialMap.value)

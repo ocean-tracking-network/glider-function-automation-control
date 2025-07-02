@@ -2,10 +2,9 @@ import { updateOne } from './db_utils.mjs'
 import db from '../db/conn.mjs'
 import { ObjectId } from 'mongodb'
 import { upload_files } from './sfmc_api.mjs'
-import os from 'os'
-import fs from 'fs'
 import { create_log } from './log_utils.mjs'
 import { send_slack_message } from './slack.mjs'
+import { trigger_event } from './events.mjs'
 
 function is_in_polygon(point, polygon) {
   let in_polygon = false
@@ -25,12 +24,6 @@ function is_in_polygon(point, polygon) {
     x_list.push(element[1])
   })
 
-  // let y_list = polygon.map((value, index) => {
-  //   return value[0]
-  // })
-  // let x_list = polygon.map((value, index) => {
-  //   return value[1]
-  // })
   x_list.splice(x_list.length - 1, 1)
   y_list.splice(y_list.length - 1, 1)
   x_list.push(x_list[0])
@@ -42,9 +35,6 @@ function is_in_polygon(point, polygon) {
     max_y: Math.max(...y_list),
     min_y: Math.min(...y_list),
   }
-  //console.log(bounding_box)
-  //console.log(x_list)
-  //console.log(y_list)
 
   if (
     x < bounding_box.max_x &&
@@ -75,11 +65,9 @@ function is_in_polygon(point, polygon) {
       let d2 = a1 * x_list[i + 1] + b1 * y_list[i + 1] + c1
 
       if (d1 > 0 && d2 > 0) {
-        //console.log("1")
         continue
       }
       if (d1 < 0 && d2 < 0) {
-        //console.log("2")
         continue
       }
 
@@ -132,14 +120,10 @@ function is_in_polygon(point, polygon) {
 }
 
 async function upload_event_files(glider, geofence, event_type) {
-  // glider: geofence obj
-  // geofence: geofence obj
-  // event_type: "enter" ? "exit"
-  if (glider.enabled == false || glider.enabled == undefined) {
+  if (glider.enabled) {
     return
   }
   let collection = await db.collection('events')
-  const files_collection = await db.collection('files')
   let events = await collection
     .find({
       glider: glider._id.toHexString(),

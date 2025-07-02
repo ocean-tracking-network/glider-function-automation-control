@@ -22,11 +22,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['add_btn', 'click', 'delete', 'tab_click'])
+const emit = defineEmits(['add_btn', 'click', 'delete', 'tab_select', 'tab_rename'])
 const selected_tab = ref("")
 
 const sort = ref()
 const group = ref()
+
+const new_tabs = ref([])
 
 onMounted(() => {
   if (props.sort != undefined) {
@@ -50,16 +52,22 @@ onMounted(() => {
 })
 
 
-function delete_element(element_id) {
+function delete_element(index, element_id) {
   emit("delete", element_id)
   if (props.standard_delete) {
-    props.list.splice(element_id, 1)
+    props.list.splice(index, 1)
   }
 }
 
 function tab_select(value) {
   selected_tab.value = value
-  emit("tab_click", value)
+  emit("tab_select", value)
+}
+
+function tab_add(new_val) {
+  if (!all_tabs.value.includes(new_val)) {
+    new_tabs.value.push(new_val)
+  }
 }
 
 const filtered_list = computed(() => {
@@ -77,6 +85,10 @@ const filtered_list = computed(() => {
   }
 })
 
+const all_tabs = computed(() => {
+  new_tabs.value = new_tabs.value.filter((tab) => !props.tabs.includes(tab))
+  return [...props.tabs, ...new_tabs.value]
+})
 
 </script>
 <template>
@@ -86,15 +98,15 @@ const filtered_list = computed(() => {
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
-        <FileBoxTabs :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
-          :tabs="tabs" />
+        <FileBoxTabs @rename="(vals) => { emit('tab_rename', vals) }" @add="tab_add" :static="tab_sort_key == undefined"
+          v-if="tabs" @select="tab_select" :selected="selected_tab" :tabs="all_tabs" />
         <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
       </div>
       <hr v-if="tabs">
       <draggable :sort="sort" :list="filtered_list" :group="group" itemKey="id" class="list-group files-container">
         <template #item="{ element, index }">
           <a class="clickable" href="#" @click="emit('click', element)">
-            <FileComponent @remove="delete_element(index)" :element="element" class="files list-group-item" />
+            <FileComponent @remove="delete_element(index, element)" :element="element" class="files list-group-item" />
           </a>
         </template>
       </draggable>

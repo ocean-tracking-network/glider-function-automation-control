@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
 import { updateOne, deleteOne } from '../utils/db_utils.mjs'
+import { trigger_event } from '../utils/events.mjs'
 
 const get_events = async (req, res) => {
   let query = {}
@@ -51,7 +52,7 @@ const trigger_events = async (req, res) => {
   if (!result) {
     return { error: 'Object not found' }.status(404)
   }
-
+  trigger_event(result)
   res.send(result).status(200)
 }
 

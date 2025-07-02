@@ -1,8 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { useFilesStore } from '@/stores/files'
+import { computed, nextTick, ref } from 'vue'
 
 const props = defineProps({
-  tabs: String,
+  tabs: Array,
   selected: String,
   static: {
     type: Boolean,
@@ -11,15 +12,18 @@ const props = defineProps({
     }
   }
 })
-const emit = defineEmits(["add", "select"])
+const emit = defineEmits(["add", "select", "rename"])
+const filesStore = useFilesStore()
 
 const rename = ref(false)
 const temp_rename_text = ref("")
 const adding_new = ref(false)
 
 function select(tab) {
+  // adding_new.value = false
+  // temp_rename_text.value = ""
   if (!props.static) {
-    if (tab == props.selected) {
+    if (tab == props.selected && !adding_new.value) {
       temp_rename_text.value = tab
       rename.value = true
     }
@@ -33,18 +37,33 @@ function select(tab) {
 
 function stop_edit() {
   rename.value = false
+  if (adding_new.value) {
+    if (temp_rename_text.value != "") {
+      emit("add", temp_rename_text.value)
+      temp_rename_text.value = ""
+    }
+    adding_new.value = false
+  }
+  else {
+    emit("rename", { old: props.selected, new: temp_rename_text.value })
+    // nextTick(() => {
+    emit("select", temp_rename_text.value)
+    // })
+
+  }
 }
 
 function add() {
+  emit("select", "")
   adding_new.value = true
   rename.value = true
-  emit("select", "")
+  temp_rename_text.value = ""
 }
 
 const all_tabs = computed(() => {
-  const tabs = [...props.tabs]
+  let tabs = [...props.tabs]
   if (adding_new.value) {
-    tabs.push("")
+    tabs.push(temp_rename_text.value)
   }
   return tabs
 })
@@ -52,10 +71,15 @@ const all_tabs = computed(() => {
 </script>
 <template>
   <div class="tab-container">
-    <button v-for="(tab, index) in tabs"
-      :class="{ first: index == 0, selected: (selected == tab && !static), last: static }" @click="select(tab)">
-      <p v-if="!rename || selected != tab" class="tab-contents">{{ tab }}</p>
-      <input @focusout="stop_edit" v-model="temp_rename_text" v-if="rename && selected == tab" class="tab-contents"
+    <button :class="{ first: index == 0 }" v-for="(tab, index) in all_tabs" @click="select(tab)">
+      <p :class="{ selected: (selected == tab && !static), last: static }"
+        :style="{ color: filesStore.colour_by_category[tab] }"
+        v-if="(!rename || selected != tab) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
+        {{ tab }}
+        <!-- {{ filesStore.colour_by_category[tab] }} -->
+      </p>
+      <input @focusout="stop_edit" v-model="temp_rename_text"
+        v-if="(rename && selected == tab) || (adding_new && index == all_tabs.length - 1)" class="tab-contents"
         type="text">
     </button>
     <button v-if="!static" @click="add" class="last">+</button>
@@ -94,7 +118,8 @@ button:hover {
 }
 
 .selected {
-  color: white;
+  /* color: white !important; */
+  font-weight: bold;
 }
 
 .tab-contents {

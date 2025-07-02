@@ -58,6 +58,12 @@ export const useEventsStore = defineStore('events', () => {
       })
   }
 
+  const trigger_event = (event) => {
+    apiClient.post(`/events/${event._id}/trigger`, {}).then((res) => {
+      console.log('Event triggered!')
+    })
+  }
+
   onMounted(() => {
     get_events()
   })
@@ -82,6 +88,7 @@ export const useEventsStore = defineStore('events', () => {
           ret.push({
             ...ele,
             name: filesStore.files_obj[ele.file].filename,
+            category: filesStore.files_obj[ele.file].category,
           })
         }
       })
@@ -101,6 +108,7 @@ export const useEventsStore = defineStore('events', () => {
           ret.push({
             ...ele,
             name: filesStore.files_obj[ele.file].filename,
+            category: filesStore.files_obj[ele.file].category,
           })
         }
       })
@@ -154,6 +162,7 @@ export const useEventsStore = defineStore('events', () => {
     exit_files,
     enter_files_ref,
     exit_files_ref,
+    trigger_event,
     get_events,
     add_event,
     remove_event,

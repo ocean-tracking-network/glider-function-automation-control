@@ -1,10 +1,17 @@
 import db from '../db/conn.mjs'
+import { ObjectId } from 'mongodb'
+import os from 'os'
+import fs from 'fs'
+import { upload_files } from './sfmc_api.mjs'
+import { create_log } from './log_utils.mjs'
 
 const trigger_event = async (event, geofence = null, glider = null) => {
   if (!glider) {
-    const glider_collection = db.collection('gliders')
-    glider = glider_collection.findOne({ _id: ObjectId.createFromHexString(event.glider) })
+    const glider_collection = await db.collection('gliders')
+    glider = await glider_collection.findOne({ _id: ObjectId.createFromHexString(event.glider) })
+    console.log(glider)
   }
+  console.log(glider)
   const files_collection = await db.collection('files')
   const file = await files_collection.findOne({ _id: ObjectId.createFromHexString(event.file) })
   if (file != null) {
@@ -14,6 +21,7 @@ const trigger_event = async (event, geofence = null, glider = null) => {
       fs.copyFileSync(file.path, temp_file_location)
     } catch (err) {
       console.log('ERROR CERATING THE TEMP FILE!')
+      console.log(err)
       return
     }
 
@@ -22,7 +30,7 @@ const trigger_event = async (event, geofence = null, glider = null) => {
       await upload_files(glider.name, 'to-glider', [temp_file_location])
       if (geofence) {
         await create_log(
-          `${glider.name} has ${event_type}ed the geofence ${geofence.name}. Sent file: ${file.filename}`,
+          `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Sent file: ${file.filename}`,
           'info',
           glider._id
         )

@@ -13,7 +13,7 @@ import {
   patch_geofences,
   post_geofences,
 } from './views/geofences.mjs'
-import { get_files, post_files, delete_files } from './views/files.mjs'
+import { get_files, post_files, delete_files, update_files } from './views/files.mjs'
 import {
   delete_events,
   get_events,
@@ -50,7 +50,7 @@ app.patch('/geofence/:id', patch_geofences)
 app.get('/files', get_files)
 app.post('/files', upload.array('files', 100), post_files)
 app.delete('/files/:id', delete_files)
-app.patch('/files', async (req, res) => {})
+app.patch('/files', update_files)
 
 // Events
 app.get('/events', get_events)
@@ -122,7 +122,7 @@ async function update_glider_positions() {
 }
 
 // Schedule
-const backend_schedule = scheduleJob('* */60 * * * *', async () => {
+const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })

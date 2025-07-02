@@ -40,7 +40,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       return false
     }
     const data = {
-      name: geofence.name,
+      name: geofence.name ? geofence.name : 'Untitled',
       latlons: geofence.latlons,
       notify: geofence.notify,
     }

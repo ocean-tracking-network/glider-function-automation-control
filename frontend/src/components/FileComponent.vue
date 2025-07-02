@@ -1,10 +1,15 @@
 <script setup>
+import { useFilesStore } from '@/stores/files';
+
 const props = defineProps(['element'])
 const emit = defineEmits(["remove"])
+const filesStore = useFilesStore()
 </script>
 <template>
   <div class="border">
-    <p :class="{ filename: true, bold: element.bold }">{{ element.name }}</p>
+    <p :style="{ color: filesStore.colour_by_category[element.category] }"
+      :class="{ filename: true, bold: element.bold }">{{
+        element.name }}</p>
     <div class="buttons">
       <!-- <button class="view">👁</button> -->
       <button @click="emit('remove')" class="del">X</button>
