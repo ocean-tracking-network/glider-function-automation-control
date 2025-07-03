@@ -120,7 +120,8 @@ function is_in_polygon(point, polygon) {
 }
 
 async function upload_event_files(glider, geofence, event_type) {
-  if (glider.enabled) {
+  if (!glider.enabled) {
+    console.log('Glider not enabled, not sending file')
     return
   }
   let collection = await db.collection('events')
