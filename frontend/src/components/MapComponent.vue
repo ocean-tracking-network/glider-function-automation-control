@@ -31,11 +31,15 @@ const { selected_glider, gliders } = storeToRefs(gliderStore)
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
 function convert_gps(val) {
-  const degrees = Number((val / 100).toFixed(0))
-  const deci_minutes = Number((((val / 100) - degrees) * 100).toFixed(3))
+  console.log("START")
+  console.log(val)
+  const degrees = Math.floor(val / 100)
+  console.log(degrees)
+  const deci_minutes = ((val / 100) - degrees) * 100
+  console.log(deci_minutes)
   const ret = degrees + (deci_minutes / 60)
   console.log(ret)
-  console.log(typeof (ret))
+  console.log("END")
   return ret
 }
 
