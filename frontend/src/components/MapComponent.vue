@@ -33,7 +33,10 @@ const { selected_glider, gliders } = storeToRefs(gliderStore)
 function convert_gps(val) {
   console.log("START")
   console.log(val)
-  const degrees = Math.floor(val / 100)
+  let degrees = Math.floor(val / 100)
+  if (val < 0) {
+    degrees = Math.ceil(val / 100)
+  }
   console.log(degrees)
   const deci_minutes = ((val / 100) - degrees) * 100
   console.log(deci_minutes)
