@@ -142,6 +142,16 @@ async function upload_event_files(glider, geofence, event_type) {
   }
 }
 
+function convert_gps(val) {
+  let degrees = Math.floor(val / 100)
+  if (val < 0) {
+    degrees = Math.ceil(val / 100)
+  }
+  const deci_minutes = (val / 100 - degrees) * 100
+  const ret = degrees + deci_minutes / 60
+  return ret
+}
+
 const update_geofences = async () => {
   // Checks each event object to see if it should be activated
   let glider_collection = await db.collection('gliders')
@@ -159,8 +169,8 @@ const update_geofences = async () => {
       let last_glider_point = glider.track[glider.track.length - 1]
       if (last_glider_point[0] > 100) {
         //Hack because SFMC uses large numbers
-        last_glider_point[0] = last_glider_point[0] / 100
-        last_glider_point[1] = last_glider_point[1] / 100
+        last_glider_point[0] = convert_gps(last_glider_point[0])
+        last_glider_point[1] = convert_gps(last_glider_point[1])
       }
       const in_geofence = is_in_polygon(last_glider_point, geofence.latlons)
       let last_in_geofence = false
