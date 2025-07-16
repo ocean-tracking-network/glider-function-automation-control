@@ -27,7 +27,15 @@ export const useUserStore = defineStore('user', () => {
     if (stored_username && stored_token) {
       // test to see if we're logged in
       localStorage.setItem(localStorage_token, stored_token)
-      apiClient.get('/glider').then(_login(stored_username, stored_token))
+      apiClient
+        .get('/glider')
+        .then((res) => {
+          _login(stored_username, stored_token)
+        })
+        .catch((err) => {
+          console.log('BAD GLIDER')
+          localStorage_token.setItem(localStorage_token, '')
+        })
     }
   })
 
@@ -45,7 +53,8 @@ export const useUserStore = defineStore('user', () => {
 
     localStorage.setItem(localStorage_username, login_username)
     localStorage.setItem(localStorage_token, login_token)
-    console.log(login_token)
+    console.log('LOGGING IN?>????')
+
     loggedin.value = true
 
     nextTick(() => {
