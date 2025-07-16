@@ -21,6 +21,9 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
+import { login } from './views/user.mjs'
+
+import { authenticateToken } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import { create_log } from './utils/log_utils.mjs'
@@ -34,34 +37,37 @@ const port = 3000
 
 // Routes
 
+// user
+app.post('/login', login)
+
 // glider
-app.post('/glider', post_gliders)
-app.get('/glider', get_gliders)
-app.post('/glider/:id/add-track', post_gliders_track)
-app.patch('/glider/:id', update_gliders)
+app.post('/glider', authenticateToken, post_gliders)
+app.get('/glider', authenticateToken, get_gliders)
+app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
+app.patch('/glider/:id', authenticateToken, update_gliders)
 
 // geofence
-app.get('/geofence', get_geofences)
-app.post('/geofence', post_geofences)
-app.delete('/geofence/:id', delete_geofences)
-app.patch('/geofence/:id', patch_geofences)
+app.get('/geofence', authenticateToken, get_geofences)
+app.post('/geofence', authenticateToken, post_geofences)
+app.delete('/geofence/:id', authenticateToken, delete_geofences)
+app.patch('/geofence/:id', authenticateToken, patch_geofences)
 
 // files
-app.get('/files', get_files)
-app.post('/files', upload.array('files', 100), post_files)
-app.delete('/files/:id', delete_files)
-app.patch('/files', update_files)
+app.get('/files', authenticateToken, get_files)
+app.post('/files', authenticateToken, upload.array('files', 100), post_files)
+app.delete('/files/:id', authenticateToken, delete_files)
+app.patch('/files', authenticateToken, update_files)
 
 // Events
-app.get('/events', get_events)
-app.post('/events', post_events)
-app.patch('/events/:id', patch_events)
-app.delete('/events/:id', delete_events)
-app.post('/events/:id/trigger', trigger_events)
+app.get('/events', authenticateToken, get_events)
+app.post('/events', authenticateToken, post_events)
+app.patch('/events/:id', authenticateToken, patch_events)
+app.delete('/events/:id', authenticateToken, delete_events)
+app.post('/events/:id/trigger', authenticateToken, trigger_events)
 
 // logs
-app.get('/logs', get_logs)
-app.post('/logs', post_logs)
+app.get('/logs', authenticateToken, get_logs)
+app.post('/logs', authenticateToken, post_logs)
 
 async function update_glider_waypoint(glider, sfmc_json) {
   const next_waypoint = [sfmc_json.nextWaypointLat / 100, sfmc_json.nextWaypointLon / 100]
@@ -106,8 +112,8 @@ async function update_glider_positions() {
       last_track = tracks[tracks.length - 1]
     }
 
-    if (last_track[0] != sfmc_json.gpsLat || last_track[1] != sfmc_json.gpsLon) {
-      tracks.push([sfmc_json.gpsLat, sfmc_json.gpsLon])
+    if (last_track[0] != sfmc_json.gpsValidLat || last_track[1] != sfmc_json.gpsValidLon) {
+      tracks.push([sfmc_json.gpsValidLat, sfmc_json.gpsValidLon])
       const filter = { _id: glider._id }
       const update_result = await collection.updateOne(filter, {
         $set: { track: tracks },

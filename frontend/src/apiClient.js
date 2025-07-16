@@ -8,4 +8,11 @@ const apiClient = axios.create({
   },
 })
 
+apiClient.interceptors.request.use(function (config) {
+  const token = localStorage.getItem('GFAC_token')
+  config.headers.Authorization = `token ${token}`
+
+  return config
+})
+
 export default apiClient

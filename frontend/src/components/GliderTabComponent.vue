@@ -6,10 +6,6 @@ import { storeToRefs } from 'pinia';
 const gliderStore = useGlidersStore()
 const { gliders, selected_glider_idx } = storeToRefs(gliderStore)
 
-onMounted(() => {
-  gliderStore.get_gliders()
-})
-
 function enable_disable_glider() {
   gliderStore.enable_disable_selected_glider()
 }

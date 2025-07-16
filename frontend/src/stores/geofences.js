@@ -145,10 +145,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     geofences.value[key].latlons[geofences.value[key].latlons.length - 1] = lat_lon
   }
 
-  onMounted(() => {
-    getGeofences()
-  })
-
   return {
     geofences,
     selected_fence,
