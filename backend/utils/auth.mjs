@@ -26,7 +26,7 @@ function generateAuthToken(username, password) {
   if (username != process.env.USERNAME || password != process.env.PASSWORD) {
     return null
   }
-  return sign({ name: username }, process.env.SECRET_TOKEN, { expiresIn: '1800s' })
+  return sign({ name: username }, process.env.SECRET_TOKEN, { expiresIn: '43200s' }) //12 hours
 }
 
 export { generateAuthToken, authenticateToken }

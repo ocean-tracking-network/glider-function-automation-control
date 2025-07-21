@@ -70,6 +70,14 @@ function tab_add(new_val) {
   }
 }
 
+function tab_rename(vals) {
+  if (!new_tabs.value.includes(vals.old)) {
+    emit('tab_rename', vals)
+  }
+  const idx = new_tabs.value.indexOf(vals.old)
+  new_tabs.value[idx] = vals.new
+}
+
 const filtered_list = computed(() => {
   if (selected_tab.value && props.tab_sort_key) {
     let ret = []
@@ -98,7 +106,7 @@ const all_tabs = computed(() => {
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
-        <FileBoxTabs @rename="(vals) => { emit('tab_rename', vals) }" @add="tab_add" :static="tab_sort_key == undefined"
+        <FileBoxTabs @rename="(vals) => { tab_rename(vals) }" @add="tab_add" :static="tab_sort_key == undefined"
           v-if="tabs" @select="tab_select" :selected="selected_tab" :tabs="all_tabs" />
         <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
       </div>
