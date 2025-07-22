@@ -35,12 +35,14 @@ function fileMoveCallback(evt, originalEvent) {
 }
 
 function delete_event_exit(index) {
-  const id = exit_files_ref.value[index]._id
-  eventsStore.remove_event(id)
+  // const id = exit_files_ref.value[index]._id
+  eventsStore.remove_event(index._id)
 }
 function delete_event_enter(index) {
-  const id = enter_files_ref.value[index]._id
-  eventsStore.remove_event(id)
+  console.log(enter_files_ref.value)
+  console.log(index)
+  // const id = enter_files_ref.value[index]._id
+  eventsStore.remove_event(index._id)
 }
 
 const display_events = computed(() => {
@@ -194,7 +196,7 @@ const all_categories = computed(() => {
   flex: 1;
   height: 10rem;
   flex-basis: 48%;
-  max-width: 50%;
+  max-width: 49.3%;
 }
 
 #middle-placeholder {

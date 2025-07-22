@@ -96,7 +96,7 @@ const all_tabs = computed(() => {
   display: flex;
   font-size: large;
   /* gap: 1rem; */
-  width: 500px;
+  max-width: 500px;
   overflow-x: scroll;
 }
 
