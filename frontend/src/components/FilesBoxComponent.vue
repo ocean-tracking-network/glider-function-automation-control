@@ -106,8 +106,9 @@ const all_tabs = computed(() => {
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
-        <FileBoxTabs @rename="(vals) => { tab_rename(vals) }" @add="tab_add" :static="tab_sort_key == undefined"
-          v-if="tabs" @select="tab_select" :selected="selected_tab" :tabs="all_tabs" />
+        <FileBoxTabs class="file-box-tabs" @rename="(vals) => { tab_rename(vals) }" @add="tab_add"
+          :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
+          :tabs="all_tabs" />
         <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
       </div>
       <hr v-if="tabs">
@@ -186,4 +187,9 @@ hr {
 .hidden {
   display: none !important
 }
+
+/* .file-box-tabs {
+  overflow-x: scroll;
+  max-width: 100px;
+} */
 </style>

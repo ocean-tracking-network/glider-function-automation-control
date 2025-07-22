@@ -90,6 +90,8 @@ const all_tabs = computed(() => {
   display: flex;
   font-size: large;
   /* gap: 1rem; */
+  /* width: 100px;
+  overflow-x: scroll; */
 }
 
 .tab-container button {
@@ -99,6 +101,16 @@ const all_tabs = computed(() => {
   border-color: white;
   padding-right: .5rem;
   padding-left: .5rem;
+  max-width: 100px;
+  text-wrap: nowrap;
+  overflow: hidden;
+  font-size: medium;
+  transition: 1s;
+}
+
+.tab-container button:hover {
+  transition: 1s;
+  max-width: 500px;
 }
 
 .first {

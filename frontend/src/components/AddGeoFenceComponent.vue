@@ -107,10 +107,10 @@ watch(fence_key, () => {
       <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons">
         <p id="index">{{ index }}</p>
         <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)" @focusin="focus_in(index)"
-          @input="on_input()" v-model="lat_lon[0]" placeholder="lon" type="text" name="" id="" />
+          @input="on_input()" v-model="lat_lon[1]" placeholder="lat" type="text" name="" id="" />
         <p>:</p>
         <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)" @focusin="focus_in(index)"
-          @input="on_input()" v-model="lat_lon[1]" placeholder="lat" type="text" name="" id="" />
+          @input="on_input()" v-model="lat_lon[0]" placeholder="lon" type="text" name="" id="" />
         <button class="x-btn" @click="remove_idx(index)" v-if="index < selected_fence.latlons.length - 1">x</button>
       </div>
     </div>
