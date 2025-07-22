@@ -83,4 +83,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  scrollbar-color: var(--color-background-soft) var(--color-background);
 }

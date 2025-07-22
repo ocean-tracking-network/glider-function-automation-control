@@ -140,7 +140,7 @@ const all_tabs = computed(() => {
   overflow-y: scroll;
   overflow-x: scroll;
   /* height: 10rem; */
-  height: 80%;
+  height: 74%;
   margin-top: .5rem;
 }
 
