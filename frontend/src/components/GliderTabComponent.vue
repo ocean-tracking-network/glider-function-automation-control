@@ -54,11 +54,6 @@ function enable_disable_glider() {
   font-size: x-large;
   padding-top: 0;
   padding-bottom: 0;
-  /* border-color: white;
-  border-width: 2px;
-  width: 2rem;
-  border-radius: 5px;
-  margin: .5rem; */
 }
 
 #add:hover {
@@ -66,22 +61,19 @@ function enable_disable_glider() {
 }
 
 .selected {
-  /* color: white; */
   font-weight: bold;
+  background-color: var(--color-border-hover);
 
 }
 
 .gliders {
   border-right-width: 2px;
-  /* border-right-color: white; */
   border-right-color: var(--color-text);
   padding: .5rem;
   width: 110px;
-  /* width: ; */
 }
 
 .gliders:hover {
-  /* color: lightgray; */
   color: var(--color-border-hover);
   transition: .2s;
 }
