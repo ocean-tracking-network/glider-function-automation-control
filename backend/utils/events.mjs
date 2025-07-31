@@ -2,7 +2,7 @@ import db from '../db/conn.mjs'
 import { ObjectId } from 'mongodb'
 import os from 'os'
 import fs from 'fs'
-import { upload_files } from './sfmc_api.mjs'
+import { upload_file } from './sfmc_api.mjs'
 import { create_log } from './log_utils.mjs'
 
 const trigger_event = async (event, geofence = null, glider = null) => {
@@ -27,7 +27,7 @@ const trigger_event = async (event, geofence = null, glider = null) => {
 
     try {
       console.log('trying to upload file')
-      await upload_files(glider.name, 'to-glider', [temp_file_location])
+      await upload_file(glider.name, 'to-glider', temp_file_location, file.category)
       if (geofence) {
         await create_log(
           `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Sent file: ${file.filename}`,
