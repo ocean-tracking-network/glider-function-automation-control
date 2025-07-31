@@ -40,6 +40,25 @@ function convert_gps(val) {
   return ret
 }
 
+function generate_geojson(latlons) {
+  let geo_json = []
+  for (let i = 0; i < latlons.length - 1; i++) {
+    const new_json = {
+      "type": "Feature",
+      "properties": { "line_num": i },
+      "geometry": { "type": "LineString", "coordinates": [[latlons[i][1], latlons[i][0]], [latlons[i + 1][1], latlons[i + 1][0]]] } //WHY IS IT IN LON:LAT FORMAT!
+    }
+    geo_json.push(new_json)
+  }
+  return geo_json
+}
+
+function get_geojson_opacity(line_num, total_num) {
+  const min = 0
+  const normalized = (line_num - min) / (total_num - min)
+  return normalized + .05
+}
+
 function create_polygons() {
   let index = 0
   geofences_filtered.value.forEach((geofence) => {
@@ -106,7 +125,16 @@ function set_glider_track() {
   })
 
   if (glider_has_track(selected_glider.value)) {
-    glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
+    // glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
+    const geo_json = generate_geojson(tracks)
+    glider_track_polyline.value = L.geoJSON(geo_json, {
+      style: function (feature) {
+        return {
+          opacity: get_geojson_opacity(feature.properties.line_num, tracks.length),
+          color: "red"
+        }
+      }
+    }).addTo(initialMap.value)
     glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
     initialMap.value.setView(tracks[tracks.length - 1])
   }
@@ -151,8 +179,6 @@ onMounted(() => {
   }).addTo(initialMap.value);
   initialMap.value.on('click', map_click)
   create_polygons()
-
-
 })
 
 function update_map() {
