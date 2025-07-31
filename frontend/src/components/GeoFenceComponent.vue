@@ -47,7 +47,10 @@ function on_click(e) {
 function remove(element) {
   back(false)
   just_removed.value = true
-  store.deleteGeofence(element.key)
+  if (confirm("WARNING!\nAre you sure you want to remove this geofence?") == true) {
+
+    store.deleteGeofence(element.key)
+  }
 }
 
 const latlons = computed(() => {
