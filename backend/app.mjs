@@ -1,9 +1,7 @@
-import db from './db/conn.mjs'
 import express from 'express'
 import multer from 'multer'
 import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
-import { get_active_deployment_details } from './utils/sfmc_api.mjs'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
 import { get_gliders, post_gliders, post_gliders_track, update_gliders } from './views/gliders.mjs'
@@ -26,7 +24,7 @@ import { login } from './views/user.mjs'
 import { authenticateToken } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
-import { create_log } from './utils/log_utils.mjs'
+import { update_glider_positions } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 
 const app = express()
@@ -69,65 +67,8 @@ app.post('/events/:id/trigger', authenticateToken, trigger_events)
 app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, post_logs)
 
-async function update_glider_waypoint(glider, sfmc_json) {
-  const next_waypoint = [sfmc_json.nextWaypointLat / 100, sfmc_json.nextWaypointLon / 100]
-  if (
-    !glider.next_waypoint ||
-    glider.next_waypoint[0] != next_waypoint[0] ||
-    glider.next_waypoint[1] != next_waypoint[1]
-  ) {
-    const collection = await db.collection('gliders')
-    const update_result = await collection.updateOne(
-      { _id: glider._id },
-      {
-        $set: { next_waypoint: next_waypoint },
-      }
-    )
-  }
-}
-
-async function update_glider_positions() {
-  let collection = await db.collection('gliders')
-  const gliders = await collection.find({}).toArray()
-
-  for (let glider of gliders) {
-    console.log('Upding glider: ' + glider.name)
-    let sfmc_json = {}
-    sfmc_json = await get_active_deployment_details(glider.name)
-    if (sfmc_json == false) {
-      console.log('CONTINUING!')
-      continue
-    }
-    sfmc_json = sfmc_json.data
-    // Keep going if the glider wasn't skipped
-    // update the next waypoint since that can change without the glider resurfacing
-    await update_glider_waypoint(glider, sfmc_json)
-    if (!sfmc_json.isGpsValid) {
-      console.log('no valid gps for: ' + glider.name)
-      continue
-    }
-    let tracks = glider.track
-    let last_track = [0, 0]
-    if (tracks.length > 0) {
-      last_track = tracks[tracks.length - 1]
-    }
-
-    if (last_track[0] != sfmc_json.gpsValidLat || last_track[1] != sfmc_json.gpsValidLon) {
-      tracks.push([sfmc_json.gpsValidLat, sfmc_json.gpsValidLon])
-      const filter = { _id: glider._id }
-      const update_result = await collection.updateOne(filter, {
-        $set: { track: tracks },
-      })
-      console.log('updated track')
-      create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
-    } else {
-      console.log('gps is the same')
-    }
-  }
-}
-
 // Schedule
-const backend_schedule = scheduleJob('*/60 * * * * *', async () => {
+const backend_schedule = scheduleJob('*/10 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })

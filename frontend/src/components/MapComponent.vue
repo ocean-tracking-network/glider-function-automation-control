@@ -1,7 +1,7 @@
 <script setup>
 import "leaflet/dist/leaflet.css"
 import * as L from 'leaflet'
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
@@ -144,7 +144,8 @@ function set_glider_track() {
       iconSize: [32, 32],
       iconAnchor: [16, 16]
     })
-    glider_next_waypoint.value = L.marker(selected_glider.value.next_waypoint, { icon: waypoint_icon }).addTo(initialMap.value)
+    const waypoint = selected_glider.value.next_waypoint
+    glider_next_waypoint.value = L.marker([convert_gps(waypoint[0]), convert_gps(waypoint[1])], { icon: waypoint_icon }).addTo(initialMap.value)
   }
   let i = 0
   gliderStore.gliders.forEach((glider) => {
