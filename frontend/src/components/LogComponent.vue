@@ -8,15 +8,21 @@ const gliderStore = useGlidersStore()
 const logs = ref([])
 const filter_by_glider = ref(false)
 
-
-onMounted(() => {
-  // placeholder logs. Not sure how or what they'll look like ye.
+function get_logs() {
   apiClient.get("/logs/").then((res) => {
     logs.value = res.data
     logs.value.sort((a, b) => {
       return new Date(b.date) - new Date(a.date)
     })
+  }).catch((err) => {
+    // This is bad, bad
+    setTimeout(get_logs, 2000)
   })
+}
+
+onMounted(() => {
+  // placeholder logs. Not sure how or what they'll look like ye.
+  get_logs()
 })
 
 const filtered_logs = computed(() => {

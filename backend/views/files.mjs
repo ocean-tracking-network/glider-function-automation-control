@@ -10,11 +10,15 @@ const get_files = async (req, res) => {
 const post_files = async (req, res) => {
   let new_docs = []
   let collection = await db.collection('files')
+  let category = req.body.category
+  if(typeof(category) != 'string'){
+    category = category[0]
+  }
   req.files.forEach(async (ele) => {
     new_docs.push({
       filename: ele.originalname,
       path: ele.path,
-      category: req.body.category,
+      category: category,
     })
   })
   let results = { msg: 'No files uploaded, empty list' }

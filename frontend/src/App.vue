@@ -5,25 +5,28 @@ import MapComponent from './components/MapComponent.vue';
 import LogComponent from './components/LogComponent.vue';
 import GeoFenceComponent from './components/GeoFenceComponent.vue';
 import GliderTabComponent from './components/GliderTabComponent.vue';
+import LoginComponent from './components/LoginComponent.vue';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useEventsStore } from './stores/events';
 import { useFilesStore } from './stores/files';
 import { useGeoFencesStore } from './stores/geofences';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from './stores/gliders';
+import { useUserStore } from './stores/user';
 
 
 const eventsStore = useEventsStore()
 const filesStore = useFilesStore()
 const geofenceStore = useGeoFencesStore()
 const gliderStore = useGlidersStore()
-
+const userStore = useUserStore()
 
 const { selected_fence } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
-const fileUpload = useTemplateRef('fileUpload')
+const { loggedin } = storeToRefs(userStore)
 
+const fileUpload = useTemplateRef('fileUpload')
 const file_tab_select = ref("")
 
 function fileMoveCallback(evt, originalEvent) {
@@ -32,12 +35,14 @@ function fileMoveCallback(evt, originalEvent) {
 }
 
 function delete_event_exit(index) {
-  const id = exit_files_ref.value[index]._id
-  eventsStore.remove_event(id)
+  // const id = exit_files_ref.value[index]._id
+  eventsStore.remove_event(index._id)
 }
 function delete_event_enter(index) {
-  const id = enter_files_ref.value[index]._id
-  eventsStore.remove_event(id)
+  console.log(enter_files_ref.value)
+  console.log(index)
+  // const id = enter_files_ref.value[index]._id
+  eventsStore.remove_event(index._id)
 }
 
 const display_events = computed(() => {
@@ -102,43 +107,58 @@ const all_categories = computed(() => {
 
 </script>
 <template>
-  <header>
-    <HeaderComponent />
-  </header>
+  <div>
+    <div :class="{ blur: !loggedin }">
+      <header>
+        <HeaderComponent />
+      </header>
 
-  <main>
-    <div id="main-flex">
+      <main>
+        <div id="main-flex">
 
-      <!-- <div id="map"> -->
-      <!-- </div> -->
-      <div>
-        <MapComponent id="map" />
-      </div>
-      <div id="side">
-        <GliderTabComponent />
-        <GeoFenceComponent id="geo" />
+          <!-- <div id="map"> -->
+          <!-- </div> -->
+          <div>
+            <MapComponent id="map" />
+          </div>
+          <div id="side">
+            <GliderTabComponent />
+            <GeoFenceComponent id="geo" />
 
-        <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
-          :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
-          :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
-        <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
-          :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
-          :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
-        <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
-          <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
+            <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
+              :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
+              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
+            <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
+              :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
+              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
+            <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
+              <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
+            </div>
+            <FilesBoxComponent @tab_rename="rename_tab_category" @tab_select="select_file_tab"
+              :tabs="filesStore.categories" :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file"
+              :move="fileMoveCallback" :sort="false" :list="files_arr"
+              :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files" id="total" />
+            <input multiple type="file" id="file-upload" ref="fileUpload" @change="upload_files_wrapper">
+          </div>
         </div>
-        <FilesBoxComponent @tab_rename="rename_tab_category" @tab_select="select_file_tab" :tabs="filesStore.categories"
-          :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file" :move="fileMoveCallback" :sort="false"
-          :list="files_arr" :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files"
-          id="total" />
-        <input multiple type="file" id="file-upload" ref="fileUpload" @change="upload_files_wrapper">
-      </div>
+        <LogComponent id="logs" />
+      </main>
     </div>
-    <LogComponent id="logs" />
-  </main>
+    <div v-if="!loggedin" id="login-div">
+      <LoginComponent />
+    </div>
+  </div>
 </template>
 
 <style scoped>
+#login-div {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+}
+
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -176,7 +196,7 @@ const all_categories = computed(() => {
   flex: 1;
   height: 10rem;
   flex-basis: 48%;
-  max-width: 50%;
+  max-width: 49.3%;
 }
 
 #middle-placeholder {
@@ -209,5 +229,9 @@ header {
 
 #file-upload {
   visibility: hidden;
+}
+
+.blur {
+  filter: blur(7px);
 }
 </style>

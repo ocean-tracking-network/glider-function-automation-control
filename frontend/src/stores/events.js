@@ -64,10 +64,6 @@ export const useEventsStore = defineStore('events', () => {
     })
   }
 
-  onMounted(() => {
-    get_events()
-  })
-
   const glider_has_geofence_event = (glider_id, geofence_id) => {
     const found = events.value.find(
       (event) => event.geofence == geofence_id && event.glider == glider_id,

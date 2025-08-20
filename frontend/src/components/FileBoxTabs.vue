@@ -22,6 +22,7 @@ const adding_new = ref(false)
 function select(tab) {
   // adding_new.value = false
   // temp_rename_text.value = ""
+  if(!adding_new.value && !rename.value){
   if (!props.static) {
     if (tab == props.selected && !adding_new.value) {
       temp_rename_text.value = tab
@@ -32,7 +33,10 @@ function select(tab) {
       temp_rename_text.value = ""
     }
   }
+
+  console.log("1")
   emit("select", tab)
+  }
 }
 
 function stop_edit() {
@@ -47,16 +51,18 @@ function stop_edit() {
   else {
     emit("rename", { old: props.selected, new: temp_rename_text.value })
     // nextTick(() => {
-    emit("select", temp_rename_text.value)
+    console.log("2")
+    // emit("select", temp_rename_text.value)
     // })
 
   }
 }
 
 function add() {
-  emit("select", "")
+  console.log("3")
+  // emit("select", "")
   adding_new.value = true
-  rename.value = true
+  // rename.value = true
   temp_rename_text.value = ""
 }
 
@@ -90,6 +96,11 @@ const all_tabs = computed(() => {
   display: flex;
   font-size: large;
   /* gap: 1rem; */
+  max-width: 500px;
+  overflow-x: scroll;
+}
+
+.tab-container * {
 }
 
 .tab-container button {
@@ -99,6 +110,16 @@ const all_tabs = computed(() => {
   border-color: white;
   padding-right: .5rem;
   padding-left: .5rem;
+  max-width: 100px;
+  text-wrap: nowrap;
+  overflow: hidden;
+  font-size: medium;
+  transition: 1s;
+}
+
+.tab-container button:hover {
+  transition: 1s;
+  max-width: 500px;
 }
 
 .first {

@@ -1,7 +1,7 @@
 <script setup>
 import "leaflet/dist/leaflet.css"
 import * as L from 'leaflet'
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
@@ -31,19 +31,32 @@ const { selected_glider, gliders } = storeToRefs(gliderStore)
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
 function convert_gps(val) {
-  console.log("START")
-  console.log(val)
   let degrees = Math.floor(val / 100)
   if (val < 0) {
     degrees = Math.ceil(val / 100)
   }
-  console.log(degrees)
   const deci_minutes = ((val / 100) - degrees) * 100
-  console.log(deci_minutes)
   const ret = degrees + (deci_minutes / 60)
-  console.log(ret)
-  console.log("END")
   return ret
+}
+
+function generate_geojson(latlons) {
+  let geo_json = []
+  for (let i = 0; i < latlons.length - 1; i++) {
+    const new_json = {
+      "type": "Feature",
+      "properties": { "line_num": i },
+      "geometry": { "type": "LineString", "coordinates": [[latlons[i][1], latlons[i][0]], [latlons[i + 1][1], latlons[i + 1][0]]] } //WHY IS IT IN LON:LAT FORMAT!
+    }
+    geo_json.push(new_json)
+  }
+  return geo_json
+}
+
+function get_geojson_opacity(line_num, total_num) {
+  const min = 0
+  const normalized = (line_num - min) / (total_num - min)
+  return normalized + .05
 }
 
 function create_polygons() {
@@ -112,7 +125,16 @@ function set_glider_track() {
   })
 
   if (glider_has_track(selected_glider.value)) {
-    glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
+    // glider_track_polyline.value = L.polyline(tracks, { color: 'red' }).addTo(initialMap.value)
+    const geo_json = generate_geojson(tracks)
+    glider_track_polyline.value = L.geoJSON(geo_json, {
+      style: function (feature) {
+        return {
+          opacity: get_geojson_opacity(feature.properties.line_num, tracks.length),
+          color: "red"
+        }
+      }
+    }).addTo(initialMap.value)
     glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
     initialMap.value.setView(tracks[tracks.length - 1])
   }
@@ -122,7 +144,8 @@ function set_glider_track() {
       iconSize: [32, 32],
       iconAnchor: [16, 16]
     })
-    glider_next_waypoint.value = L.marker(selected_glider.value.next_waypoint, { icon: waypoint_icon }).addTo(initialMap.value)
+    const waypoint = selected_glider.value.next_waypoint
+    glider_next_waypoint.value = L.marker([convert_gps(waypoint[0]), convert_gps(waypoint[1])], { icon: waypoint_icon }).addTo(initialMap.value)
   }
   let i = 0
   gliderStore.gliders.forEach((glider) => {
@@ -157,8 +180,6 @@ onMounted(() => {
   }).addTo(initialMap.value);
   initialMap.value.on('click', map_click)
   create_polygons()
-
-
 })
 
 function update_map() {

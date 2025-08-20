@@ -73,9 +73,6 @@ export const useFilesStore = defineStore('files', () => {
     '#F5DEB3', // Wheat
     '#9ACD32', // YellowGreen
   ]
-  onMounted(() => {
-    get_files()
-  })
 
   const get_files = () => {
     apiClient.get('/files').then((res) => {

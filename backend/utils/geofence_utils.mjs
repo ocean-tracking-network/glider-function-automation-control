@@ -1,7 +1,5 @@
 import { updateOne } from './db_utils.mjs'
 import db from '../db/conn.mjs'
-import { ObjectId } from 'mongodb'
-import { upload_files } from './sfmc_api.mjs'
 import { create_log } from './log_utils.mjs'
 import { send_slack_message } from './slack.mjs'
 import { trigger_event } from './events.mjs'
@@ -133,12 +131,10 @@ async function upload_event_files(glider, geofence, event_type) {
     })
     .toArray()
   if (events.length > 0) {
-    console.log('Found event')
     for (const event of events) {
       trigger_event(event, geofence, glider)
     }
   } else {
-    console.log('not found')
   }
 }
 
