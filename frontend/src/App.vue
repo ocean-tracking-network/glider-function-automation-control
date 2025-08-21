@@ -13,6 +13,7 @@ import { useGeoFencesStore } from './stores/geofences';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from './stores/gliders';
 import { useUserStore } from './stores/user';
+import ScriptComponent from './components/ScriptComponent.vue';
 
 
 const eventsStore = useEventsStore()
@@ -127,10 +128,18 @@ const all_categories = computed(() => {
 
             <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
               :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
-              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
+              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter">
+
+              <ScriptComponent />
+
+            </FilesBoxComponent>
             <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
               :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
-              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
+              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit">
+
+              <ScriptComponent />
+
+            </FilesBoxComponent>
             <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
               <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
             </div>

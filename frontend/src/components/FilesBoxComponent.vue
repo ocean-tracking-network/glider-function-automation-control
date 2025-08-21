@@ -106,6 +106,9 @@ const all_tabs = computed(() => {
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
+        <slot>
+
+        </slot>
         <FileBoxTabs class="file-box-tabs" @rename="(vals) => { tab_rename(vals) }" @add="tab_add"
           :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
           :tabs="all_tabs" />
