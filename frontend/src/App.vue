@@ -177,7 +177,7 @@ const all_categories = computed(() => {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  height: 575px;
+  height: 620px;
 }
 
 #side {
@@ -194,7 +194,7 @@ const all_categories = computed(() => {
 
 #total {
   width: 100%;
-  height: 7rem;
+  height: 10rem;
   margin-top: .5rem;
 }
 

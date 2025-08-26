@@ -106,9 +106,6 @@ const all_tabs = computed(() => {
         <strong>
           <h2>{{ props.title }}</h2>
         </strong>
-        <slot>
-
-        </slot>
         <FileBoxTabs class="file-box-tabs" @rename="(vals) => { tab_rename(vals) }" @add="tab_add"
           :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
           :tabs="all_tabs" />
@@ -122,17 +119,27 @@ const all_tabs = computed(() => {
           </a>
         </template>
       </draggable>
+      <div class="footer">
+        <slot>
+        </slot>
+      </div>
     </div>
   </div>
 </template>
 <style scoped>
+.footer{
+  width: 100%;
+  /* align-self: flex-end; */
+  margin-top: auto;
+}
 .files-box {
   display: flex;
-  flex-grow: 0;
+  /* flex-grow: 0; */
   width: 100%;
   height: 100%;
   flex-wrap: wrap;
   /* justify-content: flex-end; */
+  align-content: flex-start;
 }
 
 .files-container {
@@ -143,12 +150,13 @@ const all_tabs = computed(() => {
   overflow-y: scroll;
   overflow-x: scroll;
   /* height: 10rem; */
-  height: 74%;
+  /* height: 70%; */
   margin-top: .5rem;
 }
 
 .box-top {
   width: 100%;
+  max-height: 2rem;
   display: flex;
   justify-content: space-between;
 }

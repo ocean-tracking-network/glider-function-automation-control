@@ -1,40 +1,55 @@
 <script setup>
 import { computed, ref } from 'vue';
+import DropDownIcon from '@/assets/arrow_drop_down.svg'
 
-const options = ref(['file1.xml', 'script2.xml', 'script343.xml'])
-const title = ref("Script")
+const emit = defineEmits(["select"])
+const props = defineProps(["options", "selected", "default"])
+
 const show_dropdown = ref(false)
 const filter_text = ref("")
 
 const filtered_options = computed(() => {
   if (!filter_text.value) {
-    return options.value
+    return props.options
   }
-  return options.value.filter(option => option.includes(filter_text.value))
+  return props.options.filter(option => option.includes(filter_text.value))
 })
+
+function option_click(option){
+  emit("select", option)
+  show_dropdown.value = false;
+}
 
 
 </script>
 <template>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_drop_down" />
   <div class="dropdown">
-    <button @click="show_dropdown = !show_dropdown" class="dropbtn border">{{ title
-    }}</button>
+    <button @click="show_dropdown = !show_dropdown" class="dropbtn border">
+    <p>{{ props.selected ? props.selected : props.default}} </p> <DropDownIcon class="dropdown-icon"/>
+    </button>
     <div id="myDropdown" v-if="show_dropdown" class="dropdown-content">
       <input @focusin="" type="text" placeholder="Search.." id="myInput" v-model="filter_text">
-      <button @click="show_dropdown = false" v-for="option in filtered_options">{{ option }}</button>
+      <button @click="option_click(option)" v-for="option in filtered_options">
+        {{ option }}
+</button>
     </div>
   </div>
 </template>
 <style scoped>
 .dropbtn {
   padding: .1rem;
-  width: 50px;
+  /* width: 50px; */
+  display: flex;
+  text-align: center;
+}
+.dropbtn *{
+  margin: auto;
 }
 
 /* Dropdown button on hover & focus */
-.dropbtn:hover,
-.dropbtn:focus {
-  background-color: #3e8e41;
+.dropbtn:hover {
+  border-color: lightblue;
 }
 
 /* The search field */

@@ -280,7 +280,7 @@ watch(gliders, (new_val) => {
 <style scoped>
 #map {
   width: 500px;
-  height: 567px;
+  height: 614px;
   /* height: 300px; */
 }
 </style>

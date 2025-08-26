@@ -1,5 +1,7 @@
+import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
 import { updateOne } from '../utils/db_utils.mjs'
+import { get_available_scripts } from '../utils/sfmc_api.mjs'
 
 const get_gliders = async (req, res) => {
   let collection = await db.collection('gliders')
@@ -43,4 +45,10 @@ const post_gliders_track = async (req, res) => {
   res.send(update_result).status(200)
 }
 
-export { get_gliders, post_gliders, post_gliders_track, update_gliders }
+const get_scripts = async (req, res) => {
+  let collection = await db.collection("gliders")
+  let glider = await collection.findOne({_id: ObjectId.createFromHexString(req.params.id)})
+  const scripts = await get_available_scripts(glider.name)
+  res.send(scripts.data).status(200)
+}
+export { get_gliders, post_gliders, post_gliders_track, update_gliders, get_scripts }

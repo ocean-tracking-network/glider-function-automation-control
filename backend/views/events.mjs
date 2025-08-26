@@ -19,11 +19,22 @@ const get_events = async (req, res) => {
 
 const post_events = async (req, res) => {
   let collect = await db.collection('events')
-  const new_doc = {
-    file: req.body.file,
+  let new_doc = {
     glider: req.body.glider,
     geofence: req.body.geofence,
     event_type: req.body.event_type,
+  }
+  const file = req.body.file
+  const script = req.body.script
+  if(file){
+    new_doc.file = file
+  }
+  if(script){
+    new_doc.script = script
+    new_doc.script_type = req.body.script_type
+  }
+  if(!script && !file){
+    res.send({error: "Need to include a script or a file for the event"}).status(400)
   }
   let result = await collect.insertOne(new_doc)
   res.send(result).status(200)
@@ -35,11 +46,19 @@ const delete_events = async (req, res) => {
 }
 
 const patch_events = async (req, res) => {
-  const data = {
-    file: req.body.file,
+  let data = {
     glider: req.body.glider,
     geofence: req.body.geofence,
     event_type: req.body.event_type,
+  }
+  
+  const file = req.body.file
+  const script = req.body.script
+  if(file){
+    data.file = file
+  }
+  if(script){
+    data.script = script
   }
   let result = await updateOne('events', req.params.id, data)
   res.send(result).status(200)
