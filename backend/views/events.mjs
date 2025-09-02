@@ -18,7 +18,7 @@ const get_events = async (req, res) => {
 }
 
 const post_events = async (req, res) => {
-  let collect = await db.collection('events')
+  let collection = await db.collection('events')
   let new_doc = {
     glider: req.body.glider,
     geofence: req.body.geofence,
@@ -26,38 +26,50 @@ const post_events = async (req, res) => {
   }
   const file = req.body.file
   const script = req.body.script
-  if(file){
+  if (file) {
     new_doc.file = file
   }
-  if(script){
+  if (script) {
+    console.log('Script')
     new_doc.script = script
     new_doc.script_type = req.body.script_type
+    // we can only have a single script at a time, replace the old one if it exists, delete many just in case
+    const old_script = await collection.deleteMany({
+      geofence: new_doc.geofence,
+      event_type: new_doc.event_type,
+      script: { $exists: true },
+    })
   }
-  if(!script && !file){
-    res.send({error: "Need to include a script or a file for the event"}).status(400)
+  console.log(file)
+  if (!script && !file) {
+    res.send({ error: 'Need to include a script or a file for the event' }).status(400)
+    return
   }
-  let result = await collect.insertOne(new_doc)
+  console.log('FINISH ADDING')
+  let result = await collection.insertOne(new_doc)
   res.send(result).status(200)
 }
 
 const delete_events = async (req, res) => {
+  console.log('Removing event')
   let result = await deleteOne('events', req.params.id)
   res.send(result).status(200)
 }
 
 const patch_events = async (req, res) => {
+  console.log('Updating event')
   let data = {
     glider: req.body.glider,
     geofence: req.body.geofence,
     event_type: req.body.event_type,
   }
-  
+
   const file = req.body.file
   const script = req.body.script
-  if(file){
+  if (file) {
     data.file = file
   }
-  if(script){
+  if (script) {
     data.script = script
   }
   let result = await updateOne('events', req.params.id, data)

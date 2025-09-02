@@ -49,7 +49,10 @@ function formatDate(date) {
 }
 
 function get_glider_name(log) {
-  return gliderStore.gliders_obj[log.glider].name
+  if (gliderStore.gliders_obj[log.glider]) {
+    return gliderStore.gliders_obj[log.glider].name
+  }
+  return ""
 }
 
 function is_log_glider_selected(log) {

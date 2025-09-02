@@ -81,7 +81,12 @@ function trigger_events(event_type) {
     const events = event_type == "enter" ? eventsStore.enter_files : eventsStore.exit_files
     for (const event of events)
       eventsStore.trigger_event(event)
+    const script_event = eventsStore.selected_glider_scripts[event_type]
+    if (script_event) {
+      eventsStore.trigger_event(script_event)
+    }
   }
+
 }
 
 function rename_tab_category(vals) {
@@ -130,14 +135,14 @@ const all_categories = computed(() => {
               :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
               :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter">
 
-              <ScriptComponent />
+              <ScriptComponent event_type="enter" />
 
             </FilesBoxComponent>
             <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
               :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
               :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit">
 
-              <ScriptComponent />
+              <ScriptComponent event_type="exit" />
 
             </FilesBoxComponent>
             <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
@@ -177,7 +182,7 @@ const all_categories = computed(() => {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  height: 620px;
+  height: 575px;
 }
 
 #side {
@@ -194,7 +199,7 @@ const all_categories = computed(() => {
 
 #total {
   width: 100%;
-  height: 10rem;
+  height: 7rem;
   margin-top: .5rem;
 }
 

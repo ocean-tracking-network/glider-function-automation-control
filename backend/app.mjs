@@ -4,7 +4,13 @@ import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
-import { get_gliders, get_scripts, post_gliders, post_gliders_track, update_gliders } from './views/gliders.mjs'
+import {
+  get_gliders,
+  get_scripts,
+  post_gliders,
+  post_gliders_track,
+  update_gliders,
+} from './views/gliders.mjs'
 import {
   delete_geofences,
   get_geofences,
@@ -69,7 +75,7 @@ app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, post_logs)
 
 // Schedule
-const backend_schedule = scheduleJob('*/120 * * * * *', async () => {
+const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
 })

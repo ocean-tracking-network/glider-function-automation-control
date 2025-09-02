@@ -46,9 +46,9 @@ const post_gliders_track = async (req, res) => {
 }
 
 const get_scripts = async (req, res) => {
-  let collection = await db.collection("gliders")
-  let glider = await collection.findOne({_id: ObjectId.createFromHexString(req.params.id)})
+  let collection = await db.collection('gliders')
+  let glider = await collection.findOne({ _id: ObjectId.createFromHexString(req.params.id) })
   const scripts = await get_available_scripts(glider.name)
-  res.send(scripts.data).status(200)
+  res.send(scripts).status(200)
 }
 export { get_gliders, post_gliders, post_gliders_track, update_gliders, get_scripts }
