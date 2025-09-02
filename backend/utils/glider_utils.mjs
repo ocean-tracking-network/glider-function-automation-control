@@ -41,13 +41,17 @@ async function update_glider_positions() {
       continue
     }
     let tracks = glider.track
-    let last_track = [0, 0]
+    let last_track = { lat: 0, lon: 0 }
     if (tracks.length > 0) {
       last_track = tracks[tracks.length - 1]
     }
 
-    if (last_track[0] != sfmc_json.gpsValidLat || last_track[1] != sfmc_json.gpsValidLon) {
-      tracks.push([sfmc_json.gpsValidLat, sfmc_json.gpsValidLon])
+    if (last_track.lat != sfmc_json.gpsValidLat || last_track.lon != sfmc_json.gpsValidLon) {
+      tracks.push({
+        lat: sfmc_json.gpsValidLat,
+        lon: sfmc_json.gpsValidLon,
+        date: new Date(),
+      })
       const filter = { _id: glider._id }
       const _update_result = await collection.updateOne(filter, {
         $set: { track: tracks },
