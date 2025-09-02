@@ -62,7 +62,6 @@ const trigger_event = async (event, geofence = null, glider = null) => {
   }
   if (event.file) {
     await trigger_file_event(event, glider, geofence)
-    await create_log(`Sent file: ${file.filename} to ${glider.name}`, 'info', glider._id)
   } else if (event.script) {
     await trigger_script_event(event, glider)
   }
