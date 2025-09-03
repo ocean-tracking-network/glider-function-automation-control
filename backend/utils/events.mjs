@@ -41,7 +41,7 @@ async function trigger_file_event(event, glider, geofence) {
   }
 }
 
-async function trigger_script_event(event, glider) {
+async function trigger_script_event(event, glider, geofence) {
   await set_script(glider.name, event.script, event.script_type)
   if (geofence) {
     await create_log(
@@ -63,7 +63,7 @@ const trigger_event = async (event, geofence = null, glider = null) => {
   if (event.file) {
     await trigger_file_event(event, glider, geofence)
   } else if (event.script) {
-    await trigger_script_event(event, glider)
+    await trigger_script_event(event, glider, geofence)
   }
 }
 
