@@ -45,12 +45,12 @@ async function trigger_script_event(event, glider) {
   await set_script(glider.name, event.script, event.script_type)
   if (geofence) {
     await create_log(
-      `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Sent file: ${file.filename}`,
+      `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Swapped script to: ${event.script}`,
       'info',
       glider._id
     )
   } else {
-    await create_log(`Sent file: ${file.filename} to ${glider.name}`, 'info', glider._id)
+    await create_log(`Switched script: ${event.script} to ${glider.name}`, 'info', glider._id)
   }
 }
 
