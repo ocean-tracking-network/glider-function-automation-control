@@ -18,7 +18,9 @@ function filter_latlons(latlon) {
 }
 
 const post_geofences = async (req, res, next) => {
-  const latlons = req.body.latlons.filter(filter_latlons)
+  const latlons = req.body.latlons.filter(filter_latlons).map((latlon) => {
+    return [parseFloat(latlon[0]), parseFloat(latlon[1])]
+  })
   const name = req.body.name
   const notify = req.body.notify
 
@@ -56,7 +58,9 @@ const patch_geofences = async (req, res) => {
   const id = req.params.id
   let data = req.body
   if (data.latlons) {
-    data.latlons = data.latlons.filter(filter_latlons)
+    data.latlons = data.latlons.filter(filter_latlons).map((latlon) => {
+      return [parseFloat(latlon[0]), parseFloat(latlon[1])]
+    })
   }
 
   let result = await updateOne('geofences', id, data)
