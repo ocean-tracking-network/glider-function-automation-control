@@ -30,7 +30,7 @@ import { login } from './views/user.mjs'
 import { authenticateToken } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
-import { update_glider_positions } from './utils/glider_utils.mjs'
+import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 
 const app = express()
@@ -78,6 +78,7 @@ app.post('/logs', authenticateToken, post_logs)
 const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
+  await delete_old_tracks()
 })
 
 // app start
