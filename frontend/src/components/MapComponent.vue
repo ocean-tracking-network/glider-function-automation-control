@@ -56,7 +56,7 @@ function generate_geojson(latlons) {
 function get_geojson_opacity(line_num, total_num) {
   const min = 0
   const normalized = (line_num - min) / (total_num - min)
-  return normalized + .05
+  return normalized + .1
 }
 
 function create_polygons() {
@@ -113,8 +113,8 @@ function set_glider_track() {
   selected_glider.value.track.forEach((element) => {
     tracks.push([convert_gps(element.lat), convert_gps(element.lon)])
     glider_track_points.value.push(
-      L.circle([convert_gps(element.lat), convert_gps(element.lon)], { radius: 100, stroke: false, color: 'red' })
-        .addTo(initialMap.value).bindPopup(`<b>${element.date}</b>`)
+      L.circle([convert_gps(element.lat), convert_gps(element.lon)], { radius: 200, stroke: false, color: 'red' })
+        .addTo(initialMap.value).bindPopup(`<b>${element.date}</b><p>200m</p>`)
     )
   })
 
