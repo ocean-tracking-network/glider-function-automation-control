@@ -20,16 +20,33 @@ async function update_glider_waypoint(glider, sfmc_json) {
   }
 }
 
+async function delete_old_tracks() {
+  let collection = await db.collection('gliders')
+  const gliders = await collection.find({}).toArray()
+
+  const past_date = new Date()
+  past_date.setDate(past_date.getDate() - process.env.HISTORY_DAYS)
+
+  for (const glider of gliders) {
+    const tracks = glider.track.filter((track) => track.date > past_date)
+    await collection.updateOne(
+      { _id: glider._id },
+      {
+        $set: { track: tracks },
+      }
+    )
+  }
+}
+
 async function update_glider_positions() {
   let collection = await db.collection('gliders')
   const gliders = await collection.find({}).toArray()
 
   for (let glider of gliders) {
-    console.log('Upding glider: ' + glider.name)
     let sfmc_json = {}
     sfmc_json = await get_active_deployment_details(glider.name)
     if (sfmc_json == false) {
-      console.log('CONTINUING!')
+      console.log('No SFMC JSON')
       continue
     }
     sfmc_json = sfmc_json.data
@@ -41,13 +58,17 @@ async function update_glider_positions() {
       continue
     }
     let tracks = glider.track
-    let last_track = [0, 0]
+    let last_track = { lat: 0, lon: 0 }
     if (tracks.length > 0) {
       last_track = tracks[tracks.length - 1]
     }
 
-    if (last_track[0] != sfmc_json.gpsValidLat || last_track[1] != sfmc_json.gpsValidLon) {
-      tracks.push([sfmc_json.gpsValidLat, sfmc_json.gpsValidLon])
+    if (last_track.lat != sfmc_json.gpsValidLat || last_track.lon != sfmc_json.gpsValidLon) {
+      tracks.push({
+        lat: sfmc_json.gpsValidLat,
+        lon: sfmc_json.gpsValidLon,
+        date: new Date(),
+      })
       const filter = { _id: glider._id }
       const _update_result = await collection.updateOne(filter, {
         $set: { track: tracks },
@@ -55,9 +76,9 @@ async function update_glider_positions() {
       console.log('updated track')
       create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
     } else {
-      console.log('gps is the same')
+      // console.log('gps is the same')
     }
   }
 }
 
-export { update_glider_positions, update_glider_waypoint }
+export { update_glider_positions, update_glider_waypoint, delete_old_tracks }

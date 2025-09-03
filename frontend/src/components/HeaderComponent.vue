@@ -1,8 +1,10 @@
 <script setup>
+import { ref } from 'vue';
+const version_number = "0.1.0"
 </script>
 <template>
   <div>
-    <h1>Glider File Automation Control (GFAC)</h1>
+    <h1>Glider File Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
     <!-- (GAS Geofence Automation for Slocum) (GLAfS
     Geofence Location Automation for Slocums) () -->
     <!-- <div id="checkbox-div">
@@ -25,5 +27,10 @@ h1 {
 
 div {
   text-align: center;
+}
+
+small {
+  font-size: x-small;
+  margin-left: 5px;
 }
 </style>
