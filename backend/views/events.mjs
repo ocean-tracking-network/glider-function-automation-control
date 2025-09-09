@@ -11,7 +11,6 @@ const get_events = async (req, res) => {
   if (req.query.geofence) {
     query.geofence = req.query.geofence
   }
-  console.log(query)
   let collection = await db.collection('events')
   let results = await collection.find(query).toArray()
   res.send(results).status(200)
@@ -30,7 +29,6 @@ const post_events = async (req, res) => {
     new_doc.file = file
   }
   if (script) {
-    console.log('Script')
     new_doc.script = script
     new_doc.script_type = req.body.script_type
     // we can only have a single script at a time, replace the old one if it exists, delete many just in case
@@ -40,24 +38,20 @@ const post_events = async (req, res) => {
       script: { $exists: true },
     })
   }
-  console.log(file)
   if (!script && !file) {
     res.send({ error: 'Need to include a script or a file for the event' }).status(400)
     return
   }
-  console.log('FINISH ADDING')
   let result = await collection.insertOne(new_doc)
   res.send(result).status(200)
 }
 
 const delete_events = async (req, res) => {
-  console.log('Removing event')
   let result = await deleteOne('events', req.params.id)
   res.send(result).status(200)
 }
 
 const patch_events = async (req, res) => {
-  console.log('Updating event')
   let data = {
     glider: req.body.glider,
     geofence: req.body.geofence,

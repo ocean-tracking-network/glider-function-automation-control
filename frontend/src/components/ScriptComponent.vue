@@ -67,7 +67,7 @@ const combined_options = computed(() => {
   try {
     return [non_text, ...selected_glider_scripts.factory, ...selected_glider_scripts.user]
   } catch (err) {
-    console.log("Cannot combine files" + err)
+    console.log("Cannot combine options" + err)
     return []
   }
 })
@@ -85,11 +85,9 @@ const combined_options = computed(() => {
 </template>
 <style scoped>
 .dropdown-container {
-  /* background-color: red; */
   width: 100%;
   display: flex;
   gap: 1rem;
-  /* height: 100%; */
 }
 
 hr {

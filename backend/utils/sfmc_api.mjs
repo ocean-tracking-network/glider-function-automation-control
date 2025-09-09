@@ -60,7 +60,6 @@ async function get_available_scripts(glider_name) {
       delete result.userScripts
     }
   }
-  console.log(result)
   return result
 }
 

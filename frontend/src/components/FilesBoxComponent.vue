@@ -134,14 +134,9 @@ const all_tabs = computed(() => {
 }
 
 .files-box {
-  /* display: flex; */
-  /* flex-grow: 0; */
   width: 100%;
   height: 100%;
   position: relative;
-  /* flex-wrap: wrap; */
-  /* justify-content: flex-end; */
-  /* align-content: flex-start; */
 }
 
 .files-container {
@@ -151,12 +146,8 @@ const all_tabs = computed(() => {
   gap: .5rem;
   overflow-y: scroll;
   overflow-x: scroll;
-  /* height: 10rem; */
-  /* height: 70%; */
   margin-top: .5rem;
-  /* height: 70%; */
   min-height: 30%;
-  /* This is kind of arbitrary */
 }
 
 .box-top {
