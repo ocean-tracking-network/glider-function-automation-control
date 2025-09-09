@@ -4,6 +4,7 @@ import os from 'os'
 import fs from 'fs'
 import { set_script, upload_file } from './sfmc_api.mjs'
 import { create_log } from './log_utils.mjs'
+import { send_slack_message } from './slack.mjs'
 
 async function trigger_file_event(event, glider, geofence) {
   const files_collection = await db.collection('files')
@@ -42,6 +43,7 @@ async function trigger_file_event(event, glider, geofence) {
 }
 
 async function trigger_script_event(event, glider, geofence) {
+  const generic_message_text = `Switched script: ${event.script} for ${glider.name}`
   await set_script(glider.name, event.script, event.script_type)
   if (geofence) {
     await create_log(
@@ -50,8 +52,9 @@ async function trigger_script_event(event, glider, geofence) {
       glider._id
     )
   } else {
-    await create_log(`Switched script: ${event.script} to ${glider.name}`, 'info', glider._id)
+    await create_log(generic_message_text, 'info', glider._id)
   }
+  send_slack_message(generic_message_text)
 }
 
 const trigger_event = async (event, geofence = null, glider = null) => {
