@@ -56,7 +56,7 @@ function generate_geojson(latlons) {
 function get_geojson_opacity(line_num, total_num) {
   const min = 0
   const normalized = (line_num - min) / (total_num - min)
-  return normalized + .05
+  return normalized + .1
 }
 
 function create_polygons() {
@@ -111,10 +111,10 @@ function set_glider_track() {
   glider_track_points.value = []
   console.log(typeof (selected_glider.value.track[0]))
   selected_glider.value.track.forEach((element) => {
-    tracks.push([convert_gps(element[0]), convert_gps(element[1])])
+    tracks.push([convert_gps(element.lat), convert_gps(element.lon)])
     glider_track_points.value.push(
-      L.circle([convert_gps(element[0]), convert_gps(element[1])], { radius: 100, stroke: false, color: 'red' })
-        .addTo(initialMap.value).bindPopup("<b>100 meters</b>")
+      L.circle([convert_gps(element.lat), convert_gps(element.lon)], { radius: 200, stroke: false, color: 'red' })
+        .addTo(initialMap.value).bindPopup(`<b>${element.date}</b><p>200m</p>`)
     )
   })
 
@@ -150,7 +150,7 @@ function set_glider_track() {
   let i = 0
   gliderStore.gliders.forEach((glider) => {
     if (glider._id != selected_glider._id && glider_has_track(glider)) {
-      const current_pos = [convert_gps(glider.track[glider.track.length - 1][0]), convert_gps(glider.track[glider.track.length - 1][1])]
+      const current_pos = [convert_gps(glider.track[glider.track.length - 1].lat), convert_gps(glider.track[glider.track.length - 1].lon)]
       const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
         .on("click", on_glider_glick)
         .addTo(initialMap.value)
@@ -280,7 +280,7 @@ watch(gliders, (new_val) => {
 <style scoped>
 #map {
   width: 500px;
-  height: 567px;
+  height: 614px;
   /* height: 300px; */
 }
 </style>

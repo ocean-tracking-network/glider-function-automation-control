@@ -22,20 +22,20 @@ const adding_new = ref(false)
 function select(tab) {
   // adding_new.value = false
   // temp_rename_text.value = ""
-  if(!adding_new.value && !rename.value){
-  if (!props.static) {
-    if (tab == props.selected && !adding_new.value) {
-      temp_rename_text.value = tab
-      rename.value = true
+  if (!adding_new.value && !rename.value) {
+    if (!props.static) {
+      if (tab == props.selected && !adding_new.value) {
+        temp_rename_text.value = tab
+        rename.value = true
+      }
+      else {
+        rename.value = false
+        temp_rename_text.value = ""
+      }
     }
-    else {
-      rename.value = false
-      temp_rename_text.value = ""
-    }
-  }
 
-  console.log("1")
-  emit("select", tab)
+    console.log("1")
+    emit("select", tab)
   }
 }
 
@@ -78,7 +78,7 @@ const all_tabs = computed(() => {
 <template>
   <div class="tab-container">
     <button :class="{ first: index == 0 }" v-for="(tab, index) in all_tabs" @click="select(tab)">
-      <p :class="{ selected: (selected == tab && !static), last: static }"
+      <p :class="{ tabtext: true, selected: (selected == tab && !static), last: static }"
         :style="{ color: filesStore.colour_by_category[tab] }"
         v-if="(!rename || selected != tab) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
         {{ tab }}
@@ -94,14 +94,13 @@ const all_tabs = computed(() => {
 <style scoped>
 .tab-container {
   display: flex;
-  font-size: large;
   /* gap: 1rem; */
   max-width: 500px;
   overflow-x: scroll;
+  margin-bottom: 0 !important;
 }
 
-.tab-container * {
-}
+.tab-container * {}
 
 .tab-container button {
   border-width: 1px;
@@ -113,7 +112,6 @@ const all_tabs = computed(() => {
   max-width: 100px;
   text-wrap: nowrap;
   overflow: hidden;
-  font-size: medium;
   transition: 1s;
 }
 

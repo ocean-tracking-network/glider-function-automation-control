@@ -13,6 +13,7 @@ import { useGeoFencesStore } from './stores/geofences';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from './stores/gliders';
 import { useUserStore } from './stores/user';
+import ScriptComponent from './components/ScriptComponent.vue';
 
 
 const eventsStore = useEventsStore()
@@ -80,7 +81,12 @@ function trigger_events(event_type) {
     const events = event_type == "enter" ? eventsStore.enter_files : eventsStore.exit_files
     for (const event of events)
       eventsStore.trigger_event(event)
+    const script_event = eventsStore.selected_glider_scripts[event_type]
+    if (script_event) {
+      eventsStore.trigger_event(script_event)
+    }
   }
+
 }
 
 function rename_tab_category(vals) {
@@ -127,10 +133,18 @@ const all_categories = computed(() => {
 
             <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
               :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
-              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter" />
+              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter">
+
+              <ScriptComponent event_type="enter" />
+
+            </FilesBoxComponent>
             <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
               :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
-              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit" />
+              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit">
+
+              <ScriptComponent event_type="exit" />
+
+            </FilesBoxComponent>
             <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
               <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
             </div>
@@ -168,7 +182,7 @@ const all_categories = computed(() => {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
-  height: 575px;
+  /* height: 670px; */
 }
 
 #side {
@@ -185,7 +199,7 @@ const all_categories = computed(() => {
 
 #total {
   width: 100%;
-  height: 7rem;
+  height: 8rem;
   margin-top: .5rem;
 }
 
@@ -194,7 +208,7 @@ const all_categories = computed(() => {
   /* max-width: 50%; */
   /* width: 48%; */
   flex: 1;
-  height: 10rem;
+  height: 12rem;
   flex-basis: 48%;
   max-width: 49.3%;
 }

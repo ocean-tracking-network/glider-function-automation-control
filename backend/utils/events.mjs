@@ -2,16 +2,11 @@ import db from '../db/conn.mjs'
 import { ObjectId } from 'mongodb'
 import os from 'os'
 import fs from 'fs'
-import { upload_file } from './sfmc_api.mjs'
+import { set_script, upload_file } from './sfmc_api.mjs'
 import { create_log } from './log_utils.mjs'
+import { send_slack_message } from './slack.mjs'
 
-const trigger_event = async (event, geofence = null, glider = null) => {
-  if (!glider) {
-    const glider_collection = await db.collection('gliders')
-    glider = await glider_collection.findOne({ _id: ObjectId.createFromHexString(event.glider) })
-    console.log(glider)
-  }
-  console.log(glider)
+async function trigger_file_event(event, glider, geofence) {
   const files_collection = await db.collection('files')
   const file = await files_collection.findOne({ _id: ObjectId.createFromHexString(event.file) })
   if (file != null) {
@@ -44,6 +39,34 @@ const trigger_event = async (event, geofence = null, glider = null) => {
     fs.rmSync(temp_file_location)
   } else {
     console.log('File object not found!')
+  }
+}
+
+async function trigger_script_event(event, glider, geofence) {
+  const generic_message_text = `Switched script: ${event.script} for ${glider.name}`
+  await set_script(glider.name, event.script, event.script_type)
+  if (geofence) {
+    await create_log(
+      `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Swapped script to: ${event.script}`,
+      'info',
+      glider._id
+    )
+  } else {
+    await create_log(generic_message_text, 'info', glider._id)
+  }
+  send_slack_message(generic_message_text)
+}
+
+const trigger_event = async (event, geofence = null, glider = null) => {
+  console.log(event)
+  if (!glider) {
+    const glider_collection = await db.collection('gliders')
+    glider = await glider_collection.findOne({ _id: ObjectId.createFromHexString(event.glider) })
+  }
+  if (event.file) {
+    await trigger_file_event(event, glider, geofence)
+  } else if (event.script) {
+    await trigger_script_event(event, glider, geofence)
   }
 }
 

@@ -4,7 +4,13 @@ import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
-import { get_gliders, post_gliders, post_gliders_track, update_gliders } from './views/gliders.mjs'
+import {
+  get_gliders,
+  get_scripts,
+  post_gliders,
+  post_gliders_track,
+  update_gliders,
+} from './views/gliders.mjs'
 import {
   delete_geofences,
   get_geofences,
@@ -24,7 +30,7 @@ import { login } from './views/user.mjs'
 import { authenticateToken } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
-import { update_glider_positions } from './utils/glider_utils.mjs'
+import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 
 const app = express()
@@ -43,6 +49,7 @@ app.post('/glider', authenticateToken, post_gliders)
 app.get('/glider', authenticateToken, get_gliders)
 app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
 app.patch('/glider/:id', authenticateToken, update_gliders)
+app.get('/glider/:id/scripts', authenticateToken, get_scripts)
 
 // geofence
 app.get('/geofence', authenticateToken, get_geofences)
@@ -68,9 +75,10 @@ app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, post_logs)
 
 // Schedule
-const backend_schedule = scheduleJob('*/10 * * * * *', async () => {
+const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
+  await delete_old_tracks()
 })
 
 // app start

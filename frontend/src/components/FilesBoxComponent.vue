@@ -119,17 +119,24 @@ const all_tabs = computed(() => {
           </a>
         </template>
       </draggable>
+      <div class="footer">
+        <slot>
+        </slot>
+      </div>
     </div>
   </div>
 </template>
 <style scoped>
+.footer {
+  width: 95%;
+  position: absolute;
+  bottom: .5rem;
+}
+
 .files-box {
-  display: flex;
-  flex-grow: 0;
   width: 100%;
   height: 100%;
-  flex-wrap: wrap;
-  /* justify-content: flex-end; */
+  position: relative;
 }
 
 .files-container {
@@ -139,13 +146,13 @@ const all_tabs = computed(() => {
   gap: .5rem;
   overflow-y: scroll;
   overflow-x: scroll;
-  /* height: 10rem; */
-  height: 74%;
   margin-top: .5rem;
+  min-height: 30%;
 }
 
 .box-top {
   width: 100%;
+  max-height: 2rem;
   display: flex;
   justify-content: space-between;
 }
@@ -157,11 +164,8 @@ const all_tabs = computed(() => {
 }
 
 .files {
-  /* width: 200px; */
-  /* width: 50%; */
   width: auto;
   padding: .3rem;
-  /* height: 2.5rem; */
 }
 
 .add-btn {
@@ -187,9 +191,4 @@ hr {
 .hidden {
   display: none !important
 }
-
-/* .file-box-tabs {
-  overflow-x: scroll;
-  max-width: 100px;
-} */
 </style>
