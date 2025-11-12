@@ -185,6 +185,9 @@ h2 {
 }
 
 hr {
+  /* color: var(--color-text); */
+  border-top-width: 1px;
+  border-top-color: var(--color-text);
   width: 100%;
 }
 

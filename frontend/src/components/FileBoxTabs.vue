@@ -106,7 +106,7 @@ const all_tabs = computed(() => {
   border-width: 1px;
   border-bottom-width: 0px;
   border-left-width: 0px;
-  border-color: white;
+  border-color: var(--color-text);
   padding-right: .5rem;
   padding-left: .5rem;
   max-width: 100px;
@@ -122,7 +122,7 @@ const all_tabs = computed(() => {
 
 .first {
   border-left-width: 1px !important;
-  border-color: white;
+  border-color: var(--color-text);
   border-top-left-radius: 3px;
 }
 
@@ -131,7 +131,6 @@ const all_tabs = computed(() => {
 }
 
 button:hover {
-  color: lightgray;
   color: var(--color-border-hover);
   transition: .2s;
 }
