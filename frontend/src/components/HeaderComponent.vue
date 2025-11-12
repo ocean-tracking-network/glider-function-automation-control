@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-const version_number = "0.1.3:xml-scripts"
+const version_number = "0.2.1"
 </script>
 <template>
   <div>

@@ -8,10 +8,10 @@ export const useFilesStore = defineStore('files', () => {
   const eventsStore = useEventsStore()
 
   const colours = [
-    '#00FF00', // Lime
-    '#FFFF00', // Yellow
-    '#00FFFF', // Cyan
-    '#FF00FF', // Magenta
+    'purple',
+    'darkgreen',
+    'orange',
+    'blue',
     '#800000', // Maroon
     '#008000', // Green
     '#000080', // Navy
