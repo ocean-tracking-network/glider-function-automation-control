@@ -2,16 +2,32 @@
 
 ## Setup
 
+* Clone this repo
+* Make sure to copy `(backend/frontend)/env.example` to `.env` and fill them out
+  * The default mongodb settings should be already good if you're using docker to run the project
+
+### Docker
+
 #### Requirements
+
+* Docker
+
+#### Running
+
+* in the docker/ folder run `docker compose up`
+* pass in `--build` at the end to force rebuild the container when making changes to the code
+
+### Non Docker
+
+#### Requirements
+
 * NodeJS/npm
 * Mongodb
 
 #### Project Setup
 
-* Clone this repo
 * In both the backend and frontend folder run `npm install`
 
-- Make sure to copy `(backend/frontend)/env.example` to `.env` and fill them out
 
 #### Running
 
@@ -27,11 +43,11 @@
 
 Change the number in [HeaderComponent.vue](./frontend/src/components/HeaderComponent.vue)
 
-- Main
+* Main
 
-  - `major.minor.patch`
-  - A patch would be anytime a purly bug fix push gets pushed to main
+  * `major.minor.patch`
+  * A patch would be anytime a purly bug fix push gets pushed to main
 
-- Development
-  - `major.minor.day-of-month:branch`
-  - Keep major/minor version of the branched off version, incrament one up from main's minor or major before a merge request
+* Development
+  * `major.minor.day-of-month:branch`
+  * Keep major/minor version of the branched off version, incrament one up from main's minor or major before a merge request
