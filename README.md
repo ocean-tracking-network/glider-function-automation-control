@@ -1,8 +1,29 @@
-# Glider File Automation Control (GFAC)
+# Glider Function Automation Control (GFAC)
+
+## Setup
+
+#### Requirements
+* NodeJS/npm
+* Mongodb
+
+#### Project Setup
+
+* Clone this repo
+* In both the backend and frontend folder run `npm install`
 
 - Make sure to copy `(backend/frontend)/env.example` to `.env` and fill them out
 
-## Versioning
+#### Running
+
+* Frontend
+  * In the frontend/ directory, run `npm run dev`
+* Backend
+  * In the backend/ directory , run `node app.mjs`
+
+
+## Development
+
+### Versioning
 
 Change the number in [HeaderComponent.vue](./frontend/src/components/HeaderComponent.vue)
 
