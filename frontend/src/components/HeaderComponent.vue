@@ -4,7 +4,7 @@ const version_number = "0.2.1"
 </script>
 <template>
   <div>
-    <h1>Glider File Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
+    <h1>Glider Function Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
     <!-- (GAS Geofence Automation for Slocum) (GLAfS
     Geofence Location Automation for Slocums) () -->
     <!-- <div id="checkbox-div">
