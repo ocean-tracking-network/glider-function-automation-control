@@ -11,6 +11,7 @@
 #### Requirements
 
 * Docker
+* Put the `sfmc.tgz` in the [docker/](/docker/) directory
 
 #### Running
 
@@ -23,6 +24,7 @@
 
 * NodeJS/npm
 * Mongodb
+* sfmc javascript library
 
 #### Project Setup
 
@@ -32,9 +34,9 @@
 #### Running
 
 * Frontend
-  * In the frontend/ directory, run `npm run dev`
+  * In the [frontend/](/frontend/) directory, run `npm run dev`
 * Backend
-  * In the backend/ directory , run `node app.mjs`
+  * In the [backend/](/backend/) directory , run `node app.mjs`
 
 
 ## Development

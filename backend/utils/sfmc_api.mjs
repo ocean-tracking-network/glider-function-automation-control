@@ -1,14 +1,3 @@
-/**
- * Copyright 2020 Teledyne Webb Research as an unpublished work.
- *
- * The information contained herein is the property of Teledyne Webb Research
- * and is considered proprietary. This information may not be used for any
- * other purpose, copied, transferred or disclosed to third parties, reverse
- * engineered, modified or improved without written consent from Teledyne
- * Webb Research.
- *
- */
-
 import sfmc, { glider } from 'sfmc'
 import { send_slack_message } from './slack.mjs'
 
