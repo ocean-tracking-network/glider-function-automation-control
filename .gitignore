@@ -33,3 +33,4 @@ local.json
 uploads/
 
 backend/.env
+*.tgz
