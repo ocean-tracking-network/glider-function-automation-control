@@ -1,14 +1,24 @@
 <script setup>
 import { useFilesStore } from '@/stores/files';
+import { computed } from 'vue';
 
 const props = defineProps(['element'])
 const emit = defineEmits(["remove"])
 const filesStore = useFilesStore()
+
+const styleColor = computed(() => {
+  return (props.element.category !== undefined ? filesStore.colour_by_category[props.element.category] : '')
+})
+
+const classBold = computed(() => {
+  return (props.element.bold !== undefined ?  props.element.bold : false )
+})
+
 </script>
 <template>
   <div class="border">
-    <p :style="{ color: filesStore.colour_by_category[element.category] }"
-      :class="{ filename: true, bold: element.bold }">{{
+    <p :style="{ color: styleColor }"
+      :class="{ filename: true, bold: classBold}">{{
         element.name }}</p>
     <div class="buttons">
       <!-- <button class="view">👁</button> -->
