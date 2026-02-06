@@ -65,9 +65,7 @@ function create_polygons() {
     let options = {}
     if (index == Object.keys(store.geofences).indexOf(store.selected_fence_key)) {
       options.color = "orange"
-      //CHANGE #JS0002
-      // console.log("red?")
-      //END CHANGE #JS0002
+      console.log("red?")
     }
     index++
     let new_polygon = L.polygon(geofence.latlons, options)
@@ -226,57 +224,32 @@ watch(selected_idx, (new_idx) => {
 })
 
 watch(selected_glider, () => {
-  console.log("Updating glider track")
+  console.log("Updaing glider track")
   set_glider_track()
 })
 
-//BEGIN CHANGES #JS0001
 watch(selected_fence, () => {
   if (selected_fence.value) {
     try {
-      // compute polygon centroid using shoelace formula for better centering
-      const pts = selected_fence.value.latlons
-        .filter((p) => p && p[0] !== undefined && p[1] !== undefined)
-        .map((p) => ({ x: parseFloat(p[1]), y: parseFloat(p[0]) })) // x=lon, y=lat
-
-      if (pts.length < 1) return
-
-      let area = 0
-      let cx = 0
-      let cy = 0
-      for (let i = 0; i < pts.length; i++) {
-        const j = (i + 1) % pts.length
-        const a = pts[i].x * pts[j].y - pts[j].x * pts[i].y
-        area += a
-        cx += (pts[i].x + pts[j].x) * a
-        cy += (pts[i].y + pts[j].y) * a
-      }
-      area = area / 2
-      if (Math.abs(area) < 1e-9) {
-        // fallback to simple average if degenerate
-        let sumx = 0
-        let sumy = 0
-        pts.forEach((p) => {
-          sumx += p.x
-          sumy += p.y
-        })
-        const avgx = sumx / pts.length
-        const avgy = sumy / pts.length
-        initialMap.value.setView([avgy, avgx])
-        console.log(avgx + "," + avgy)
-      } else {
-        cx = cx / (6 * area)
-        cy = cy / (6 * area)
-        initialMap.value.setView([cy, cx])
-        console.log(cx + "," + cy)
-      }
+      let avg_lat = 0
+      let avg_lon = 0
+      selected_fence.value.latlons.forEach((ele) => {
+        if (ele[0] && ele[1]) {
+          avg_lat += parseFloat(ele[0])
+          avg_lon += parseFloat(ele[1])
+        }
+      })
+      avg_lat = avg_lat / (selected_fence.value.latlons.length - 1)
+      avg_lon = avg_lon / (selected_fence.value.latlons.length - 1)
+      console.log(avg_lat)
+      console.log(avg_lon)
+      initialMap.value.setView([avg_lat, avg_lon])
     } catch (error) {
       console.log("Failed to center view on geofence")
       console.log(error)
     }
   }
 })
-//END CHANGES #JS0001
 
 
 const geofences_filtered = computed(() => {

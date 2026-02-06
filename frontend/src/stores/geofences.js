@@ -15,7 +15,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
   const set_force_map_update = (value) => {
     force_map_update.value = value
-    console.log ("FORCE MAP UPDATE")
   }
 
   const getGeofences = () => {
@@ -74,7 +73,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       name: geofence.name,
       notify: geofence.notify,
     }
-    console.log(data + " Data")
+    console.log(data)
     const url = '/geofence/' + selected_fence_key.value
     apiClient.patch(url, data).then((res) => {
       //console.log(res)
@@ -124,7 +123,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
   function select(key) {
     console.log('selecting fence')
-    console.log(key + " this ONE")
+    console.log(key)
     selected_fence.value = geofences.value[key]
     selected_fence_key.value = key
     set_force_map_update(true)
