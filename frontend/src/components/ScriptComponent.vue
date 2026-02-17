@@ -6,6 +6,7 @@ import { useGlidersStore } from '@/stores/gliders';
 import { storeToRefs } from 'pinia';
 import { useScriptsStore } from '@/stores/scripts';
 import { useEventsStore } from '@/stores/events';
+import { useUserStore } from '@/stores/user';
 
 
 const props = defineProps(['event_type'])
@@ -17,8 +18,10 @@ const non_text = "None"
 const gliderStore = useGlidersStore()
 const scriptsStore = useScriptsStore()
 const eventsStore = useEventsStore()
+const userStore = useUserStore()
 const { scripts } = storeToRefs(scriptsStore)
 const { selected_glider } = storeToRefs(gliderStore)
+const { isAdmin } = storeToRefs(userStore)
 
 onMounted(() => {
   update_scripts()
@@ -52,6 +55,9 @@ function get_script_type(script_name) {
 }
 
 function on_select(option) {
+  if (!isAdmin.value) {
+    return
+  }
   const selected_script_event = eventsStore.selected_glider_scripts[props.event_type]
   if (option == non_text && selected_script_event) {
     eventsStore.remove_event(selected_script_event._id)
@@ -79,7 +85,8 @@ const combined_options = computed(() => {
     <hr>
     <div class="dropdown-container">
       <strong>Selected Script:</strong>
-      <DropDownComponent :selected="selected" @select="on_select" :default="non_text" :options="combined_options" />
+      <DropDownComponent :selected="selected" @select="on_select" :default="non_text" :options="combined_options"
+        :disabled="!isAdmin" />
     </div>
   </div>
 </template>

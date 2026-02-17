@@ -7,9 +7,11 @@ import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
 import slocum1 from "@/assets/slocum_marker.png";
 import waypointIcon from "@/assets/target-opaque-32x32.png"
+import { useUserStore } from "@/stores/user";
 
 const store = useGeoFencesStore();
 const gliderStore = useGlidersStore();
+const userStore = useUserStore();
 
 const initialMap = ref()
 const polygons = ref([])
@@ -27,6 +29,7 @@ const glider_to_leaflet_id_map = ref({})
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
+const { isAdmin } = storeToRefs(userStore)
 
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
@@ -164,6 +167,9 @@ function set_glider_track() {
 }
 
 function map_click(e) {
+  if (!isAdmin.value) {
+    return
+  }
   if (store.selected_fence && interactive_map.value) {
     // store.selected_fence
     // //console.log(e.latlng)

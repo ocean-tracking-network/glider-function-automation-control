@@ -25,9 +25,9 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
-import { login } from './views/user.mjs'
+import { login, create_user } from './views/user.mjs'
 
-import { authenticateToken } from './utils/auth.mjs'
+import { authenticateToken, requireAdmin } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
@@ -39,40 +39,43 @@ const upload = multer({ dest: 'uploads/' })
 app.use(express.json())
 const port = 3000
 
+//ADMIN USER ROLE REQUIRED FOR MOST OPERATIONS, IMPLEMENTED WITH requireAdmin AND authenticateToken
+
 // Routes
 
 // user
 app.post('/login', login)
+app.post('/users', authenticateToken, requireAdmin, create_user)
 
 // glider
-app.post('/glider', authenticateToken, post_gliders)
+app.post('/glider', authenticateToken, requireAdmin, post_gliders)
 app.get('/glider', authenticateToken, get_gliders)
-app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
-app.patch('/glider/:id', authenticateToken, update_gliders)
+app.post('/glider/:id/add-track', authenticateToken, requireAdmin, post_gliders_track)
+app.patch('/glider/:id', authenticateToken, requireAdmin, update_gliders)
 app.get('/glider/:id/scripts', authenticateToken, get_scripts)
 
 // geofence
 app.get('/geofence', authenticateToken, get_geofences)
-app.post('/geofence', authenticateToken, post_geofences)
-app.delete('/geofence/:id', authenticateToken, delete_geofences)
-app.patch('/geofence/:id', authenticateToken, patch_geofences)
+app.post('/geofence', authenticateToken, requireAdmin, post_geofences)
+app.delete('/geofence/:id', authenticateToken, requireAdmin, delete_geofences)
+app.patch('/geofence/:id', authenticateToken, requireAdmin, patch_geofences)
 
 // files
 app.get('/files', authenticateToken, get_files)
-app.post('/files', authenticateToken, upload.array('files', 100), post_files)
-app.delete('/files/:id', authenticateToken, delete_files)
-app.patch('/files', authenticateToken, update_files)
+app.post('/files', authenticateToken, requireAdmin, upload.array('files', 100), post_files)
+app.delete('/files/:id', authenticateToken, requireAdmin, delete_files)
+app.patch('/files', authenticateToken, requireAdmin, update_files)
 
 // Events
 app.get('/events', authenticateToken, get_events)
-app.post('/events', authenticateToken, post_events)
-app.patch('/events/:id', authenticateToken, patch_events)
-app.delete('/events/:id', authenticateToken, delete_events)
-app.post('/events/:id/trigger', authenticateToken, trigger_events)
+app.post('/events', authenticateToken, requireAdmin, post_events)
+app.patch('/events/:id', authenticateToken, requireAdmin, patch_events)
+app.delete('/events/:id', authenticateToken, requireAdmin, delete_events)
+app.post('/events/:id/trigger', authenticateToken, requireAdmin, trigger_events)
 
 // logs
 app.get('/logs', authenticateToken, get_logs)
-app.post('/logs', authenticateToken, post_logs)
+app.post('/logs', authenticateToken, requireAdmin, post_logs)
 
 // Schedule
 const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
