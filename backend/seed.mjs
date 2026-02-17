@@ -14,8 +14,7 @@ const seedDatabase = async () => {
     // Check if seed users already exist
     const existingAdmin = await collection.findOne({ username: 'testadmin' })
     const existingViewer = await collection.findOne({ username: 'viewer' })
-
-
+ 
 
     // Delete old seed users if they exist
     if (existingAdmin) await collection.deleteOne({ username: 'testadmin' })
