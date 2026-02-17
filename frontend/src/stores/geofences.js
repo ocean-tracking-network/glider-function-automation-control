@@ -1,7 +1,9 @@
-import { ref, computed, onMounted } from 'vue'
-import { defineStore } from 'pinia'
+import { ref, watch, onMounted } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
+import { kml } from '@tmcw/togeojson'
 import apiClient from '@/apiClient'
 import { useEventsStore } from './events'
+import { useFilesStore } from './files'
 
 export const useGeoFencesStore = defineStore('geofences', () => {
   const geofences = ref({})
@@ -11,7 +13,26 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const selected_idx = ref(null)
   const interactive_map = ref(false)
   const force_map_update = ref(false)
+  const selected_kml_geo_json = ref(null)
   const eventsStore = useEventsStore()
+  const filesStore = useFilesStore()
+  const {local_kml_file} = storeToRefs(filesStore)
+
+  watch(local_kml_file, async (new_kml_file) => {
+    if (!new_kml_file) {
+      selected_kml_geo_json.value = null
+    } else {
+      const kmlText = await new_kml_file.text()
+      const kmlDom = new DOMParser().parseFromString(kmlText, "text/xml")
+      selected_kml_geo_json.value = kml(kmlDom).features.map((feature) => {
+        return {
+          coordinates: feature.geometry.coordinates,
+          placemark: feature.properties.name,
+          description: feature.properties.description,
+        }
+      })
+    }
+  })
 
   const set_force_map_update = (value) => {
     force_map_update.value = value
@@ -164,5 +185,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     saveOrUpdateGeofence,
     deleteGeofence,
     getGeofences,
+    selected_kml_geo_json
   }
 })
