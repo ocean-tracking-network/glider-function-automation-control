@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
 import { updateOne } from '../utils/db_utils.mjs'
-import { get_available_scripts } from '../utils/sfmc_api.mjs'
+import { get_active_deployment_details, get_available_scripts } from '../utils/sfmc_api.mjs'
 
 const get_gliders = async (req, res) => {
   let collection = await db.collection('gliders')
@@ -17,9 +17,34 @@ const post_gliders = async (req, res) => {
     res.send({ error: 'Need to specify a name' }).status(400)
     return
   }
+
+  const sfmc_json = await get_active_deployment_details(glider_name)
+
+  // Dummy data
+  // const sfmc_json = {
+  //   data: {
+  //     gpsValidLat: 4859.91552734375,
+  //     gpsValidLon: -6317.248046875,
+  //     id: 275,
+  //     isGpsValid: true,
+  //     name: glider_name,
+  //   },
+  // }
+
+  if (!sfmc_json) {
+    console.log(`No SFMC JSON for ${glider_name}`)
+    return
+  }
+
   const new_doc = {
     name: glider_name,
-    track: [],
+    track: [
+      {
+        lat: sfmc_json.data.gpsValidLat,
+        lon: sfmc_json.data.gpsValidLon,
+        date: new Date(),
+      },
+],
     enabled: false,
   }
   let result = await collection.insertOne(new_doc)

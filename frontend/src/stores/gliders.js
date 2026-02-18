@@ -29,9 +29,9 @@ export const useGlidersStore = defineStore('gliders', () => {
       })
   }
 
-  const save_glider = (g) => {
-    data = {
-      name: g.name,
+  const save_glider = (name) => {
+const data = {
+      name: name,
     }
     apiClient.post('/glider', data).then((res) => {
       console.log(res)

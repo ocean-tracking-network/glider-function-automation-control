@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted } from 'vue';
 import { useGlidersStore } from '@/stores/gliders';
 import { storeToRefs } from 'pinia';
 
@@ -10,6 +9,38 @@ function enable_disable_glider() {
   gliderStore.enable_disable_selected_glider()
 }
 
+function add_glider_prompt() {
+  const rawName = prompt('Please enter new glider name', '')
+  if (rawName === null) {
+    return
+  }
+
+  const name = rawName.trim()
+
+  if (!name) {
+    alert('Invalid: Name is empty')
+    return
+  }
+  if (name.includes(' ')) {
+    alert('Invalid: Name cannot include spaces')
+    return
+  }
+  if (gliders.value.some((glider) => glider.name === name)) {
+    alert(`Invalid: "${name}" is already taken`)
+    return
+  }
+
+  if (!confirm(`Are you sure you want to create glider '${name}''`)) {
+    return
+  }
+
+  gliderStore.save_glider(name)
+}
+function delete_glider_prompt(glider) {
+  if (confirm(`Are you sure you want to delete glider ${glider.name}`)) {
+    gliderStore.delete_glider(glider)
+  }
+}
 </script>
 <template>
   <div class="border">
@@ -20,12 +51,9 @@ function enable_disable_glider() {
           class="enable" type="checkbox">
         {{ glider.name }}
       </button>
-      <button class="gliders" id="add">
-        +
-      </button>
+      <button class="gliders" id="add" @click="add_glider_prompt()">+</button>
     </div>
-    <!-- <button id="add">+</button> -->
-  </div>
+      </div>
 </template>
 <style scoped>
 #tab-body {
