@@ -150,8 +150,19 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
             @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
-          <div>
-            <code>{{ selected_kml_geo_json }}</code>
+          <div class="uploaded-kml-coordinates-selector-inner-contianer">
+            <div class="kml-file-placemark-card" v-for="(geofence, index) in selected_kml_geo_json">
+              <div class="kml-file-placemark-card-placemark">
+                <span><b>Placemark:</b></span>
+                <p>{{ geofence.placemark }}</p>
+              </div>
+              <div class="kml-file-placemark-card-coordinates">
+                <span><b>Coordinates:</b></span>
+                <p>#{{ geofence.coordinates.length ?? 0 }}</p>
+              </div>
+              <button :disabled="!geofence.coordinates.length" class="border"
+                @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
+            </div>
           </div>
           <button class="remove x-btn" @click="filesStore.clear_kml_file">
             x
@@ -243,22 +254,59 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   position: relative;
 }
 
-.uploaded-kml-coordinates-selector-contianer div {
-  overflow-x: clip;
-  overflow-y: auto;
-  width: 100%;
-  height: 100%;
-}
-
 .uploaded-kml-coordinates-selector-contianer .remove {
   position: absolute;
-  top: 0px;
-  right: 0px;
+  top: -4px;
+  right: -4px;
   border: 1px solid lightgray;
   border-radius: 4px;
   width: 26px;
   height: 26px;
   background-color: white;
+}
+
+.uploaded-kml-coordinates-selector-inner-contianer {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kml-file-placemark-card {
+  width: 100%;
+  padding: 8px;
+  color: var(--color-text);
+  border-color: lightgray;
+  border-width: 1px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.kml-file-placemark-card button {
+  padding: 4px 2px;
+}
+
+.kml-file-placemark-card button:hover {
+  transition: .2s;
+  border-color: lightblue;
+}
+
+.kml-file-placemark-card button:disabled {
+  background-color: lightgray;
+  opacity: .4;
+  border-color: lightgray;
+}
+
+.kml-file-placemark-card-placemark,
+.kml-file-placemark-card-coordinates {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
 }
 
 .inputs {

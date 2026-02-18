@@ -26,13 +26,26 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       const kmlDom = new DOMParser().parseFromString(kmlText, "text/xml")
       selected_kml_geo_json.value = kml(kmlDom).features.map((feature) => {
         return {
-          coordinates: feature.geometry.coordinates,
+          coordinates: feature.geometry.coordinates[0],
           placemark: feature.properties.name,
           description: feature.properties.description,
         }
       })
     }
   })
+
+  watch(selected_kml_geo_json, () => {
+    // Auto Fill geofence latlons inputs if inputs are empty
+    // and kml file contains only 1 placemark
+    if (selected_fence.value.latlons.length <= 1 && selected_kml_geo_json.value.length === 1) {
+      apply_coordinates_from_kml_file(selected_kml_geo_json.value[0].coordinates)
+      local_kml_file.value = null
+    }
+  })
+
+  const apply_coordinates_from_kml_file = (latlons) => {
+    selected_fence.value.latlons = latlons
+  }
 
   const set_force_map_update = (value) => {
     force_map_update.value = value
@@ -185,6 +198,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     saveOrUpdateGeofence,
     deleteGeofence,
     getGeofences,
-    selected_kml_geo_json
+    selected_kml_geo_json,
+    apply_coordinates_from_kml_file
   }
 })
