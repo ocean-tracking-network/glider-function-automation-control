@@ -50,6 +50,7 @@ function delete_glider_prompt(glider) {
         <input v-model="glider.enabled" @change="enable_disable_glider" :disabled="selected_glider_idx != index"
           class="enable" type="checkbox">
         {{ glider.name }}
+        <button v-if="gliders[selected_glider_idx]._id == glider._id" @click="delete_glider_prompt(glider)" class="x-btn">X</button>
       </button>
       <button class="gliders" id="add" @click="add_glider_prompt()">+</button>
     </div>
@@ -84,8 +85,18 @@ function delete_glider_prompt(glider) {
   padding-bottom: 0;
 }
 
-#add:hover {
+/* #add:hover {
   border-color: limegreen;
+} */
+
+.x-btn:hover {
+  transition: .2s;
+  color: red;
+}
+
+.x-btn {
+  height: 1px;
+  padding-left: 4px;
 }
 
 .selected {

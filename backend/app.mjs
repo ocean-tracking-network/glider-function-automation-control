@@ -10,6 +10,7 @@ import {
   post_gliders,
   post_gliders_track,
   update_gliders,
+  delete_gliders,
 } from './views/gliders.mjs'
 import {
   delete_geofences,
@@ -45,10 +46,12 @@ const port = 3000
 app.post('/login', login)
 
 // glider
-app.post('/glider', authenticateToken, post_gliders)
 app.get('/glider', authenticateToken, get_gliders)
-app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
+app.post('/glider', authenticateToken, post_gliders)
+app.delete('/glider/:id', authenticateToken, delete_gliders)
 app.patch('/glider/:id', authenticateToken, update_gliders)
+// glider-tracks
+app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
 app.get('/glider/:id/scripts', authenticateToken, get_scripts)
 
 // geofence
