@@ -29,11 +29,18 @@ export const useGlidersStore = defineStore('gliders', () => {
       })
   }
 
-  const save_glider = (g) => {
-    data = {
-      name: g.name,
+  const save_glider = (name) => {
+    const data = {
+      name: name,
     }
     apiClient.post('/glider', data).then((res) => {
+      console.log(res)
+      get_gliders()
+    })
+  }
+
+  const delete_glider = (glider) => {
+    apiClient.delete(`/glider/${glider._id}`).then((res) => {
       console.log(res)
       get_gliders()
     })
@@ -57,6 +64,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     save_glider,
     get_gliders,
     select_glider,
+    delete_glider,
     enable_disable_selected_glider,
     gliders_obj,
     selected_glider_idx,
