@@ -160,7 +160,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
                 <span><b>Coordinates:</b></span>
                 <p>#{{ geofence.coordinates.length ?? 0 }}</p>
               </div>
-              <button :disabled="!geofence.coordinates.length" class="border"
+              <button :disabled="!geofence.coordinates.length || geofence.coordinates.length < 3" class="border"
                 @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
             </div>
           </div>

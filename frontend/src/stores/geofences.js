@@ -16,28 +16,38 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const selected_kml_geo_json = ref(null)
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
-  const {local_kml_file} = storeToRefs(filesStore)
+  const { local_kml_file } = storeToRefs(filesStore)
 
   watch(local_kml_file, async (new_kml_file) => {
     if (!new_kml_file) {
       selected_kml_geo_json.value = null
     } else {
       const kmlText = await new_kml_file.text()
-      const kmlDom = new DOMParser().parseFromString(kmlText, "text/xml")
-      selected_kml_geo_json.value = kml(kmlDom).features.map((feature) => {
-        return {
-          coordinates: feature.geometry.coordinates[0],
-          placemark: feature.properties.name,
-          description: feature.properties.description,
-        }
-      })
+      const kmlDom = new DOMParser().parseFromString(kmlText, 'text/xml')
+      if (kmlDom.getElementsByTagName('parsererror').length) {
+        local_kml_file.value = null
+        alert(`Failed to parse ${new_kml_file.name} file! please upload a valid .kml file`)
+      } else {
+        const geoJson = kml(kmlDom)
+        selected_kml_geo_json.value = geoJson.features.map((feature) => {
+          return {
+            coordinates: feature.geometry.coordinates[0],
+            placemark: feature.properties.name,
+            description: feature.properties.description,
+          }
+        })
+      }
     }
   })
 
   watch(selected_kml_geo_json, () => {
     // Auto Fill geofence latlons inputs if inputs are empty
     // and kml file contains only 1 placemark
-    if (selected_fence.value.latlons.length <= 1 && selected_kml_geo_json.value.length === 1) {
+    if (
+      selected_fence.value.latlons.length <= 1 &&
+      selected_kml_geo_json.value &&
+      selected_kml_geo_json.value.length === 1
+    ) {
       apply_coordinates_from_kml_file(selected_kml_geo_json.value[0].coordinates)
       local_kml_file.value = null
     }
@@ -199,6 +209,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     deleteGeofence,
     getGeofences,
     selected_kml_geo_json,
-    apply_coordinates_from_kml_file
+    apply_coordinates_from_kml_file,
   }
 })
