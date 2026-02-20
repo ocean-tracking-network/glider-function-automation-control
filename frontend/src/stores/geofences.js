@@ -31,17 +31,19 @@ export const useGeoFencesStore = defineStore('geofences', () => {
         const geoJson = kml(kmlDom)
         selected_kml_geo_json.value = geoJson.features.map((feature) => {
           const coordinates = []
-          const isValid = true
+          let isValid = true
 
           switch (feature.geometry.type) {
             case 'Point':
-              coordinates.push([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
+              coordinates.push([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
               if (coordinates.length < 1) {
                 isValid = false
               }
               break
             case 'Polygon':
-              coordinates.push(...feature.geometry.coordinates[0])
+              coordinates.push(
+                ...feature.geometry.coordinates[0].map((lonlats) => [lonlats[1], lonlats[0]]),
+              )
               if (coordinates.length < 3) {
                 isValid = false
               }
