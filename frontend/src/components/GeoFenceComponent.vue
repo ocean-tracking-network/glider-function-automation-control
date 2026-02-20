@@ -1,4 +1,5 @@
 <script setup>
+
 import { computed, nextTick, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
@@ -6,10 +7,12 @@ import { useGeoFencesStore } from '@/stores/geofences';
 import { useEventsStore } from '@/stores/events';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from '@/stores/gliders';
+import { useUserStore } from '@/stores/user';
 
 const store = useGeoFencesStore()
 const eventsStore = useEventsStore()
 const gliderStore = useGlidersStore()
+const userStore = useUserStore()
 const geofence_editor = ref(false);
 const selected_fence_local = ref("")
 const just_removed = ref(false)
@@ -17,11 +20,22 @@ const just_removed = ref(false)
 const { geofences, selected_fence } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
 
+//GET USER ROLE FROM STORED USER
+const { isAdmin } = storeToRefs(userStore)
+
+//ADD GEOFENCE RESTRICTED TO ADMIN
 function add_geo() {
+  if (!isAdmin.value) {
+    return
+  }
   geofence_editor.value = true
 }
 
+//SAVE RESTRICTED TO ADMIN
 function back(save) {
+  if (!isAdmin.value) {
+    save = false
+  }
   if (save) {
     store.saveOrUpdateGeofence()
   }
@@ -44,7 +58,11 @@ function on_click(e) {
   //console.log("ONCLICK")
 }
 
+//RESTRICT REMOVE TO ADMIN
 function remove(element) {
+  if (!isAdmin.value) {
+    return
+  }
   back(false)
   just_removed.value = true
   if (confirm("WARNING!\nAre you sure you want to remove this geofence?") == true) {
@@ -79,14 +97,17 @@ watch(selected_fence, (new_val) => {
   }
 })
 
+
+//UI/UX DRIVEN BY isAdmin WHERE NEEDED
 </script>
 <template>
   <div>
     <FilesBoxComponent v-if="geofence_editor == false" @delete="remove" @add_btn="add_geo()" @click="on_click"
-      :list="latlons" :draggable="false" title="Geofences" id="geo" />
+      :list="latlons" :draggable="false" :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin"
+      title="Geofences" id="geo" />
 
     <div class="border2 border" v-if="geofence_editor == true">
-      <AddGeoFenceComponent @back="back" :fenceKey="selected_fence_local" />
+      <AddGeoFenceComponent @back="back" :fenceKey="selected_fence_local" :canEdit="isAdmin" />
     </div>
   </div>
 </template>

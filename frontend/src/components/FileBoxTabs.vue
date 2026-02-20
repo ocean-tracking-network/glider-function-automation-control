@@ -10,7 +10,11 @@ const props = defineProps({
     default(rawProps) {
       return false
     }
-  }
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 const emit = defineEmits(["add", "select", "rename"])
 const filesStore = useFilesStore()
@@ -20,6 +24,9 @@ const temp_rename_text = ref("")
 const adding_new = ref(false)
 
 function select(tab) {
+  if (props.disabled) {
+    return
+  }
   // adding_new.value = false
   // temp_rename_text.value = ""
   if (!adding_new.value && !rename.value) {
@@ -40,6 +47,12 @@ function select(tab) {
 }
 
 function stop_edit() {
+  if (props.disabled) {
+    rename.value = false
+    adding_new.value = false
+    temp_rename_text.value = ""
+    return
+  }
   rename.value = false
   if (adding_new.value) {
     if (temp_rename_text.value != "") {
@@ -59,6 +72,9 @@ function stop_edit() {
 }
 
 function add() {
+  if (props.disabled) {
+    return
+  }
   console.log("3")
   // emit("select", "")
   adding_new.value = true
@@ -77,18 +93,19 @@ const all_tabs = computed(() => {
 </script>
 <template>
   <div class="tab-container">
-    <button :class="{ first: index == 0 }" v-for="(tab, index) in all_tabs" @click="select(tab)">
+    <button :class="{ first: index == 0 }" v-for="(tab, index) in all_tabs" @click="select(tab)"
+      :disabled="props.disabled">
       <p :class="{ tabtext: true, selected: (selected == tab && !static), last: static }"
         :style="{ color: filesStore.colour_by_category[tab] }"
         v-if="(!rename || selected != tab) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
         {{ tab }}
         <!-- {{ filesStore.colour_by_category[tab] }} -->
       </p>
-      <input @focusout="stop_edit" v-model="temp_rename_text"
+      <input @focusout="stop_edit" v-model="temp_rename_text" :disabled="props.disabled"
         v-if="(rename && selected == tab) || (adding_new && index == all_tabs.length - 1)" class="tab-contents"
         type="text">
     </button>
-    <button v-if="!static" @click="add" class="last">+</button>
+    <button v-if="!static && !props.disabled" @click="add" class="last">+</button>
   </div>
 </template>
 <style scoped>

@@ -1,4 +1,5 @@
 <script setup>
+
 import FilesBoxComponent from './components/FilesBoxComponent.vue';
 import HeaderComponent from './components/HeaderComponent.vue';
 import MapComponent from './components/MapComponent.vue';
@@ -25,7 +26,9 @@ const userStore = useUserStore()
 const { selected_fence } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
-const { loggedin } = storeToRefs(userStore)
+
+//ADDED isAdmin
+const { loggedin, isAdmin } = storeToRefs(userStore)
 
 const fileUpload = useTemplateRef('fileUpload')
 const file_tab_select = ref("")
@@ -51,23 +54,36 @@ const display_events = computed(() => {
 })
 
 function add_file() {
+  if (!isAdmin.value) {
+    return
+  }
   fileUpload.value.click()
 }
 
 function delete_file(file) {
+  if (!isAdmin.value) {
+    return
+  }
   // const file_id = files_arr.value[idx]._id
   filesStore.delete_file(file._id)
 }
 
 function show_send_now_btn(list) {
   // returns string ["Send Now"] if it should be sent
+  if (!isAdmin.value) {
+    return undefined
+  }
   if (list.length > 0) {
     return ["Send Now"]
   }
   return undefined
 }
 
+//FILE UPLOAD RESTRICTED TO ADMIN USER
 function upload_files_wrapper(event) {
+  if (!isAdmin.value) {
+    return
+  }
   let category = file_tab_select.value
   if (category == "") {
     category = undefined
@@ -76,6 +92,9 @@ function upload_files_wrapper(event) {
 }
 
 function trigger_events(event_type) {
+  if (!isAdmin.value) {
+    return
+  }
   let send = window.confirm("Are you sure you want to send the file now?")
   if (send) {
     const events = event_type == "enter" ? eventsStore.enter_files : eventsStore.exit_files
@@ -89,7 +108,11 @@ function trigger_events(event_type) {
 
 }
 
+//RENAME RESTRICTED TO ADMIN USER
 function rename_tab_category(vals) {
+  if (!isAdmin.value) {
+    return
+  }
   let files_to_update = []
   for (let file of filesStore.files_arr) {
     if (file.category == vals.old) {
@@ -118,7 +141,16 @@ const all_categories = computed(() => {
       <header>
         <HeaderComponent />
       </header>
+      <!-- CONDITIONAL BANNER TO DENOTE VIEWER MODE -->
+      <div v-if="loggedin && !isAdmin" class="viewer-banner">
+        VIEWER USER - READ ONLY MODE
+      </div>
+      <!-- CONDITIONAL BANNER TO DENOTE ADMIN MODE -->
+      <div v-if="loggedin && isAdmin" class="admin-banner">
+        ADMIN USER - FULL PRIVILEGE ENABLED
+      </div>
 
+      <!-- PAGE ADMIN/VIEWER UI/UX CONTROLLED HERE -->
       <main>
         <div id="main-flex">
 
@@ -132,15 +164,17 @@ const all_categories = computed(() => {
             <GeoFenceComponent id="geo" />
 
             <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
-              :add_btn="false" @delete="delete_event_enter" :standard_delete="false" v-if="display_events"
-              :list="enter_files_ref" group="files" :draggable="true" title="On Enter" class="middle" id="enter">
+              :add_btn="false" @delete="delete_event_enter" :standard_delete="false" :can_delete="isAdmin"
+              v-if="display_events" :list="enter_files_ref" group="files" :draggable="isAdmin" title="On Enter"
+              class="middle" id="enter">
 
               <ScriptComponent event_type="enter" />
 
             </FilesBoxComponent>
             <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
-              :add_btn="false" @delete="delete_event_exit" :standard_delete="false" v-if="display_events"
-              :list="exit_files_ref" group="files" :draggable="true" title="On Exit" class="middle" id="exit">
+              :add_btn="false" @delete="delete_event_exit" :standard_delete="false" :can_delete="isAdmin"
+              v-if="display_events" :list="exit_files_ref" group="files" :draggable="isAdmin" title="On Exit"
+              class="middle" id="exit">
 
               <ScriptComponent event_type="exit" />
 
@@ -151,8 +185,10 @@ const all_categories = computed(() => {
             <FilesBoxComponent @tab_rename="rename_tab_category" @tab_select="select_file_tab"
               :tabs="filesStore.categories" :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file"
               :move="fileMoveCallback" :sort="false" :list="files_arr"
-              :group="{ name: 'files', pull: 'clone', put: false }" :draggable="true" title="All Files" id="total" />
-            <input multiple type="file" id="file-upload" ref="fileUpload" @change="upload_files_wrapper">
+              :group="{ name: 'files', pull: 'clone', put: false }" :draggable="isAdmin" :add_btn="isAdmin"
+              :can_delete="isAdmin" :tabs_disabled="!isAdmin" title="All Files" id="total" />
+            <input multiple type="file" id="file-upload" ref="fileUpload" @change="upload_files_wrapper"
+              :disabled="!isAdmin">
           </div>
         </div>
         <LogComponent id="logs" />
@@ -224,6 +260,28 @@ const all_categories = computed(() => {
 
 header {
   width: 100%;
+}
+
+.viewer-banner {
+  margin-top: .5rem;
+  padding: .4rem .75rem;
+  border: 1px solid var(--color-text);
+  border-radius: 6px;
+  background-color: #ffcc00;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: .04em;
+}
+
+.admin-banner {
+  margin-top: .5rem;
+  padding: .4rem .75rem;
+  border: 1px solid var(--color-text);
+  border-radius: 6px;
+  background-color: #ff0000;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: .04em;
 }
 
 #logs {

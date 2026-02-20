@@ -11,9 +11,17 @@ const props = defineProps({
   list: Array,
   sort: true,
   standard_delete: true,
+  can_delete: {
+    type: Boolean,
+    default: true,
+  },
   move: Function,
   tabs: Array,
   tab_sort_key: String,
+  tabs_disabled: {
+    type: Boolean,
+    default: false,
+  },
   add_btn: {
     type: Boolean,
     default(rawProps) {
@@ -53,6 +61,9 @@ onMounted(() => {
 
 
 function delete_element(index, element_id) {
+  if (!props.can_delete) {
+    return
+  }
   emit("delete", element_id)
   if (props.standard_delete) {
     props.list.splice(index, 1)
@@ -108,14 +119,15 @@ const all_tabs = computed(() => {
         </strong>
         <FileBoxTabs class="file-box-tabs" @rename="(vals) => { tab_rename(vals) }" @add="tab_add"
           :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
-          :tabs="all_tabs" />
+          :tabs="all_tabs" :disabled="props.tabs_disabled" />
         <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
       </div>
       <hr v-if="tabs">
       <draggable :sort="sort" :list="filtered_list" :group="group" itemKey="id" class="list-group files-container">
         <template #item="{ element, index }">
           <a class="clickable" href="#" @click="emit('click', element)">
-            <FileComponent @remove="delete_element(index, element)" :element="element" class="files list-group-item" />
+            <FileComponent :canDelete="props.can_delete" @remove="delete_element(index, element)" :element="element"
+              class="files list-group-item" />
           </a>
         </template>
       </draggable>

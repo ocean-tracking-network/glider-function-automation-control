@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import DropDownIcon from '@/assets/arrow_drop_down.svg'
 
 const emit = defineEmits(["select"])
-const props = defineProps(["options", "selected", "default"])
+const props = defineProps(["options", "selected", "default", "disabled"])
 
 const show_dropdown = ref(false)
 const filter_text = ref("")
@@ -16,6 +16,9 @@ const filtered_options = computed(() => {
 })
 
 function option_click(option) {
+  if (props.disabled) {
+    return
+  }
   emit("select", option)
   show_dropdown.value = false;
 }
@@ -26,13 +29,15 @@ function option_click(option) {
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_drop_down" />
   <div class="dropdown">
-    <button @click="show_dropdown = !show_dropdown" class="dropbtn border">
+    <button :disabled="props.disabled" @click="show_dropdown = props.disabled ? false : !show_dropdown"
+      class="dropbtn border">
       <p>{{ props.selected ? props.selected : props.default }} </p>
       <DropDownIcon class="dropdown-icon" />
     </button>
     <div v-if="show_dropdown" class="dropdown-content">
-      <input @focusin="" type="text" placeholder="Search.." class="dropdown-search" v-model="filter_text">
-      <button @click="option_click(option)" v-for="option in filtered_options">
+      <input :disabled="props.disabled" @focusin="" type="text" placeholder="Search.." class="dropdown-search"
+        v-model="filter_text">
+      <button :disabled="props.disabled" @click="option_click(option)" v-for="option in filtered_options">
         {{ option }}
       </button>
     </div>

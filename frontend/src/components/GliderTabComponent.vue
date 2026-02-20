@@ -2,9 +2,12 @@
 import { ref } from 'vue';
 import { useGlidersStore } from '@/stores/gliders';
 import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores/user';
 
 const gliderStore = useGlidersStore()
+const userStore = useUserStore()
 const { gliders, selected_glider_idx } = storeToRefs(gliderStore)
+const { isAdmin } = storeToRefs(userStore)
 
 const new_glider_name = ref('')
 const selected_delete = ref({})
@@ -13,6 +16,9 @@ const delete_prompt = ref(false)
 const error_msg = ref('')
 
 function enable_disable_glider() {
+  if (!isAdmin.value) {
+    return
+  }
   gliderStore.enable_disable_selected_glider()
 }
 
@@ -43,8 +49,9 @@ function add_glider() {
     <div id="button-div">
       <button v-for="(glider, index) in gliders" :class="{ selected: selected_glider_idx == index, gliders: true }"
         @click="gliderStore.select_glider(index)">
-        <input v-if="isAdmin" v-model="glider.enabled" @change="enable_disable_glider"
-          :disabled="selected_glider_idx != index" class="enable" type="checkbox">
+        <input v-model="glider.enabled" @change="enable_disable_glider"
+          :disabled="!isAdmin || selected_glider_idx != index"
+          class="enable" type="checkbox">
         {{ glider.name }}
         <button v-if="isAdmin && gliders[selected_glider_idx]._id == glider._id"
           @click="selected_delete = glider; delete_prompt = true" class="x-btn">X</button>
