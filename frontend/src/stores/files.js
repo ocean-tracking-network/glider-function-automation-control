@@ -5,6 +5,7 @@ import { useEventsStore } from './events'
 
 export const useFilesStore = defineStore('files', () => {
   const files_raw = ref([])
+  const local_kml_file = ref(null)
   const eventsStore = useEventsStore()
 
   const colours = [
@@ -74,6 +75,8 @@ export const useFilesStore = defineStore('files', () => {
     '#9ACD32', // YellowGreen
   ]
 
+  //
+
   const get_files = () => {
     apiClient.get('/files').then((res) => {
       files_raw.value = res.data
@@ -85,6 +88,15 @@ export const useFilesStore = defineStore('files', () => {
       get_files()
       eventsStore.get_events()
     })
+  }
+
+  const upload_kml_file = (event, files) => {
+    const file = event ? event.target.files[0] : files[0]
+    local_kml_file.value = file
+  }
+
+  const clear_kml_file = () => {
+    local_kml_file.value = null
   }
 
   const upload_files = (event, category) => {
@@ -170,5 +182,8 @@ export const useFilesStore = defineStore('files', () => {
     upload_files,
     delete_file,
     get_files,
+    local_kml_file,
+    upload_kml_file,
+    clear_kml_file
   }
 })
