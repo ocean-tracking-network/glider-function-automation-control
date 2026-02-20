@@ -47,11 +47,11 @@ app.post('/login', login)
 
 // glider
 app.get('/glider', authenticateToken, get_gliders)
-app.post('/glider', authenticateToken, post_gliders)
-app.delete('/glider/:id', authenticateToken, delete_gliders)
-app.patch('/glider/:id', authenticateToken, update_gliders)
+app.post('/glider', authenticateToken, requireAdmin, post_gliders)
+app.delete('/glider/:id', authenticateToken, requireAdmin, delete_gliders)
+app.patch('/glider/:id', authenticateToken, requireAdmin, update_gliders)
 // glider-tracks
-app.post('/glider/:id/add-track', authenticateToken, post_gliders_track)
+app.post('/glider/:id/add-track', authenticateToken, requireAdmin, post_gliders_track)
 app.get('/glider/:id/scripts', authenticateToken, get_scripts)
 
 // geofence
