@@ -11,6 +11,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@tmcw/togeojson": "^7.1.2",
     "axios": "^1.7.9",
     "leaflet": "^1.9.4",
     "pinia": "^2.3.1",
@@ -24,6 +25,6 @@
     "@vue/eslint-config-prettier": "^10.1.0",
     "prettier": "^3.4.2",
     "vite": "^6.0.11",
-    "vite-plugin-vue-devtools": "^7.7.0"
+    "vite-plugin-vue-devtools": "^8.0.5"
   }
 }

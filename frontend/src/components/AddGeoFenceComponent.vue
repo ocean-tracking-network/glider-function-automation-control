@@ -1,16 +1,19 @@
 <script setup>
-import { computed, onBeforeMount, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, useTemplateRef, watch } from 'vue';
 import { useGeoFencesStore } from '@/stores/geofences';
 import { storeToRefs } from 'pinia';
+import { useFilesStore } from '@/stores/files';
+import { useDropZone } from '@vueuse/core'
 
+
+const filesStore = useFilesStore()
 const store = useGeoFencesStore()
-const { geofences, interactive_map, selected_fence } = storeToRefs(store)
+const { geofences, interactive_map, selected_fence, selected_kml_geo_json } = storeToRefs(store)
+const uploadKmlFile = useTemplateRef('uploadKmlFile')
+const dropZoneRef = useTemplateRef('dropZoneRef')
+
 const props = defineProps({
-  fenceKey: String,
-  canEdit: {
-    type: Boolean,
-    default: true,
-  },
+  fenceKey: String
 })
 
 const emit = defineEmits(["geofenceupdate", "back"])
@@ -19,9 +22,6 @@ const fence_key = ref("")
 const lock_fence = ref(true)
 
 onBeforeMount(() => {
-  if (!props.canEdit) {
-    lock_fence.value = true
-  }
   if (props.fenceKey) {
     fence_key.value = props.fenceKey
     let latlons = selected_fence.value.latlons
@@ -62,8 +62,12 @@ function focus_in(idx) {
   store.select_idx(idx)
 }
 
+function onDrop(files) {
+  filesStore.upload_kml_file(null, files)
+}
+
 function remove_idx(idx) {
-  if (props.canEdit && !lock_fence.value) {
+  if (!lock_fence.value) {
     selected_fence.value.latlons.splice(idx, 1)
   }
 }
@@ -87,45 +91,230 @@ watch(fence_key, () => {
   console.log(fence_key.value)
 })
 
+const { isOverDropZone } = useDropZone(dropZoneRef, {
+  onDrop,
+  // dataTypes: ['.kml'],
+  multiple: false,
+  // whether to prevent default behavior for unhandled events
+  preventDefaultForUnhandled: false,
+})
+
 </script>
 <template>
-  <div>
-    <div id="name">
-      <div>
+  <div class="geofence-container">
+    <div class="main-container">
+      <div class="header">
         <button id="back-btn" class="border" @click="emit('back', !lock_fence)">{{ back_display }}</button>
-        <input v-model="lock_fence" id="lock" type="checkbox" class="label" :disabled="!props.canEdit">
-        <label for="lock">Lock</label>
+        <input :disabled="lock_fence" class="text-input" id="name-input" v-model="selected_fence.name"
+          placeholder="Name" type="text">
       </div>
-      <input :disabled="lock_fence || !props.canEdit" class="text-input" id="name-input" v-model="selected_fence.name"
-        placeholder="Name" type="text">
-      <div>
-        <div>
-          <input :disabled="lock_fence || !props.canEdit" v-model="selected_fence.notify" id="notify" type="checkbox">
-          <label class="label" for="map-interact">Notify when glider enters/leaves</label>
+      <div class="lat-lon-container">
+        <div id="main-container" :class="{ overflow: overflowed }">
+          <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons" :key="'lat_lon-' + index">
+            <p id="index">{{ index }}</p>
+            <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)"
+              @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[0]" placeholder="lat" type="text" name=""
+              id="" />
+            <p>:</p>
+            <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)"
+              @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[1]" placeholder="lon" type="text" name=""
+              id="" />
+            <button class="x-btn" @click="remove_idx(index)" v-if="index < selected_fence.latlons.length - 1">x</button>
+          </div>
         </div>
-        <div>
-          <input :disabled="lock_fence || !props.canEdit" v-model="interactive_map" id="map-interact" type="checkbox">
-          <label class="label" for="map-interact">Enable interactive map</label>
-        </div>
-
       </div>
     </div>
-    <div id="main-container" :class="{ overflow: overflowed }">
-      <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons">
-        <p id="index">{{ index }}</p>
-        <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-          @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[0]" placeholder="lat" type="text" name=""
-          id="" />
-        <p>:</p>
-        <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-          @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[1]" placeholder="lon" type="text" name=""
-          id="" />
-        <button class="x-btn" @click="remove_idx(index)" v-if="props.canEdit && index < selected_fence.latlons.length - 1">x</button>
+    <div class="controls-container">
+      <div>
+        <input v-model="lock_fence" id="lock" type="checkbox">
+        <label for="lock" class="label">Lock</label>
+      </div>
+      <div>
+        <input :disabled="lock_fence" v-model="selected_fence.notify" id="notify" type="checkbox">
+        <label class="label" for="map-interact">Notify when glider enters/leaves</label>
+      </div>
+      <div>
+        <input :disabled="lock_fence" v-model="interactive_map" id="map-interact" type="checkbox">
+        <label class="label" for="map-interact">Enable interactive map</label>
+      </div>
+      <div class="border upload-kml-container" ref="dropZoneRef">
+        <div v-if="!selected_kml_geo_json" class="upload-kml-dropzone">
+          <button :class="{ overDropZone: isOverDropZone }" @click="uploadKmlFile.click()">
+            <div v-if="!isOverDropZone">
+              <p>Click or Drop</p>
+              <p>a KML File here</p>
+            </div>
+            <div v-else>Drop it</div>
+          </button>
+          <input type="file" class="upload-kml-input" accept=".kml" ref="uploadKmlFile"
+            @change="filesStore.upload_kml_file" />
+        </div>
+        <div v-else class="uploaded-kml-coordinates-selector-contianer">
+          <div class="uploaded-kml-coordinates-selector-inner-contianer">
+            <div class="kml-file-placemark-card" v-for="(geofence, index) in selected_kml_geo_json"
+              :key="geofence.placemark + index">
+              <div class="kml-file-placemark-card-placemark">
+                <span><b>Placemark:</b></span>
+                <p>{{ geofence.placemark }}</p>
+              </div>
+              <div class="kml-file-placemark-card-type">
+                <span><b>Type:</b></span>
+                <p>{{ geofence.type }}</p>
+              </div>
+              <div class="kml-file-placemark-card-coordinates">
+                <span><b>Coordinates:</b></span>
+                <p>#{{ geofence.coordinates.length ?? 0 }}</p>
+              </div>
+              <button :disabled="!geofence.isValid" class="border"
+                @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
+            </div>
+          </div>
+          <button class="remove x-btn" @click="filesStore.clear_kml_file">
+            x
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <style scoped>
+.geofence-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.main-container {
+  flex: 60%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+#name-input {
+  margin: 0px auto;
+}
+
+.lat-lon-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.controls-container {
+  flex: 40%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 4px;
+}
+
+.upload-kml-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.upload-kml-dropzone button {
+  border: 0.5px dotted lightgray;
+  padding: 16px;
+  border-radius: 4px;
+}
+
+.overDropZone {
+  transition: .5s;
+  border: 1px dotted lightgreen !important;
+  padding: 30px;
+}
+
+.upload-kml-container p {
+  text-align: center;
+  position: relative;
+}
+
+.upload-kml-input {
+  visibility: hidden;
+  position: absolute;
+}
+
+.uploaded-kml-coordinates-selector-contianer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.uploaded-kml-coordinates-selector-contianer .remove {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  border: 1px solid lightgray;
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  background-color: white;
+}
+
+.uploaded-kml-coordinates-selector-inner-contianer {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kml-file-placemark-card {
+  width: 100%;
+  padding: 8px;
+  color: var(--color-text);
+  border-color: lightgray;
+  border-width: 1px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  gap: 8px;
+}
+
+.kml-file-placemark-card button {
+  padding: 4px 2px;
+}
+
+.kml-file-placemark-card button:hover {
+  transition: .2s;
+  border-color: lightblue;
+}
+
+.kml-file-placemark-card button:disabled {
+  background-color: lightgray;
+  opacity: .4;
+  border-color: lightgray;
+}
+
+.kml-file-placemark-card-placemark,
+.kml-file-placemark-card-type,
+.kml-file-placemark-card-coordinates {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+}
+
 .inputs {
   display: flex;
   flex-wrap: nowrap;
