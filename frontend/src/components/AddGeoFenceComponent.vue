@@ -156,11 +156,15 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
                 <span><b>Placemark:</b></span>
                 <p>{{ geofence.placemark }}</p>
               </div>
+              <div class="kml-file-placemark-card-type">
+                <span><b>Type:</b></span>
+                <p>{{ geofence.type }}</p>
+              </div>
               <div class="kml-file-placemark-card-coordinates">
                 <span><b>Coordinates:</b></span>
                 <p>#{{ geofence.coordinates.length ?? 0 }}</p>
               </div>
-              <button :disabled="!geofence.coordinates.length || geofence.coordinates.length < 3" class="border"
+              <button :disabled="!geofence.isValid" class="border"
                 @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
             </div>
           </div>
@@ -302,6 +306,7 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 }
 
 .kml-file-placemark-card-placemark,
+.kml-file-placemark-card-type,
 .kml-file-placemark-card-coordinates {
   display: flex;
   flex-direction: row;

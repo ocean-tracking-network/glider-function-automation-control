@@ -30,9 +30,34 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       } else {
         const geoJson = kml(kmlDom)
         selected_kml_geo_json.value = geoJson.features.map((feature) => {
+          const coordinates = []
+          const isValid = true
+
+          switch (feature.geometry.type) {
+            case 'Point':
+              coordinates.push([feature.geometry.coordinates[0], feature.geometry.coordinates[1]])
+              if (coordinates.length < 1) {
+                isValid = false
+              }
+              break
+            case 'Polygon':
+              coordinates.push(...feature.geometry.coordinates[0])
+              if (coordinates.length < 3) {
+                isValid = false
+              }
+              break
+            default:
+              isValid = false
+              break
+          }
+
+          console.log('coordinates: ', coordinates)
+
           return {
-            coordinates: feature.geometry.coordinates[0],
+            coordinates: coordinates,
             placemark: feature.properties.name,
+            type: feature.geometry.type,
+            isValid: isValid,
             description: feature.properties.description,
           }
         })
@@ -54,7 +79,11 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   })
 
   const apply_coordinates_from_kml_file = (latlons) => {
-    selected_fence.value.latlons = latlons
+    if (selected_fence.value.latlons.length <= 1) {
+      selected_fence.value.latlons = [...latlons]
+    } else {
+      selected_fence.value.latlons.splice(-1, 1, ...latlons)
+    }
   }
 
   const set_force_map_update = (value) => {
