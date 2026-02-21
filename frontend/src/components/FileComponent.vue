@@ -2,7 +2,13 @@
 import { useFilesStore } from '@/stores/files';
 import { computed } from 'vue';
 
-const props = defineProps(['element'])
+const props = defineProps({
+  element: Object,
+  canDelete: {
+    type: Boolean,
+    default: true,
+  },
+})
 const emit = defineEmits(["remove"])
 const filesStore = useFilesStore()
 
@@ -20,7 +26,7 @@ const classBold = computed(() => {
     <p :style="{ color: styleColor }"
       :class="{ filename: true, bold: classBold}">{{
         element.name }}</p>
-    <div class="buttons">
+    <div class="buttons" v-if="props.canDelete">
       <!-- <button class="view">👁</button> -->
       <button @click="emit('remove')" class="del">X</button>
     </div>

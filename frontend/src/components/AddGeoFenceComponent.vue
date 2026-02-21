@@ -13,7 +13,11 @@ const uploadKmlFile = useTemplateRef('uploadKmlFile')
 const dropZoneRef = useTemplateRef('dropZoneRef')
 
 const props = defineProps({
-  fenceKey: String
+  fenceKey: String,
+  canEdit: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 const emit = defineEmits(["geofenceupdate", "back"])
@@ -38,6 +42,9 @@ onBeforeMount(() => {
 })
 
 function on_input() {
+  if (!props.canEdit || lock_fence.value) {
+    return
+  }
   let latlons = selected_fence.value.latlons
   const idx = latlons.length - 1
   if (latlons[idx][0] || latlons[idx][1]) {
@@ -46,6 +53,9 @@ function on_input() {
 }
 
 function focus_out(idx) {
+  if (!props.canEdit || lock_fence.value) {
+    return
+  }
   let latlons = selected_fence.value.latlons
   let geofence = selected_fence.value
   if (idx == latlons.length - 1) {
@@ -63,11 +73,14 @@ function focus_in(idx) {
 }
 
 function onDrop(files) {
+  if (!props.canEdit || lock_fence.value) {
+    return
+  }
   filesStore.upload_kml_file(null, files)
 }
 
 function remove_idx(idx) {
-  if (!lock_fence.value) {
+  if (props.canEdit && !lock_fence.value) {
     selected_fence.value.latlons.splice(idx, 1)
   }
 }
@@ -105,48 +118,48 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
     <div class="main-container">
       <div class="header">
         <button id="back-btn" class="border" @click="emit('back', !lock_fence)">{{ back_display }}</button>
-        <input :disabled="lock_fence" class="text-input" id="name-input" v-model="selected_fence.name"
+        <input :disabled="lock_fence || !props.canEdit" class="text-input" id="name-input" v-model="selected_fence.name"
           placeholder="Name" type="text">
       </div>
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
           <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons" :key="'lat_lon-' + index">
             <p id="index">{{ index }}</p>
-            <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)"
+            <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
               @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[0]" placeholder="lat" type="text" name=""
               id="" />
             <p>:</p>
-            <input :disabled="lock_fence" class="text-input latlon" @focusout="focus_out(index)"
+            <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
               @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[1]" placeholder="lon" type="text" name=""
               id="" />
-            <button class="x-btn" @click="remove_idx(index)" v-if="index < selected_fence.latlons.length - 1">x</button>
+            <button class="x-btn" @click="remove_idx(index)" v-if="props.canEdit && index < selected_fence.latlons.length - 1">x</button>
           </div>
         </div>
       </div>
     </div>
     <div class="controls-container">
       <div>
-        <input v-model="lock_fence" id="lock" type="checkbox">
+        <input :disabled="!props.canEdit" v-model="lock_fence" id="lock" type="checkbox">
         <label for="lock" class="label">Lock</label>
       </div>
       <div>
-        <input :disabled="lock_fence" v-model="selected_fence.notify" id="notify" type="checkbox">
+        <input :disabled="lock_fence || !props.canEdit" v-model="selected_fence.notify" id="notify" type="checkbox">
         <label class="label" for="map-interact">Notify when glider enters/leaves</label>
       </div>
       <div>
-        <input :disabled="lock_fence" v-model="interactive_map" id="map-interact" type="checkbox">
+        <input :disabled="lock_fence || !props.canEdit" v-model="interactive_map" id="map-interact" type="checkbox">
         <label class="label" for="map-interact">Enable interactive map</label>
       </div>
-      <div class="border upload-kml-container" ref="dropZoneRef">
+      <div class="upload-kml-container" :class="{ border: props.canEdit }" ref="dropZoneRef">
         <div v-if="!selected_kml_geo_json" class="upload-kml-dropzone">
-          <button :class="{ overDropZone: isOverDropZone }" @click="uploadKmlFile.click()">
-            <div v-if="!isOverDropZone">
+          <button :disabled="lock_fence || !props.canEdit" :class="{ overDropZone: isOverDropZone }" @click="uploadKmlFile.click()">
+            <div v-if="props.canEdit && !isOverDropZone">
               <p>Click or Drop</p>
               <p>a KML File here</p>
             </div>
-            <div v-else>Drop it</div>
+            <div v-else-if="props.canEdit">Drop it</div>
           </button>
-          <input type="file" class="upload-kml-input" accept=".kml" ref="uploadKmlFile"
+          <input :disabled="lock_fence || !props.canEdit"  type="file" class="upload-kml-input" accept=".kml" ref="uploadKmlFile"
             @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
@@ -165,11 +178,11 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
                 <span><b>Coordinates:</b></span>
                 <p>#{{ geofence.coordinates.length ?? 0 }}</p>
               </div>
-              <button :disabled="!geofence.isValid" class="border"
+              <button :disabled="!geofence.isValid || lock_fence || !props.canEdit" class="border"
                 @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
             </div>
           </div>
-          <button class="remove x-btn" @click="filesStore.clear_kml_file">
+          <button :disabled="lock_fence || !props.canEdit" class="remove x-btn" @click="filesStore.clear_kml_file">
             x
           </button>
         </div>
