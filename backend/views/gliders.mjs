@@ -23,8 +23,8 @@ const post_gliders = async (req, res) => {
   // Dummy data
   // const sfmc_json = {
   //   data: {
-  //     gpsValidLat: Number((Math.random() * 180 - 90).toFixed(6)),
-  //     gpsValidLon: Number((Math.random() * 360 - 180).toFixed(6)),
+  //     gpsValidLat: 4859.91552734375 + (Math.random() * (1 - -1) + -1),
+  //     gpsValidLon: -6317.248046875 + (Math.random() * (1 - -1) + -1),
   //     id: 275,
   //     isGpsValid: true,
   //     name: glider_name,
