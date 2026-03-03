@@ -198,8 +198,14 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
   function select(key) {
     console.log('selecting fence')
+    const fence = geofences.value[key]
+    if (!fence) {
+      selected_fence.value = ''
+      selected_fence_key.value = ''
+      return
+    }
     console.log(key)
-    selected_fence.value = geofences.value[key]
+    selected_fence.value = fence
     selected_fence_key.value = key
     set_force_map_update(true)
   }
