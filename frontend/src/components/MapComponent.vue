@@ -66,7 +66,7 @@ function create_polygons() {
   let index = 0
   geofences_filtered.value.forEach((geofence) => {
     let options = {}
-    if (index == Object.keys(store.geofences).indexOf(store.selected_fence_key)) {
+    if (geofence.key === store.selected_fence_key) {
       options.color = "orange"
       //CHANGE #JS0002
       // console.log("red?")
@@ -86,10 +86,14 @@ const on_polygon_click = (e) => {
 }
 
 const on_glider_glick = (e) => {
-  gliderStore.select_glider(glider_to_leaflet_id_map.value[e.target._leaflet_id])
+  const gliderId = glider_to_leaflet_id_map.value[e.target._leaflet_id]
+  if (gliderId) gliderStore.select_glider(gliderId)
 }
 
 function set_glider_track() {
+  if (!selected_glider.value) return
+  if (!Array.isArray(selected_glider.value.track)) return
+
   if (glider_track_polyline.value != null) {
     glider_track_polyline.value.removeFrom(initialMap.value)
     glider_track_points.value.forEach((ele) => {
@@ -154,13 +158,13 @@ function set_glider_track() {
   }
   let i = 0
   gliderStore.gliders.forEach((glider) => {
-    if (glider._id != selected_glider._id && glider_has_track(glider)) {
+    if (selected_glider.value && glider._id != selected_glider._id && glider_has_track(glider)) {
       const current_pos = [convert_gps(glider.track[glider.track.length - 1].lat), convert_gps(glider.track[glider.track.length - 1].lon)]
       const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
         .on("click", on_glider_glick)
         .addTo(initialMap.value)
       all_glider_markers.value.push(new_marker)
-      glider_to_leaflet_id_map.value[new_marker._leaflet_id] = i
+      glider_to_leaflet_id_map.value[new_marker._leaflet_id] = glider._id
     }
     i++
   })
@@ -175,7 +179,10 @@ function map_click(e) {
     // //console.log(e.latlng)
     const lat = e.latlng.lat.toFixed(4)
     const lon = e.latlng.lng.toFixed(4)
-    geofences.value[store.selected_fence_key].latlons[geofences.value[store.selected_fence_key].latlons.length - 1] = [lat, lon]
+    if (store.selected_fence_key && geofences.value[store.selected_fence_key]) {
+      const fence = geofences.value[store.selected_fence_key]
+      fence.latlons[fence.latlons.length - 1] = [lat, lon]
+    }
   }
 
 }
@@ -300,8 +307,10 @@ const geofences_filtered = computed(() => {
 })
 
 watch(gliders, (new_val) => {
-  if (new_val.length > 0) {
-    gliderStore.select_glider(0)
+  if (!new_val.length) return
+  const stillExists = new_val.some((g) => g._id === gliderStore.selected_glider_id)
+  if (!stillExists) {
+    gliderStore.select_glider(new_val[0]._id)
   }
 })
 

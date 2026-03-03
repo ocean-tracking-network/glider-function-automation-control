@@ -4,7 +4,7 @@ import apiClient from '@/apiClient'
 
 export const useGlidersStore = defineStore('gliders', () => {
   const gliders = ref([])
-  const selected_glider_idx = ref({})
+  const selected_glider_id = ref(null)
 
   const get_gliders = () => {
     apiClient.get('/glider').then((res) => {
@@ -12,11 +12,12 @@ export const useGlidersStore = defineStore('gliders', () => {
     })
   }
 
-  const select_glider = (glider_index) => {
-    selected_glider_idx.value = glider_index
+  const select_glider = (glider_id) => {
+    selected_glider_id.value = glider_id ?? null
   }
 
   const enable_disable_selected_glider = () => {
+    if (!selected_glider.value) return
     const data = {
       enabled: selected_glider.value.enabled,
     }
@@ -47,17 +48,16 @@ export const useGlidersStore = defineStore('gliders', () => {
   }
 
   const gliders_obj = computed(() => {
-    let ret = {}
+    const ret = {}
     gliders.value.forEach((ele) => {
-      ret[ele._id] = {
-        ...ele,
-      }
+      ret[ele._id] = { ...ele }
     })
     return ret
   })
 
   const selected_glider = computed(() => {
-    return gliders.value[selected_glider_idx.value]
+    if (!selected_glider_id.value) return null
+    return gliders.value.find((g) => g._id === selected_glider_id.value) ?? null
   })
 
   return {
@@ -67,7 +67,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     delete_glider,
     enable_disable_selected_glider,
     gliders_obj,
-    selected_glider_idx,
+    selected_glider_id,
     selected_glider,
     gliders,
   }
