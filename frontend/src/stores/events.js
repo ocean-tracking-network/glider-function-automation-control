@@ -16,13 +16,21 @@ export const useEventsStore = defineStore('events', () => {
 
   // options {} file_id if file, script and script_type if a script
   const add_event = (event_type, options) => {
+    const selected_glider = gliderStore.selected_glider
+    const selected_fence_key = geofenceStore.selected_fence_key
+
+    if (!selected_glider?._id || !selected_fence_key) {
+      console.warn('Cannot add event: missing selected glider or geofence')
+      return
+    }
+
     const file_id = options.file_id
     const script = options.script
     const script_type = options.script_type
 
     const data = {
-      geofence: geofenceStore.selected_fence_key,
-      glider: gliderStore.selected_glider._id,
+      geofence: selected_fence_key,
+      glider: selected_glider._id,
       event_type: event_type,
     }
     if (file_id) {
