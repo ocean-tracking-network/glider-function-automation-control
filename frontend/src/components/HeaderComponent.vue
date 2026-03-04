@@ -4,9 +4,21 @@ import { useUserStore } from '@/stores/user';
 
 const version_number = "0.2.1"
 const userStore = useUserStore();
+const emit = defineEmits(['toggle-user-management']);
+const menuOpen = ref(false);
 
 function logout() {
   userStore.logout();
+  menuOpen.value = false;
+}
+
+function openUserManagement() {
+  emit('toggle-user-management');
+  menuOpen.value = false;
+}
+
+function toggleMenu() {
+  menuOpen.value = !menuOpen.value;
 }
 </script>
 
@@ -22,7 +34,21 @@ function logout() {
           <span class="username">{{ userStore.username }}</span>
           <span class="role" :class="userStore.role">{{ userStore.role }}</span>
         </div>
-        <button class="logout-btn" @click="logout">Logout</button>
+        <div class="menu-container">
+          <button class="hamburger-btn" @click="toggleMenu" :class="{ active: menuOpen }">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div class="dropdown-menu" v-if="menuOpen">
+            <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
+              + Create User
+            </button>
+            <button class="menu-item logout-item" @click="logout">
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="placeholder" v-else></div>
@@ -115,6 +141,83 @@ small {
   color: white;
 }
 
+.menu-container {
+  position: relative;
+}
+
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  color: var(--color-text);
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 1.5rem;
+  height: 0.2rem;
+  background-color: var(--color-text);
+  border-radius: 0.1rem;
+  transition: all 0.3s ease;
+}
+
+.hamburger-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(0.6rem, 0.6rem);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(0.5rem, -0.5rem);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border-hover);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 150px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.menu-item:hover {
+  background-color: var(--color-border-hover);
+}
+
+.menu-item.logout-item {
+  border-top: 1px solid var(--color-border);
+  color: #ff6b6b;
+}
+
+.menu-item.logout-item:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.manage-users-btn,
 .logout-btn {
   background-color: transparent;
   border: 1px solid var(--color-border);
@@ -127,12 +230,33 @@ small {
   transition: all 0.3s ease;
 }
 
+.manage-users-btn {
+  /* background-color: #4caf50;
+  color: white;
+  border-color: #4caf50; */
+    background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.manage-users-btn:hover {
+  background-color: #45a049;
+  border-color: #45a049;
+}
+
 .logout-btn:hover {
   background-color: var(--color-border-hover);
   border-color: var(--color-text);
   color: var(--color-text);
 }
 
+.manage-users-btn:active,
 .logout-btn:active {
   transform: scale(0.98);
 }
