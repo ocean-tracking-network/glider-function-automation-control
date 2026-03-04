@@ -34,3 +34,10 @@ uploads/
 
 backend/.env
 *.tgz
+frontend/.env
+docker/entrypoint.sh
+docker/frontend.dockerfile
+docker/backend.dockerfile
+docker/docker-compose.yml
+backend/config/local.json.example
+frontend/env.example
