@@ -84,7 +84,8 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
   await update_glider_positions()
   await update_geofences()
-  // await delete_old_tracks()
+  //uncommenting this line re-enables the track deletion
+  await delete_old_tracks()
 })
 
 // app start
