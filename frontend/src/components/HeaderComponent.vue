@@ -12,6 +12,7 @@ function logout() {
 
 <template>
   <div class="header-wrapper">
+    <div class="placeholder"></div>
     <div class="header-title">
       <h1>Glider Function Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
     </div>
@@ -24,6 +25,7 @@ function logout() {
         <button class="logout-btn" @click="logout">Logout</button>
       </div>
     </div>
+    <div class="placeholder" v-else></div>
   </div>
 </template>
 
@@ -36,14 +38,27 @@ function logout() {
   padding: 0 1rem;
 }
 
+.placeholder {
+  flex: 1;
+  height: 2.5rem;
+  border: 2px solid transparent;
+  border-radius: 2rem;
+  padding: 0.5rem 1.5rem;
+  box-sizing: border-box;
+}
+
 .header-title {
   flex: 1;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 h1 {
   font-size: x-large;
   margin: 0;
+  white-space: nowrap;
 }
 
 small {
@@ -52,6 +67,7 @@ small {
 }
 
 .login-badge-container {
+  flex: 1;
   display: flex;
   justify-content: flex-end;
   padding: 0;
