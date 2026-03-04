@@ -7,6 +7,7 @@ import LogComponent from './components/LogComponent.vue';
 import GeoFenceComponent from './components/GeoFenceComponent.vue';
 import GliderTabComponent from './components/GliderTabComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
+import UserManagementComponent from './components/UserManagementComponent.vue';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useEventsStore } from './stores/events';
 import { useFilesStore } from './stores/files';
@@ -32,6 +33,7 @@ const { loggedin, isAdmin } = storeToRefs(userStore)
 
 const fileUpload = useTemplateRef('fileUpload')
 const file_tab_select = ref("")
+const showUserManagement = ref(false)
 
 function fileMoveCallback(evt, originalEvent) {
   console.log(evt)
@@ -134,12 +136,16 @@ const all_categories = computed(() => {
   return [...filesStore.categories, ...temp_file_categories.value]
 })
 
+function toggleUserManagement() {
+  showUserManagement.value = !showUserManagement.value
+}
+
 </script>
 <template>
   <div>
-    <div :class="{ blur: !loggedin }">
+    <div :class="{ blur: !loggedin || showUserManagement }">
       <header>
-        <HeaderComponent />
+        <HeaderComponent @toggle-user-management="toggleUserManagement" />
       </header>
 
       <!-- PAGE ADMIN/VIEWER UI/UX CONTROLLED HERE -->
@@ -188,6 +194,10 @@ const all_categories = computed(() => {
     </div>
     <div v-if="!loggedin" id="login-div">
       <LoginComponent />
+    </div>
+    <div v-if="showUserManagement && isAdmin" id="user-management-div">
+      <UserManagementComponent />
+      <button class="close-btn" @click="toggleUserManagement">Close</button>
     </div>
   </div>
 </template>
@@ -275,5 +285,31 @@ header {
 
 .blur {
   filter: blur(7px);
+}
+
+#user-management-div {
+  position: fixed;
+  top: 30%;
+  left: 50%;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+}
+
+.close-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.close-btn:hover {
+  background-color: var(--color-border-hover);
 }
 </style>

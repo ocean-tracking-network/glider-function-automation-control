@@ -23,8 +23,8 @@ const post_gliders = async (req, res) => {
   // Dummy data
   // const sfmc_json = {
   //   data: {
-  //     gpsValidLat: 4859.91552734375,
-  //     gpsValidLon: -6317.248046875,
+  //     gpsValidLat: 4859.91552734375 + (Math.random() * (1 - -1) + -1),
+  //     gpsValidLon: -6317.248046875 + (Math.random() * (1 - -1) + -1),
   //     id: 275,
   //     isGpsValid: true,
   //     name: glider_name,
@@ -88,4 +88,11 @@ const get_scripts = async (req, res) => {
   const scripts = await get_available_scripts(glider.name)
   res.send(scripts).status(200)
 }
-export { get_gliders, post_gliders, post_gliders_track, update_gliders, get_scripts, delete_gliders }
+export {
+  get_gliders,
+  post_gliders,
+  post_gliders_track,
+  update_gliders,
+  get_scripts,
+  delete_gliders,
+}
