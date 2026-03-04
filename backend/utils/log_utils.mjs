@@ -24,7 +24,7 @@ const create_log = async (message, level, glider = '') => {
     new_doc.glider = glider
   }
   const result = await collection.insertOne(new_doc)
-  console.log(`${level} - ${new Date().toISOString} - ${glider} - ${message}`)
+  console.log(`${level} - ${new Date().toISOString()} - ${glider} - ${message}`)
   purge_old_logs()
   return result
 }
