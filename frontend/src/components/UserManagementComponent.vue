@@ -65,7 +65,7 @@ async function createUser() {
           v-model="newPassword"
           type="password"
           id="new-password"
-          placeholder="Password (min 6 chars)"
+          placeholder="Password (min 3 chars)"
           autocomplete="new-password"
         >
         <br>

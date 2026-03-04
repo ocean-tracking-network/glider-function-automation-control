@@ -458,7 +458,8 @@ button {
 }
 
 #back-btn {
-  width: 6rem;
+  margin-left: 10px;
+  width: 7rem;
   padding: 8px 12px;
 }
 

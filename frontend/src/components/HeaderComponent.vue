@@ -42,7 +42,7 @@ function toggleMenu() {
           </button>
           <div class="dropdown-menu" v-if="menuOpen">
             <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
-              + Create User
+              Create User
             </button>
             <button class="menu-item logout-item" @click="logout">
               Logout

@@ -221,7 +221,7 @@ watch(selected_fence, (new_val) => {
   user-select: none;
 }
 
-.resize-handle:hover { 
+.resize-handle:hover {
   background-color:grey }
 
 .drawer-header {
@@ -231,7 +231,7 @@ watch(selected_fence, (new_val) => {
   padding: 20px;
   margin-bottom: 15px;
   border-bottom: 1px solid var(--color-border, lightgray);
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
 .drawer-title { margin: 0; color: var(--color-text); font-size: 1.25rem; font-weight: 600; }
