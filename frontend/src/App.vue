@@ -141,14 +141,6 @@ const all_categories = computed(() => {
       <header>
         <HeaderComponent />
       </header>
-      <!-- CONDITIONAL BANNER TO DENOTE VIEWER MODE -->
-      <div v-if="loggedin && !isAdmin" class="viewer-banner">
-        VIEWER USER - READ ONLY MODE
-      </div>
-      <!-- CONDITIONAL BANNER TO DENOTE ADMIN MODE -->
-      <div v-if="loggedin && isAdmin" class="admin-banner">
-        ADMIN USER - FULL PRIVILEGE ENABLED
-      </div>
 
       <!-- PAGE ADMIN/VIEWER UI/UX CONTROLLED HERE -->
       <main>
@@ -260,28 +252,6 @@ const all_categories = computed(() => {
 
 header {
   width: 100%;
-}
-
-.viewer-banner {
-  margin-top: .5rem;
-  padding: .4rem .75rem;
-  border: 1px solid var(--color-text);
-  border-radius: 6px;
-  background-color: #ffcc00;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: .04em;
-}
-
-.admin-banner {
-  margin-top: .5rem;
-  padding: .4rem .75rem;
-  border: 1px solid var(--color-text);
-  border-radius: 6px;
-  background-color: #ff0000;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: .04em;
 }
 
 #logs {

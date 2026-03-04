@@ -92,6 +92,17 @@ export const useUserStore = defineStore('user', () => {
       })
   }
 
+  const logout = () => {
+    username.value = null
+    token.value = null
+    role.value = null
+    loggedin.value = false
+
+    localStorage.removeItem(localStorage_username)
+    localStorage.removeItem(localStorage_token)
+    localStorage.removeItem(localStorage_role)
+  }
+
   return {
     username,
     token,
@@ -99,5 +110,6 @@ export const useUserStore = defineStore('user', () => {
     isAdmin,
     loggedin,
     login,
+    logout,
   }
 })
