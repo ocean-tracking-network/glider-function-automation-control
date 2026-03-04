@@ -1,16 +1,24 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import FileComponent from './FileComponent.vue';
-import draggable from 'vuedraggable'
-import FileBoxTabs from './FileBoxTabs.vue';
+import { computed, ref } from 'vue';
+import FileListComponent from './FileListComponent.vue';
+import FilesBoxHeader from './FilesBoxHeader.vue';
 
 const props = defineProps({
   title: String,
-  draggable: true,
+  draggable: {
+    type: Boolean,
+    default: true,
+  },
   group: [Object, String],
   list: Array,
-  sort: true,
-  standard_delete: true,
+  sort: {
+    type: Boolean,
+    default: true,
+  },
+  standard_delete: {
+    type: Boolean,
+    default: true,
+  },
   can_delete: {
     type: Boolean,
     default: true,
@@ -24,49 +32,21 @@ const props = defineProps({
   },
   add_btn: {
     type: Boolean,
-    default(rawProps) {
-      return true
-    }
+    default: true,
   }
 })
 
 const emit = defineEmits(['add_btn', 'click', 'delete', 'tab_select', 'tab_rename'])
 const selected_tab = ref("")
-
-const sort = ref()
-const group = ref()
-
 const new_tabs = ref([])
 
-onMounted(() => {
-  if (props.sort != undefined) {
-    sort.value = props.sort
-  }
-  else {
-    sort.value = true
-  }
-  if (!props.draggable) {
-    group.value = {
-      name: "no-dragable",
-      pull: false,
-      clone: false,
-      put: false,
-    }
-    sort.value = false
-  }
-  else {
-    group.value = props.group
-  }
-})
-
-
-function delete_element(index, element_id) {
-  if (!props.can_delete) {
-    return
-  }
+function delete_element(element_id) {
   emit("delete", element_id)
   if (props.standard_delete) {
-    props.list.splice(index, 1)
+    const index = props.list.findIndex(item => item.id === element_id)
+    if (index > -1) {
+      props.list.splice(index, 1)
+    }
   }
 }
 
@@ -86,7 +66,9 @@ function tab_rename(vals) {
     emit('tab_rename', vals)
   }
   const idx = new_tabs.value.indexOf(vals.old)
-  new_tabs.value[idx] = vals.new
+  if (idx > -1) {
+    new_tabs.value[idx] = vals.new
+  }
 }
 
 const filtered_list = computed(() => {
@@ -105,6 +87,9 @@ const filtered_list = computed(() => {
 })
 
 const all_tabs = computed(() => {
+  if (!props.tabs) {
+    return []
+  }
   new_tabs.value = new_tabs.value.filter((tab) => !props.tabs.includes(tab))
   return [...props.tabs, ...new_tabs.value]
 })
@@ -113,24 +98,29 @@ const all_tabs = computed(() => {
 <template>
   <div>
     <div class="border files-box">
-      <div class="box-top">
-        <strong>
-          <h2>{{ props.title }}</h2>
-        </strong>
-        <FileBoxTabs class="file-box-tabs" @rename="(vals) => { tab_rename(vals) }" @add="tab_add"
-          :static="tab_sort_key == undefined" v-if="tabs" @select="tab_select" :selected="selected_tab"
-          :tabs="all_tabs" :disabled="props.tabs_disabled" />
-        <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>
-      </div>
+      <FilesBoxHeader
+        :title="props.title"
+        :tabs="all_tabs"
+        :selected_tab="selected_tab"
+        :tabs_disabled="props.tabs_disabled"
+        :add_btn="props.add_btn"
+        :tab_sort_key="props.tab_sort_key"
+        @add_btn="emit('add_btn')"
+        @tab_select="tab_select"
+        @tab_add="tab_add"
+        @tab_rename="tab_rename"
+      />
       <hr v-if="tabs">
-      <draggable :sort="sort" :list="filtered_list" :group="group" itemKey="id" class="list-group files-container">
-        <template #item="{ element, index }">
-          <a class="clickable" href="#" @click="emit('click', element)">
-            <FileComponent :canDelete="props.can_delete" @remove="delete_element(index, element)" :element="element"
-              class="files list-group-item" />
-          </a>
-        </template>
-      </draggable>
+      <FileListComponent
+        :list="filtered_list"
+        :draggable="props.draggable"
+        :group="props.group"
+        :sort="props.sort"
+        :can_delete="props.can_delete"
+        :move="props.move"
+        @click="emit('click', $event)"
+        @delete="delete_element"
+      />
       <div class="footer">
         <slot>
         </slot>
@@ -151,53 +141,7 @@ const all_tabs = computed(() => {
   position: relative;
 }
 
-.files-container {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  gap: .5rem;
-  overflow-y: scroll;
-  overflow-x: scroll;
-  margin-top: .5rem;
-  min-height: 30%;
-}
-
-.box-top {
-  width: 100%;
-  max-height: 2rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.box-top * {
-  margin-top: auto;
-  margin-bottom: auto;
-  text-align: center;
-}
-
-.files {
-  width: auto;
-  padding: .3rem;
-}
-
-.add-btn {
-  transition: .2s;
-  padding: .3rem;
-  padding-top: .2rem;
-  padding-bottom: .2rem;
-}
-
-h2 {
-  font-size: large;
-}
-
-.add-btn:hover {
-  transition: .2s;
-  border-color: limegreen;
-}
-
 hr {
-  /* color: var(--color-text); */
   border-top-width: 1px;
   border-top-color: var(--color-text);
   width: 100%;

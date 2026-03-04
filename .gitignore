@@ -41,3 +41,6 @@ docker/backend.dockerfile
 docker/docker-compose.yml
 backend/config/local.json.example
 frontend/env.example
+
+backend/utils/glider_utils.mjs
+backend/views/gliders.mjs

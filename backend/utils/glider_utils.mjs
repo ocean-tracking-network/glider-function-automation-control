@@ -25,6 +25,8 @@ async function delete_old_tracks() {
   const gliders = await collection.find({}).toArray()
 
   const past_date = new Date()
+
+  //date just comes from the .env/env.example file
   past_date.setDate(past_date.getDate() - process.env.HISTORY_DAYS)
 
   for (const glider of gliders) {
@@ -44,18 +46,18 @@ async function update_glider_positions() {
 
   for (let glider of gliders) {
     let sfmc_json = {}
-    sfmc_json = await get_active_deployment_details(glider.name)
+    // sfmc_json = await get_active_deployment_details(glider.name)
 
     // Random sfmc_json (with default) to simulate unique movement of gliders
-    // sfmc_json = {
-    //   'data': {
-    //     'gpsValidLat': glider.track.length > 0 ? glider.track[glider.track.length-1].lat + (Math.random() * (1 - -1) + -1) : 4859.91552734375,
-    //     'gpsValidLon': glider.track.length > 0 ? glider.track[glider.track.length-1].lon + (Math.random() * (1 - -1) + -1) : -6317.248046875,
-    //     'id': 275,
-    //     'isGpsValid': true,
-    //     'name': glider.name,
-    //   }
-    // }
+    sfmc_json = {
+      'data': {
+        'gpsValidLat': glider.track.length > 0 ? glider.track[glider.track.length-1].lat + (Math.random() * (1 - -1) + -1) : 4859.91552734375,
+        'gpsValidLon': glider.track.length > 0 ? glider.track[glider.track.length-1].lon + (Math.random() * (1 - -1) + -1) : -6317.248046875,
+        'id': 275,
+        'isGpsValid': true,
+        'name': glider.name,
+      }
+    }
 
     if (sfmc_json == false) {
       console.log('No SFMC JSON')
