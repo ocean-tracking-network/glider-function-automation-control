@@ -23,7 +23,7 @@ onMounted(() => {
 </script>
 <template>
   <Teleport defer to="#main-flex">
-    <div v-if="blur" :class="{blur}"></div>
+    <div class="modal-backdrop" :class="{blur}"></div>
     <div class="border modal"
       tabindex="0"
       ref="modalRef"
@@ -47,12 +47,6 @@ onMounted(() => {
 }
 
 .blur {
-  position:fixed;
-  top: 0%;
-  left: 0%;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
   backdrop-filter: blur(7px);
 }
 
@@ -67,6 +61,17 @@ onMounted(() => {
   left: 50%;
   z-index: 1001;
   transform: translate(-50%, -30%);
+}
+
+.modal-backdrop {
+  position:fixed;
+  top: 0%;
+  left: 0%;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+
+  background-color: transparent;
 }
 
 :slotted(button), button {
