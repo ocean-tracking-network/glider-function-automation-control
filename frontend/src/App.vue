@@ -203,14 +203,6 @@ function toggleUserManagement() {
 </template>
 
 <style scoped>
-#login-div {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  z-index: 1000;
-  transform: translate(-50%, -50%);
-}
-
 .logo {
   display: block;
   margin: 0 auto 2rem;
