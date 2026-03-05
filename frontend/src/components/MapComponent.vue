@@ -24,7 +24,6 @@ const glider_current_location = ref(null)
 const glider_next_waypoint = ref(null)
 
 const all_glider_markers = ref([])
-const glider_to_leaflet_id_map = ref({})
 
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
@@ -83,11 +82,6 @@ function create_polygons() {
 
 const on_polygon_click = (e) => {
   store.select(polygon_to_geofence_map.value[e.target._leaflet_id])
-}
-
-const on_glider_glick = (e) => {
-  const gliderId = glider_to_leaflet_id_map.value[e.target._leaflet_id]
-  if (gliderId) gliderStore.select_glider(gliderId)
 }
 
 function set_glider_track() {
@@ -161,10 +155,9 @@ function set_glider_track() {
     if (selected_glider.value && glider._id != selected_glider._id && glider_has_track(glider)) {
       const current_pos = [convert_gps(glider.track[glider.track.length - 1].lat), convert_gps(glider.track[glider.track.length - 1].lon)]
       const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
-        .on("click", on_glider_glick)
+        .on("click", () => { gliderStore.select_glider(glider._id) })
         .addTo(initialMap.value)
       all_glider_markers.value.push(new_marker)
-      glider_to_leaflet_id_map.value[new_marker._leaflet_id] = glider._id
     }
     i++
   })
