@@ -137,7 +137,7 @@ const all_categories = computed(() => {
 </script>
 <template>
   <div>
-    <div :class="{ blur: !loggedin }">
+    <div>
       <header>
         <HeaderComponent />
       </header>
@@ -194,21 +194,11 @@ const all_categories = computed(() => {
         <LogComponent id="logs" />
       </main>
     </div>
-    <div v-if="!loggedin" id="login-div">
-      <LoginComponent />
-    </div>
+    <LoginComponent v-if="!loggedin"/>
   </div>
 </template>
 
 <style scoped>
-#login-div {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  z-index: 1000;
-  transform: translate(-50%, -50%);
-}
-
 .logo {
   display: block;
   margin: 0 auto 2rem;

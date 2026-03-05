@@ -3,26 +3,28 @@ import { ref } from 'vue';
 import { useGlidersStore } from '@/stores/gliders';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
+import ModalComponent from './ModalComponent.vue';
 
 const gliderStore = useGlidersStore()
 const userStore = useUserStore()
 const { gliders, selected_glider_id } = storeToRefs(gliderStore)
 const { isAdmin } = storeToRefs(userStore)
 
+const show_add_modal = ref(false)
 const new_glider_name = ref('')
-const selected_delete = ref({})
-const add_prompt = ref(false)
-const delete_prompt = ref(false)
 const error_msg = ref('')
 
+const selected_delete = ref(null)
+
 function enable_disable_glider() {
-  if (!isAdmin.value) {
-    return
-  }
+  if (!isAdmin.value) return
+
   gliderStore.enable_disable_selected_glider()
 }
 
 function add_glider() {
+  if (!isAdmin.value) return
+
   const name = new_glider_name.value.trim()
 
   if (!name) {
@@ -39,52 +41,66 @@ function add_glider() {
   }
 
   gliderStore.save_glider(name)
-  error_msg.value = ''
-  add_prompt.value = ''
+  hide_add_modal()
+}
+
+function delete_glider() {
+  if (!isAdmin.value) return
+
+  gliderStore.delete_glider(selected_delete.value)
+  selected_delete.value = null
+}
+
+function hide_add_modal() {
+  show_add_modal.value = false
   new_glider_name.value = ''
+  error_msg.value = ''
 }
 </script>
 <template>
+  <ModalComponent v-if="show_add_modal"
+    header="Add a New Glider"
+    @close="hide_add_modal()"
+    @confirm="add_glider()"
+  >
+    <form action="">
+      <p v-if="error_msg" class="danger">{{ error_msg }}</p>
+      <input v-model="new_glider_name" type="text" placeholder="Enter Glider Name">
+      <br>
+      <button type="button" @click="add_glider()">Add</button>
+      <button type="button" @click="hide_add_modal()">Cancel</button>
+    </form>
+  </ModalComponent>
+
+  <ModalComponent v-if="selected_delete" :blur="true" @close="selected_delete = null">
+    <h2>Are You Sure You Want to Delete Glider: {{ selected_delete.name }}</h2>
+    <form action="">
+      <button type="button" class="danger" @click="delete_glider()">Delete</button>
+      <button type="button" @click="selected_delete = null">Cancel</button>
+    </form>
+  </ModalComponent>
+
   <div class="border tab-border">
     <div id="button-div">
-      <button v-for="glider in gliders" :key="glider._id"
+      <button v-for="glider in gliders"
+        :key="glider._id"
         :class="{ selected: selected_glider_id === glider._id, gliders: true }"
-        @click="gliderStore.select_glider(glider._id)">
-        <input v-model="glider.enabled" @change="enable_disable_glider"
-          :disabled="!isAdmin || selected_glider_id !== glider._id" class="enable" type="checkbox">
+        @click="gliderStore.select_glider(glider._id)"
+      >
+        <input v-model="glider.enabled"
+          @change="enable_disable_glider"
+          :disabled="!isAdmin || selected_glider_id !== glider._id"
+          class="enable" type="checkbox"
+        >
         {{ glider.name }}
         <button v-if="isAdmin && selected_glider_id === glider._id"
-          @click="selected_delete = glider; delete_prompt = true" class="x-btn">X</button>
+          @click="selected_delete = glider"
+          class="x-btn"
+        >X</button>
       </button>
-      <button v-if="isAdmin" class="gliders" id="add" @click="add_prompt = true">+</button>
+      <button v-if="isAdmin" class="gliders" id="add" @click="show_add_modal = true">+</button>
     </div>
   </div>
-
-  <Teleport defer to="#main-flex">
-    <div v-if="isAdmin && add_prompt" class="border modal">
-      <h2 class="modal-header">Add a New Glider</h2>
-      <form action="">
-        <p v-if="error_msg" class="danger">{{ error_msg }}</p>
-        <input v-model="new_glider_name" type="text" placeholder="Enter Glider Name">
-        <br>
-        <button v-if="isAdmin" type="button" class="border" @click="add_glider()">Add</button>
-        <button type="button" class="border"
-          @click="error_msg = ''; new_glider_name = ''; add_prompt = false">Cancel</button>
-      </form>
-    </div>
-  </Teleport>
-
-  <Teleport defer to="#main-flex">
-    <div v-if="isAdmin && delete_prompt" class="border modal">
-      <h2 class="modal-header">Are You Sure You Want to Delete Glider: {{ selected_delete.name ?? delete_prompt ==
-        false }}</h2>
-      <form action="">
-        <button type="button" class="border danger"
-          @click="gliderStore.delete_glider(selected_delete); delete_prompt = false">Delete</button>
-        <button type="button" class="border" @click="selected_delete = {}; delete_prompt = false">Cancel</button>
-      </form>
-    </div>
-  </Teleport>
 </template>
 <style scoped>
 #tab-body {
@@ -114,10 +130,6 @@ function add_glider() {
   padding-top: 0;
   padding-bottom: 0;
 }
-
-/* #add:hover {
-  border-color: limegreen;
-} */
 
 .x-btn:hover {
   transition: .2s;
@@ -153,46 +165,5 @@ function add_glider() {
 
 .danger {
   color: red;
-}
-
-.modal {
-  background-color: var(--color-background);
-  padding: 2rem;
-  text-align: center;
-  width: 300px;
-
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  z-index: 1000;
-  transform: translate(-50%, -50%);
-}
-
-.modal-header {
-  margin-bottom: 2rem;
-  font-size: x-large;
-}
-
-form button {
-  transition: .3s;
-  /* float: left; */
-  /* margin: 1rem 0 0 2rem; */
-  width: 30%;
-  display: inline;
-  margin: 10%;
-}
-
-form button:hover {
-  transition: .3s;
-  background-color: var(--color-border-hover);
-}
-
-input {
-  background-color: var(--color-background-soft);
-  color: var(--color-text);
-  border-radius: 3px;
-  border-color: lightgray;
-  border-width: 1px;
-  padding: .2rem;
 }
 </style>

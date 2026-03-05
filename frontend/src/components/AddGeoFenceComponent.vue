@@ -4,12 +4,13 @@ import { useGeoFencesStore } from '@/stores/geofences';
 import { storeToRefs } from 'pinia';
 import { useFilesStore } from '@/stores/files';
 import { useDropZone } from '@vueuse/core'
+import ModalComponent from './ModalComponent.vue';
 import draggable from 'vuedraggable'
 
 
 const filesStore = useFilesStore()
 const store = useGeoFencesStore()
-const { geofences, interactive_map, selected_fence, selected_kml_geo_json } = storeToRefs(store)
+const { geofences, interactive_map, selected_fence, selected_kml_geo_json, show_alert_modal } = storeToRefs(store)
 const uploadKmlFile = useTemplateRef('uploadKmlFile')
 const dropZoneRef = useTemplateRef('dropZoneRef')
 
@@ -127,6 +128,8 @@ function onMoveLatLon(evt) {
 
 </script>
 <template>
+  <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''"></ModalComponent>
+
   <div class="geofence-container">
     <div class="main-container">
       <div class="header">
