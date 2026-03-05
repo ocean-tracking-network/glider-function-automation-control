@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia';
 import { useFilesStore } from '@/stores/files';
 import { useDropZone } from '@vueuse/core'
 import ModalComponent from './ModalComponent.vue';
+import draggable from 'vuedraggable'
 
 
 const filesStore = useFilesStore()
@@ -113,6 +114,18 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   preventDefaultForUnhandled: false,
 })
 
+function onMoveLatLon(evt) {
+  const rows = selected_fence.value?.latlons ?? []
+  const last = rows.length - 1
+
+  const from = evt.draggedContext?.index
+  const to = evt.relatedContext?.index
+
+  // keep trailing placeholder row fixed at end
+  if (from === last || to === last) return false
+  return true
+}
+
 </script>
 <template>
   <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''"></ModalComponent>
@@ -126,17 +139,36 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
       </div>
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
-          <div class="inputs" v-for="(lat_lon, index) in selected_fence.latlons" :key="'lat_lon-' + index">
-            <p id="index">{{ index }}</p>
-            <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-              @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[0]" placeholder="lat" type="text" name=""
-              id="" />
-            <p>:</p>
-            <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-              @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[1]" placeholder="lon" type="text" name=""
-              id="" />
-            <button class="x-btn" @click="remove_idx(index)" v-if="props.canEdit && index < selected_fence.latlons.length - 1">x</button>
-          </div>
+          <draggable :move="onMoveLatLon" :list="selected_fence.latlons" :item-key="(_, index) => `latlon-${index}`"
+            handle=".drag-handle" :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
+            <template #item="{ element: lat_lon, index }">
+              <div class="inputs">
+                <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
+                  ⋮⋮
+                </button>
+                <button v-if="index >= selected_fence.latlons.length - 1" type="button" disabled="true"
+                  class="no-drag-handle">
+                  ⋮⋮
+                </button>
+                <span style="width: 20px;"></span>
+
+                <p id="index">{{ index }}</p>
+                <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
+                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[0]" placeholder="lat" type="text" />
+                <p>:</p>
+                <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
+                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon[1]" placeholder="lon" type="text" />
+
+                <button class="x-btn" @click="remove_idx(index)"
+                  v-if="props.canEdit && index < selected_fence.latlons.length - 1">
+                  x
+                </button>
+                <button class="no-x-btn" v-if="index >= selected_fence.latlons.length - 1" disabled="true">
+                  x
+                </button>
+              </div>
+            </template>
+          </draggable>
         </div>
       </div>
     </div>
@@ -155,15 +187,16 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
       </div>
       <div class="upload-kml-container" :class="{ border: props.canEdit }" ref="dropZoneRef">
         <div v-if="!selected_kml_geo_json" class="upload-kml-dropzone">
-          <button :disabled="lock_fence || !props.canEdit" :class="{ overDropZone: isOverDropZone }" @click="uploadKmlFile.click()">
+          <button :disabled="lock_fence || !props.canEdit" :class="{ overDropZone: isOverDropZone }"
+            @click="uploadKmlFile.click()">
             <div v-if="props.canEdit && !isOverDropZone">
               <p>Click or Drop</p>
               <p>a KML File here</p>
             </div>
             <div v-else-if="props.canEdit">Drop it</div>
           </button>
-          <input :disabled="lock_fence || !props.canEdit"  type="file" class="upload-kml-input" accept=".kml" ref="uploadKmlFile"
-            @change="filesStore.upload_kml_file" />
+          <input :disabled="lock_fence || !props.canEdit" type="file" class="upload-kml-input" accept=".kml"
+            ref="uploadKmlFile" @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
           <div class="uploaded-kml-coordinates-selector-inner-contianer">
@@ -194,6 +227,28 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   </div>
 </template>
 <style scoped>
+.drag-handle {
+  cursor: grab;
+  border: none;
+  background: transparent;
+  padding: 0 4px;
+}
+
+.no-drag-handle {
+  padding: 0 4px;
+  opacity: 0;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.latlon-draggable {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .geofence-container {
   width: 100%;
   height: 100%;
@@ -333,11 +388,14 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
 
 .inputs {
   display: flex;
+  flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
   gap: .3rem;
   width: 16rem;
   flex-basis: 20%;
   margin-right: 1rem;
+  padding-bottom: .5rem;
 }
 
 #index {
@@ -370,7 +428,6 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   background-color: lightgray;
   color: black;
   */
-  margin-bottom: .5rem;
   padding: .1rem;
   /* background-color: black; */
   background-color: var(--color-background-soft);
@@ -410,7 +467,11 @@ button {
 }
 
 .x-btn {
-  height: 1px;
+  /* height: 1px; */
+}
+
+.no-x-btn {
+  opacity: 0;
 }
 
 #name-input {
