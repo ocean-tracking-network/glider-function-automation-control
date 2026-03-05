@@ -143,7 +143,11 @@ function onMoveLatLon(evt) {
                 <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
                   ⋮⋮
                 </button>
-                <span v-else style="width: 20px;"></span>
+                <button v-if="index >= selected_fence.latlons.length - 1" type="button" disabled="true"
+                  class="no-drag-handle">
+                  ⋮⋮
+                </button>
+                <span style="width: 20px;"></span>
 
                 <p id="index">{{ index }}</p>
                 <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
@@ -154,6 +158,9 @@ function onMoveLatLon(evt) {
 
                 <button class="x-btn" @click="remove_idx(index)"
                   v-if="props.canEdit && index < selected_fence.latlons.length - 1">
+                  x
+                </button>
+                <button class="no-x-btn" v-if="index >= selected_fence.latlons.length - 1" disabled="true">
                   x
                 </button>
               </div>
@@ -222,6 +229,11 @@ function onMoveLatLon(evt) {
   border: none;
   background: transparent;
   padding: 0 4px;
+}
+
+.no-drag-handle {
+  padding: 0 4px;
+  opacity: 0;
 }
 
 .drag-handle:active {
@@ -373,11 +385,14 @@ function onMoveLatLon(evt) {
 
 .inputs {
   display: flex;
+  flex-direction: row;
   flex-wrap: nowrap;
+  align-items: center;
   gap: .3rem;
   width: 16rem;
   flex-basis: 20%;
   margin-right: 1rem;
+  padding-bottom: .5rem;
 }
 
 #index {
@@ -410,7 +425,6 @@ function onMoveLatLon(evt) {
   background-color: lightgray;
   color: black;
   */
-  margin-bottom: .5rem;
   padding: .1rem;
   /* background-color: black; */
   background-color: var(--color-background-soft);
@@ -450,7 +464,11 @@ button {
 }
 
 .x-btn {
-  height: 1px;
+  /* height: 1px; */
+}
+
+.no-x-btn {
+  opacity: 0;
 }
 
 #name-input {
