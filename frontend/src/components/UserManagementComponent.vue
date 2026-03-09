@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import ModalComponent from './ModalComponent.vue';
 
 const userStore = useUserStore()
 
@@ -46,72 +47,60 @@ async function createUser() {
 </script>
 
 <template>
-  <div id="user-management-container" class="border">
-    <h2 id="header">Create New User</h2>
+  <ModalComponent header="Create New User" :blur="true" @close="$emit('close')">
     <div class="message" :class="messageType" v-if="message">
       {{ message }}
     </div>
-    <div>
-      <form @submit.prevent="createUser">
-        <input
-          v-model="newUsername"
-          type="text"
-          id="new-username"
-          placeholder="Username"
-          autocomplete="off"
-        >
-        <br>
-        <input
-          v-model="newPassword"
-          type="password"
-          id="new-password"
-          placeholder="Password (min 3 chars)"
-          autocomplete="new-password"
-        >
-        <br>
-        <div class="role-selector">
-          <label class="role-option">
-            <input
-              type="radio"
-              v-model="newRole"
-              value="viewer"
-              name="role"
-            >
-            <span class="role-label">Viewer</span>
-          </label>
-          <label class="role-option">
-            <input
-              type="radio"
-              v-model="newRole"
-              value="admin"
-              name="role"
-            >
-            <span class="role-label">Admin</span>
-          </label>
-        </div>
-        <br>
-        <button type="submit" class="border">Create User</button>
-      </form>
-    </div>
-  </div>
+    <form @submit.prevent="createUser">
+      <input
+        v-model="newUsername"
+        type="text"
+        id="new-username"
+        placeholder="Username"
+        autocomplete="off"
+      >
+      <br>
+      <input
+        v-model="newPassword"
+        type="password"
+        id="new-password"
+        placeholder="Password (min 3 chars)"
+        autocomplete="new-password"
+      >
+      <br>
+      <div class="role-selector">
+        <label class="role-option">
+          <input
+            type="radio"
+            v-model="newRole"
+            value="viewer"
+            name="role"
+          >
+          <span class="role-label">Viewer</span>
+        </label>
+        <label class="role-option">
+          <input
+            type="radio"
+            v-model="newRole"
+            value="admin"
+            name="role"
+          >
+          <span class="role-label">Admin</span>
+        </label>
+      </div>
+      <br>
+      <button type="submit">Create User</button>
+      <button type="button" class="close-btn" @click="$emit('close')">Close</button>
+    </form>
+  </ModalComponent>
 </template>
 
 <style scoped>
-#user-management-container {
-  background-color: var(--color-background);
-  padding: 2rem;
-  text-align: center;
-  min-width: 300px;
-}
-
-#header {
-  margin-bottom: 1.5rem;
-  font-size: large;
-}
-
 .message {
   padding: 0.75rem;
+  margin: -1rem 0 1rem;
   margin-bottom: 1rem;
+  margin-top: -1rem;
   border-radius: 5px;
   font-size: 0.9rem;
 }
@@ -126,33 +115,6 @@ async function createUser() {
   background-color: #f8d7da;
   color: #721c24;
   border: 1px solid #f5c6cb;
-}
-
-button {
-  transition: .3s;
-  cursor: pointer;
-  padding: 0.5rem 1.5rem;
-  background-color: var(--color-background-soft);
-  color: var(--color-text);
-}
-
-button:hover {
-  transition: .3s;
-  background-color: var(--color-border-hover);
-}
-
-input[type="text"],
-input[type="password"] {
-  margin-bottom: 1rem;
-  background-color: var(--color-background-soft);
-  border-radius: 3px;
-  color: var(--color-text);
-  border-color: lightgray;
-  border-width: 1px;
-  padding: .5rem;
-  width: 100%;
-  max-width: 250px;
-  box-sizing: border-box;
 }
 
 .role-selector {

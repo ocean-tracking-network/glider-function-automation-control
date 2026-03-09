@@ -28,7 +28,6 @@ const { selected_fence } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
 
-//ADDED isAdmin
 const { loggedin, isAdmin } = storeToRefs(userStore)
 
 const fileUpload = useTemplateRef('fileUpload')
@@ -143,7 +142,7 @@ function toggleUserManagement() {
 </script>
 <template>
   <div>
-    <div :class="{ blur: !loggedin || showUserManagement }">
+    <div>
       <header>
         <HeaderComponent @toggle-user-management="toggleUserManagement" />
       </header>
@@ -192,13 +191,8 @@ function toggleUserManagement() {
         <LogComponent id="logs" />
       </main>
     </div>
-    <div v-if="!loggedin" id="login-div">
-      <LoginComponent />
-    </div>
-    <div v-if="showUserManagement && isAdmin" id="user-management-div">
-      <UserManagementComponent />
-      <button class="close-btn" @click="toggleUserManagement">Close</button>
-    </div>
+    <LoginComponent v-if="!loggedin" />
+    <UserManagementComponent v-if="showUserManagement && isAdmin" @close="showUserManagement = false"/>
   </div>
 </template>
 
@@ -273,35 +267,5 @@ header {
 
 #file-upload {
   visibility: hidden;
-}
-
-.blur {
-  filter: blur(7px);
-}
-
-#user-management-div {
-  position: fixed;
-  top: 30%;
-  left: 50%;
-  z-index: 1000;
-  transform: translate(-50%, -50%);
-}
-
-.close-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1.5rem;
-  background-color: var(--color-background-soft);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.close-btn:hover {
-  background-color: var(--color-border-hover);
 }
 </style>

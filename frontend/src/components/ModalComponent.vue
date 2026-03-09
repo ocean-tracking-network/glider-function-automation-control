@@ -104,6 +104,7 @@ onMounted(() => {
   border-radius: 3px;
   border-color: lightgray;
   border-width: 1px;
-  padding: .2rem;
+  padding: .5rem;
+  width: 100%;
 }
 </style>
