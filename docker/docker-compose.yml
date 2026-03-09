@@ -26,10 +26,8 @@ services:
     build:
       context: ../
       dockerfile: ./docker/backend.dockerfile
-    environment:
-      - ATLAS_URI=mongodb://ceotr:ceotr@mongo:27017/?authSource=admin
     volumes:
-      - backend_uploads:/usr/src/app/uploads
+      - /home/ellis/resource/gas/uploads:/usr/src/app/uploads
     ports:
       - 3000:3000
     depends_on:
@@ -43,6 +41,3 @@ services:
       dockerfile: ./docker/frontend.dockerfile
     ports:
       - 8080:8080
-
-volumes:
-  backend_uploads:

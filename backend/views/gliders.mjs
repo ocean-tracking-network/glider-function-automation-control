@@ -18,18 +18,18 @@ const post_gliders = async (req, res) => {
     return
   }
 
-  // const sfmc_json = await get_active_deployment_details(glider_name)
+  const sfmc_json = await get_active_deployment_details(glider_name)
 
-  // Dummy data
-  const sfmc_json = {
-    data: {
-      gpsValidLat: 4859.91552734375 + (Math.random() * (1 - -1) + -1),
-      gpsValidLon: -6317.248046875 + (Math.random() * (1 - -1) + -1),
-      id: 275,
-      isGpsValid: true,
-      name: glider_name,
-    },
-  }
+  //// Dummy data
+  // const sfmc_json = {
+  //   data: {
+  //     gpsValidLat: 4859.91552734375 + (Math.random() * (1 - -1) + -1),
+  //     gpsValidLon: -6317.248046875 + (Math.random() * (1 - -1) + -1),
+  //     id: 275,
+  //     isGpsValid: true,
+  //     name: glider_name,
+  //   },
+  // }
 
   if (!sfmc_json) {
     console.log(`No SFMC JSON for ${glider_name}`)
