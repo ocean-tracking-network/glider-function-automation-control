@@ -20,7 +20,7 @@ const post_gliders = async (req, res) => {
 
   const sfmc_json = await get_active_deployment_details(glider_name)
 
-  // Dummy data
+  //// Dummy data
   // const sfmc_json = {
   //   data: {
   //     gpsValidLat: 4859.91552734375 + (Math.random() * (1 - -1) + -1),

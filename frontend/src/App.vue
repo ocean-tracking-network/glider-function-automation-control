@@ -7,6 +7,7 @@ import LogComponent from './components/LogComponent.vue';
 import GeoFenceComponent from './components/GeoFenceComponent.vue';
 import GliderTabComponent from './components/GliderTabComponent.vue';
 import LoginComponent from './components/LoginComponent.vue';
+import UserManagementComponent from './components/UserManagementComponent.vue';
 import { computed, ref, useTemplateRef } from 'vue';
 import { useEventsStore } from './stores/events';
 import { useFilesStore } from './stores/files';
@@ -27,11 +28,11 @@ const { selected_fence } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
 
-//ADDED isAdmin
 const { loggedin, isAdmin } = storeToRefs(userStore)
 
 const fileUpload = useTemplateRef('fileUpload')
 const file_tab_select = ref("")
+const showUserManagement = ref(false)
 
 function fileMoveCallback(evt, originalEvent) {
   console.log(evt)
@@ -134,21 +135,17 @@ const all_categories = computed(() => {
   return [...filesStore.categories, ...temp_file_categories.value]
 })
 
+function toggleUserManagement() {
+  showUserManagement.value = !showUserManagement.value
+}
+
 </script>
 <template>
   <div>
     <div>
       <header>
-        <HeaderComponent />
+        <HeaderComponent @toggle-user-management="toggleUserManagement" />
       </header>
-      <!-- CONDITIONAL BANNER TO DENOTE VIEWER MODE -->
-      <div v-if="loggedin && !isAdmin" class="viewer-banner">
-        VIEWER USER - READ ONLY MODE
-      </div>
-      <!-- CONDITIONAL BANNER TO DENOTE ADMIN MODE -->
-      <div v-if="loggedin && isAdmin" class="admin-banner">
-        ADMIN USER - FULL PRIVILEGE ENABLED
-      </div>
 
       <!-- PAGE ADMIN/VIEWER UI/UX CONTROLLED HERE -->
       <main>
@@ -194,7 +191,8 @@ const all_categories = computed(() => {
         <LogComponent id="logs" />
       </main>
     </div>
-    <LoginComponent v-if="!loggedin"/>
+    <LoginComponent v-if="!loggedin" />
+    <UserManagementComponent v-if="showUserManagement && isAdmin" @close="showUserManagement = false"/>
   </div>
 </template>
 
@@ -252,28 +250,6 @@ header {
   width: 100%;
 }
 
-.viewer-banner {
-  margin-top: .5rem;
-  padding: .4rem .75rem;
-  border: 1px solid var(--color-text);
-  border-radius: 6px;
-  background-color: #ffcc00;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: .04em;
-}
-
-.admin-banner {
-  margin-top: .5rem;
-  padding: .4rem .75rem;
-  border: 1px solid var(--color-text);
-  border-radius: 6px;
-  background-color: #ff0000;
-  text-align: center;
-  font-weight: bold;
-  letter-spacing: .04em;
-}
-
 #logs {
   width: 100%;
 }
@@ -291,9 +267,5 @@ header {
 
 #file-upload {
   visibility: hidden;
-}
-
-.blur {
-  filter: blur(7px);
 }
 </style>

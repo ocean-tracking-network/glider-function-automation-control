@@ -98,9 +98,9 @@ const back_display = computed(() => {
   return lock_fence.value ? "Back" : "Save/Back"
 })
 
-watch(geofences.value, async (new_fence, old_fence) => {
+watch(() => geofences.value, async (new_fence, old_fence) => {
   on_input()
-})
+}, { deep: true })
 
 watch(fence_key, () => {
   console.log(fence_key.value)
@@ -251,72 +251,94 @@ function onMoveLatLon(evt) {
 
 .geofence-container {
   width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: row;
-  gap: 4px;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .main-container {
-  flex: 60%;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
 }
 
 .header {
   display: flex;
   flex-direction: row;
-  gap: 4px;
+  gap: 8px;
+  align-items: center;
 }
 
 #name-input {
   margin: 0px auto;
+  flex: 1;
 }
 
 .lat-lon-container {
-  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
+  min-height: 200px;
 }
 
 .controls-container {
-  flex: 40%;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  gap: 4px;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border, lightgray);
+}
+
+.controls-container > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
 }
 
 .upload-kml-container {
-  height: 100%;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  min-height: 150px;
+  border: 1px dashed var(--color-border, lightgray);
+  border-radius: 4px;
+  padding: 16px;
 }
 
 .upload-kml-dropzone button {
-  border: 0.5px dotted lightgray;
-  padding: 16px;
-  border-radius: 4px;
+  border: 2px dashed var(--color-border, lightgray);
+  padding: 24px 32px;
+  border-radius: 6px;
+  background-color: var(--color-background-soft);
+  color: var(--color-text);
+  width: 100%;
+  max-width: 300px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.upload-kml-dropzone button:hover:not(:disabled) {
+  border-color: lightblue;
+  background-color: var(--color-background);
 }
 
 .overDropZone {
-  transition: .5s;
-  border: 1px dotted lightgreen !important;
-  padding: 30px;
+  transition: .3s !important;
+  border: 2px dashed lightgreen !important;
+  padding: 40px 48px !important;
+  background-color: var(--color-background);
 }
 
 .upload-kml-container p {
   text-align: center;
   position: relative;
+  margin: 0;
+  color: var(--color-text);
 }
 
 .upload-kml-input {
@@ -326,44 +348,60 @@ function onMoveLatLon(evt) {
 
 .uploaded-kml-coordinates-selector-contianer {
   width: 100%;
-  height: 100%;
   position: relative;
 }
 
 .uploaded-kml-coordinates-selector-contianer .remove {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  border: 1px solid lightgray;
+  top: 0;
+  right: 0;
+  border: 1px solid var(--color-border, lightgray);
   border-radius: 4px;
-  width: 26px;
-  height: 26px;
-  background-color: white;
+  width: 30px;
+  height: 30px;
+  background-color: var(--color-background);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: red;
+  transition: all 0.2s;
+}
+
+.uploaded-kml-coordinates-selector-contianer .remove:hover {
+  background-color: #ffe0e0;
+  border-color: red;
 }
 
 .uploaded-kml-coordinates-selector-inner-contianer {
   width: 100%;
-  height: 100%;
-  overflow-y: scroll;
+  max-height: 250px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .kml-file-placemark-card {
   width: 100%;
-  padding: 8px;
+  padding: 12px;
   color: var(--color-text);
-  border-color: lightgray;
+  border-color: var(--color-border, lightgray);
   border-width: 1px;
   display: flex;
   flex-direction: column;
   border-radius: 4px;
   gap: 8px;
+  background-color: var(--color-background-soft);
 }
 
 .kml-file-placemark-card button {
-  padding: 4px 2px;
+  padding: 6px 12px;
+  align-self: flex-start;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
 
 .kml-file-placemark-card button:hover {
@@ -375,6 +413,7 @@ function onMoveLatLon(evt) {
   background-color: lightgray;
   opacity: .4;
   border-color: lightgray;
+  cursor: not-allowed;
 }
 
 .kml-file-placemark-card-placemark,
@@ -382,8 +421,20 @@ function onMoveLatLon(evt) {
 .kml-file-placemark-card-coordinates {
   display: flex;
   flex-direction: row;
-  gap: 4px;
+  gap: 8px;
   align-items: center;
+  font-size: 0.95rem;
+}
+
+.kml-file-placemark-card-placemark span,
+.kml-file-placemark-card-type span,
+.kml-file-placemark-card-coordinates span {
+  min-width: 90px;
+}
+
+.kml-file-placemark-card p {
+  margin: 0;
+  color: var(--color-text);
 }
 
 .inputs {
@@ -399,28 +450,34 @@ function onMoveLatLon(evt) {
 }
 
 #index {
-  min-width: 1rem;
+  min-width: 2rem;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
 .latlon {
-  width: 6rem;
+  width: 7rem;
 }
 
 #main-container {
-  width: 10%;
-  height: 10rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  flex-wrap: wrap;
+  max-height: 300px;
+  padding: 12px;
+  background-color: var(--color-background-soft);
+  border-radius: 4px;
+  overflow-y: auto;
 }
 
 .overflow {
-  overflow: scroll;
-  width: 100% !important;
+  overflow-y: auto !important;
 }
 
 .label {
-  margin: .5rem;
+  margin: 0;
+  font-weight: 500;
+  color: var(--color-text);
 }
 
 .text-input {
@@ -431,25 +488,34 @@ function onMoveLatLon(evt) {
   padding: .1rem;
   /* background-color: black; */
   background-color: var(--color-background-soft);
-  border-radius: 3px;
-  /* color: lightgray; */
+  border-radius: 4px;
   color: var(--color-text);
-  border-color: lightgray;
-  border-width: 1px;
+  border: 1px solid var(--color-border, lightgray);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: lightblue;
 }
 
 #name input {
-  margin-left: .5rem;
+  margin-left: 0;
 }
 
 #name {
   display: flex;
   justify-content: space-between;
-  margin-bottom: .5rem;
+  margin-bottom: 0;
 }
 
 button {
   transition: .2s;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  margin-left: 10px;
 }
 
 #back-btn:hover {
@@ -458,7 +524,9 @@ button {
 }
 
 #back-btn {
-  width: 5rem;
+  margin-left: 10px;
+  width: 7rem;
+  padding: 8px 12px;
 }
 
 .x-btn:hover {
@@ -467,18 +535,15 @@ button {
 }
 
 .x-btn {
-  /* height: 1px; */
-}
-
-.no-x-btn {
-  opacity: 0;
+  height: auto;
+  padding: 4px 8px;
+  font-size: 1rem;
+  min-width: auto;
 }
 
 #name-input {
-  /* height: 100%; */
-  min-width: 12rem;
-  /* font-size: x-large; */
   text-align: center;
+  padding: 8px 12px;
 }
 
 .overflow-child {
@@ -487,5 +552,7 @@ button {
 
 input:disabled {
   background-color: var(--color-background);
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

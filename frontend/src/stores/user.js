@@ -92,6 +92,39 @@ export const useUserStore = defineStore('user', () => {
       })
   }
 
+  const logout = () => {
+    username.value = null
+    token.value = null
+    role.value = null
+    loggedin.value = false
+
+    localStorage.removeItem(localStorage_username)
+    localStorage.removeItem(localStorage_token)
+    localStorage.removeItem(localStorage_role)
+  }
+
+  const createUser = async (newUsername, newPassword, newRole) => {
+    try {
+      const data = {
+        username: newUsername,
+        password: newPassword,
+        role: newRole,
+      }
+      const response = await apiClient.post('/users', data)
+      return { success: true, data: response.data }
+    } catch (err) {
+      console.error('Error creating user:', err)
+      if (err.response?.status === 409) {
+        return { success: false, error: 'Username already exists' }
+      } else if (err.response?.status === 403) {
+        return { success: false, error: 'You do not have permission to create users' }
+      } else if (err.response?.status === 400) {
+        return { success: false, error: 'Username and password are required' }
+      }
+      return { success: false, error: 'Failed to create user' }
+    }
+  }
+
   return {
     username,
     token,
@@ -99,5 +132,7 @@ export const useUserStore = defineStore('user', () => {
     isAdmin,
     loggedin,
     login,
+    logout,
+    createUser,
   }
 })

@@ -25,6 +25,8 @@ async function delete_old_tracks() {
   const gliders = await collection.find({}).toArray()
 
   const past_date = new Date()
+
+  //date just comes from the .env/env.example file
   past_date.setDate(past_date.getDate() - process.env.HISTORY_DAYS)
 
   for (const glider of gliders) {
@@ -46,7 +48,7 @@ async function update_glider_positions() {
     let sfmc_json = {}
     sfmc_json = await get_active_deployment_details(glider.name)
 
-    // Random sfmc_json (with default) to simulate unique movement of gliders
+    //// Random sfmc_json (with default) to simulate unique movement of gliders
     // sfmc_json = {
     //   'data': {
     //     'gpsValidLat': glider.track.length > 0 ? glider.track[glider.track.length-1].lat + (Math.random() * (1 - -1) + -1) : 4859.91552734375,
