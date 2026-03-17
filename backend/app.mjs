@@ -30,7 +30,7 @@ import { login } from './views/user.mjs'
 import { authenticateToken } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
-import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
+import { delete_old_tracks, update_glider_positions, subscribe_sfmc_gliders } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 
 const app = express()
@@ -75,11 +75,12 @@ app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, post_logs)
 
 // Schedule
-const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
+const backend_schedule = scheduleJob(`*/${process.env.SCHEDULE_SECS} * * * * *`, async () => {
   await update_glider_positions()
   await update_geofences()
   await delete_old_tracks()
 })
+
 
 // app start
 app.listen(port, async () => {
@@ -91,6 +92,9 @@ app.listen(port, async () => {
     console.log('pausing for 5 seconds to make sure you want to do this')
     await new Promise((r) => setTimeout(r, 5000))
   }
+  
+  subscribe_sfmc_gliders()
+
   console.log(`example app listening on port ${port}`)
   send_slack_message('debug: Backend started and listening')
 })

@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
 import { updateOne } from '../utils/db_utils.mjs'
-import { get_available_scripts } from '../utils/sfmc_api.mjs'
+import { get_active_deployment_details, get_available_scripts, get_glider_details } from '../utils/sfmc_api.mjs'
 
 const get_gliders = async (req, res) => {
   let collection = await db.collection('gliders')
@@ -17,8 +17,11 @@ const post_gliders = async (req, res) => {
     res.send({ error: 'Need to specify a name' }).status(400)
     return
   }
+  const sfmc_json = await get_glider_details(glider_name)
+  console.log(sfmc_json)
   const new_doc = {
     name: glider_name,
+    sfmc_id: sfmc_json.id,
     track: [],
     enabled: false,
   }
