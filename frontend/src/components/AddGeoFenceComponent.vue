@@ -22,10 +22,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(["geofenceupdate", "back"])
+const emit = defineEmits(["geofenceupdate", "back", "dirty-change"])
 
 const fence_key = ref("")
 const lock_fence = ref(true)
+const initial_snapshot = ref('')
 
 onBeforeMount(() => {
   if (props.fenceKey) {
@@ -87,6 +88,34 @@ function remove_idx(idx) {
   }
 }
 
+function normalize_latlons(latlons) {
+  if (!Array.isArray(latlons)) {
+    return []
+  }
+
+  const normalized = latlons.map((latlon) => {
+    if (!Array.isArray(latlon)) {
+      return ['', '']
+    }
+    return [latlon[0] ?? '', latlon[1] ?? '']
+  })
+
+  const last_latlon = normalized[normalized.length - 1]
+  if (last_latlon && !last_latlon[0] && !last_latlon[1]) {
+    normalized.pop()
+  }
+
+  return normalized
+}
+
+function create_snapshot() {
+  return JSON.stringify({
+    name: selected_fence.value?.name ?? '',
+    notify: selected_fence.value?.notify ?? false,
+    latlons: normalize_latlons(selected_fence.value?.latlons),
+  })
+}
+
 const overflowed = computed(() => {
   if (selected_fence.value.latlons.length >= 6) {
     return true
@@ -101,6 +130,14 @@ const back_display = computed(() => {
 watch(() => geofences.value, async (new_fence, old_fence) => {
   on_input()
 }, { deep: true })
+
+watch(
+  [selected_fence],
+  () => {
+    emit('dirty-change', create_snapshot() !== initial_snapshot.value)
+  },
+  { deep: true },
+)
 
 watch(fence_key, () => {
   console.log(fence_key.value)
@@ -125,6 +162,11 @@ function onMoveLatLon(evt) {
   if (from === last || to === last) return false
   return true
 }
+
+onBeforeMount(() => {
+  initial_snapshot.value = create_snapshot()
+  emit('dirty-change', false)
+})
 
 </script>
 <template>

@@ -3,6 +3,7 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
+import ModalComponent from './ModalComponent.vue';
 import { useGeoFencesStore } from '@/stores/geofences';
 import { useEventsStore } from '@/stores/events';
 import { storeToRefs } from 'pinia';
@@ -19,6 +20,8 @@ const is_create_mode = ref(false)
 const just_removed = ref(false)
 const drawerWidth = ref(370)
 const isResizing = ref(false)
+const show_close_confirm_modal = ref(false)
+const geofence_is_dirty = ref(false)
 
 const { geofences, selected_fence } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
@@ -30,6 +33,8 @@ const { isAdmin } = storeToRefs(userStore)
 watch(() => userStore.loggedin, (new_val) => {
   if (!new_val) {
     geofence_editor.value = false
+    geofence_is_dirty.value = false
+    show_close_confirm_modal.value = false
   }
 })
 
@@ -39,6 +44,7 @@ function add_geo() {
     return
   }
   is_create_mode.value = true
+  geofence_is_dirty.value = false
   const hasSelectedGeofence = selected_fence_local.value !== "" || selected_fence.value !== ""
   selected_fence_local.value = ""
   store.deselect()
@@ -67,8 +73,27 @@ function back(save) {
   }
   geofence_editor.value = false
   is_create_mode.value = false
+  geofence_is_dirty.value = false
+  show_close_confirm_modal.value = false
   store.deselect()
   selected_fence_local.value = ""
+}
+
+function request_close_drawer() {
+  if (!geofence_is_dirty.value) {
+    back(false)
+    return
+  }
+
+  show_close_confirm_modal.value = true
+}
+
+function confirm_close_save() {
+  back(true)
+}
+
+function confirm_close_discard() {
+  back(false)
 }
 
 function on_click(e) {
@@ -77,6 +102,7 @@ function on_click(e) {
     return
   }
   is_create_mode.value = false
+  geofence_is_dirty.value = false
   selected_fence_local.value = e.key
   geofence_editor.value = true
   store.select(e.key)
@@ -157,24 +183,33 @@ watch(selected_fence, (new_val) => {
 <template>
   <div class="geofence-section">
     <div class="geofence-list">
-      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click"
-        :list="latlons" :draggable="false" :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin"
-        title="Geofences" id="geo" />
+      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" :list="latlons" :draggable="false"
+        :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin" title="Geofences" id="geo" />
     </div>
 
 
     <transition name="slide-drawer">
       <div v-if="geofence_editor" class="drawer-overlay">
+        <ModalComponent v-if="show_close_confirm_modal" :blur="true" @close="show_close_confirm_modal = false">
+          <h2>Save geofence changes before closing?</h2>
+          <div class="close-confirm-actions">
+            <button type="button" @click="confirm_close_save()">Save</button>
+            <button type="button" @click="confirm_close_discard()">Discard</button>
+            <button type="button" @click="show_close_confirm_modal = false">Cancel</button>
+          </div>
+        </ModalComponent>
         <div class="drawer-panel" :style="{ width: drawerWidth + 'px' }" @click.stop>
           <div class="resize-handle" @mousedown="startResize"></div>
           <div class="drawer-header">
-            <h2 class="drawer-title">{{ is_create_mode ? 'Create Geofence' : (selected_fence_local ? 'Edit Geofence' : 'Create Geofence') }}</h2>
-            <button class="drawer-close-btn" @click="back(false)" aria-label="Close drawer">
+            <h2 class="drawer-title">{{ is_create_mode ? 'Create Geofence' : (selected_fence_local ? 'Edit Geofence' :
+              'Create Geofence') }}</h2>
+            <button class="drawer-close-btn" @click="request_close_drawer()" aria-label="Close drawer">
               <span>&times;</span>
             </button>
           </div>
           <div class="drawer-content">
-            <AddGeoFenceComponent @back="back" :fenceKey="selected_fence_local" :canEdit="isAdmin" />
+            <AddGeoFenceComponent @back="back" @dirty-change="geofence_is_dirty = $event"
+              :fenceKey="selected_fence_local" :canEdit="isAdmin" />
           </div>
         </div>
       </div>
@@ -189,8 +224,15 @@ watch(selected_fence, (new_val) => {
   flex-direction: column;
 }
 
-.geofence-list { flex: 1; height: 100%; overflow: hidden; }
-#geo { height: 100%; }
+.geofence-list {
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+#geo {
+  height: 100%;
+}
 
 .drawer-panel {
   position: fixed;
@@ -222,7 +264,8 @@ watch(selected_fence, (new_val) => {
 }
 
 .resize-handle:hover {
-  background-color:grey }
+  background-color: grey
+}
 
 .drawer-header {
   display: flex;
@@ -234,7 +277,12 @@ watch(selected_fence, (new_val) => {
   flex-shrink: 0;
 }
 
-.drawer-title { margin: 0; color: var(--color-text); font-size: 1.25rem; font-weight: 600; }
+.drawer-title {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
 
 .drawer-close-btn {
   font-size: 2rem;
@@ -251,4 +299,16 @@ watch(selected_fence, (new_val) => {
   flex-shrink: 0;
 }
 
+.close-confirm-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 0.5em;
+}
+
+.close-confirm-actions button {
+  margin: 0;
+}
 </style>
