@@ -199,11 +199,24 @@ function onMoveLatLon(evt) {
   const last = rows.length - 1
 
   const from = evt.draggedContext?.index
-  const to = evt.relatedContext?.index
+  const to = evt.draggedContext?.futureIndex
 
   // keep trailing placeholder row fixed at end
   if (from === last || to === last) return false
+
+  focus_in(to)
+
   return true
+}
+
+function on_latlon_drag_start(evt) {
+  const start_index = evt?.oldIndex
+  focus_in(start_index)
+}
+
+function on_latlon_drag_end(evt) {
+  const end_index = evt?.newIndex
+  focus_in(end_index)
 }
 
 onBeforeMount(() => {
@@ -225,8 +238,9 @@ onBeforeMount(() => {
       </div>
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
-          <draggable :move="onMoveLatLon" :list="selected_fence.latlons" :item-key="(_, index) => `latlon-${index}`"
-            handle=".drag-handle" :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
+          <draggable :move="onMoveLatLon" :list="selected_fence.latlons" @start="on_latlon_drag_start"
+            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`" handle=".drag-handle"
+            :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
             <template #item="{ element: lat_lon, index }">
               <div class="inputs">
                 <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
