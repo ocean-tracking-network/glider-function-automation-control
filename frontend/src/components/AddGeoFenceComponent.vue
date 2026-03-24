@@ -13,6 +13,7 @@ const store = useGeoFencesStore()
 const { geofences, interactive_map, selected_fence, selected_kml_geo_json, show_alert_modal } = storeToRefs(store)
 const uploadKmlFile = useTemplateRef('uploadKmlFile')
 const dropZoneRef = useTemplateRef('dropZoneRef')
+const uploadedKmlListRef = useTemplateRef('uploadedKmlListRef')
 
 const props = defineProps({
   fenceKey: String,
@@ -129,6 +130,29 @@ function apply_all_kml_coordinates() {
   } else {
     latlons.push(...combined_coordinates)
   }
+}
+
+function scroll_to_next_kml_item(index) {
+  const next_index = index + 1
+  if (!uploadedKmlListRef.value) {
+    return
+  }
+
+  const next_card = uploadedKmlListRef.value.querySelector(`[data-kml-index="${next_index}"]`)
+  if (!next_card) {
+    return
+  }
+
+  next_card.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center',
+    inline: 'nearest',
+  })
+}
+
+function apply_kml_item(geofence, index) {
+  store.apply_coordinates_from_kml_file(geofence.coordinates)
+  scroll_to_next_kml_item(index)
 }
 
 function normalize_latlons(latlons) {
@@ -299,9 +323,9 @@ onBeforeMount(() => {
             ref="uploadKmlFile" @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
-          <div class="uploaded-kml-coordinates-selector-inner-contianer">
+          <div class="uploaded-kml-coordinates-selector-inner-contianer" ref="uploadedKmlListRef">
             <div class="kml-file-placemark-card" v-for="(geofence, index) in selected_kml_geo_json"
-              :key="geofence.placemark + index">
+              :key="geofence.placemark + index" :data-kml-index="index">
               <div class="kml-file-placemark-card-placemark">
                 <span><b>Placemark:</b></span>
                 <p>{{ geofence.placemark }}</p>
@@ -315,7 +339,7 @@ onBeforeMount(() => {
                 <p>#{{ geofence.coordinates.length ?? 0 }}</p>
               </div>
               <button :disabled="!geofence.isValid || lock_fence || !props.canEdit" class="border"
-                @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
+                @click="apply_kml_item(geofence, index)">Apply</button>
             </div>
           </div>
           <button :disabled="!can_apply_all_kml" class="border apply-all-kml-btn" @click="apply_all_kml_coordinates">
