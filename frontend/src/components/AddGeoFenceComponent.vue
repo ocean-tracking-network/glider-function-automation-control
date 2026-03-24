@@ -88,6 +88,49 @@ function remove_idx(idx) {
   }
 }
 
+const valid_kml_placemarks = computed(() => {
+  return (selected_kml_geo_json.value ?? []).filter((placemark) => placemark?.isValid)
+})
+
+const can_apply_all_kml = computed(() => {
+  return props.canEdit && !lock_fence.value && valid_kml_placemarks.value.length > 0
+})
+
+function apply_all_kml_coordinates() {
+  if (!can_apply_all_kml.value || !selected_fence.value) {
+    return
+  }
+
+  const combined_coordinates = []
+
+  valid_kml_placemarks.value.forEach((placemark) => {
+    if (placemark.type === 'Point') {
+      if (placemark.coordinates?.[0]) {
+        combined_coordinates.push(placemark.coordinates[0])
+      }
+      return
+    }
+
+    if (placemark.type === 'Polygon') {
+      combined_coordinates.push(...(placemark.coordinates ?? []))
+    }
+  })
+
+  if (combined_coordinates.length === 0) {
+    return
+  }
+
+  const latlons = selected_fence.value.latlons ?? []
+  const last_latlon = latlons[latlons.length - 1]
+  const has_trailing_blank = Array.isArray(last_latlon) && !last_latlon[0] && !last_latlon[1]
+
+  if (has_trailing_blank) {
+    latlons.splice(latlons.length - 1, 0, ...combined_coordinates)
+  } else {
+    latlons.push(...combined_coordinates)
+  }
+}
+
 function normalize_latlons(latlons) {
   if (!Array.isArray(latlons)) {
     return []
@@ -170,7 +213,8 @@ onBeforeMount(() => {
 
 </script>
 <template>
-  <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''"></ModalComponent>
+  <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''">
+  </ModalComponent>
 
   <div class="geofence-container">
     <div class="main-container">
@@ -260,6 +304,9 @@ onBeforeMount(() => {
                 @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
             </div>
           </div>
+          <button :disabled="!can_apply_all_kml" class="border apply-all-kml-btn" @click="apply_all_kml_coordinates">
+            Apply All
+          </button>
           <button :disabled="lock_fence || !props.canEdit" class="remove x-btn" @click="filesStore.clear_kml_file">
             x
           </button>
@@ -328,15 +375,14 @@ onBeforeMount(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-top: 16px;
   border-top: 1px solid var(--color-border, lightgray);
+  padding: 16px 10px;
 }
 
-.controls-container > div {
+.controls-container>div {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 10px;
 }
 
 .upload-kml-container {
@@ -424,6 +470,12 @@ onBeforeMount(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.apply-all-kml-btn {
+  width: 100%;
+  margin: 0;
+  margin-top: 12px;
 }
 
 .kml-file-placemark-card {
