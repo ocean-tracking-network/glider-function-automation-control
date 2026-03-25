@@ -8,7 +8,8 @@ const props = defineProps({
   alertText: String,
   alertBtnText: String,
 
-  blur: Boolean
+  blur: Boolean,
+  wide: Boolean,
 })
 
 const emit = defineEmits({
@@ -24,7 +25,7 @@ onMounted(() => {
 <template>
   <Teleport defer to="#main-flex">
     <div class="modal-backdrop" :class="{blur}"></div>
-    <div class="border modal"
+    <div class="border modal" :class="{ wide }"
       tabindex="0"
       ref="modalRef"
       @keyup.esc="$emit('close', true)"
@@ -61,6 +62,13 @@ onMounted(() => {
   left: 50%;
   z-index: 1001;
   transform: translate(-50%, -30%);
+}
+
+.modal.wide {
+  width: min(90vw, 28rem);
+  max-width: calc(100vw - 2rem);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 .modal-backdrop {

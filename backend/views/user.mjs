@@ -75,4 +75,38 @@ const create_user = async (req, res) => {
   res.status(201).send({ _id: result.insertedId, username, role: normalizedRole })
 }
 
-export { login, create_user }
+const user_exists = async (req, res) => {
+  const { username } = req.params
+
+  if (!username) {
+    return res.sendStatus(400)
+  }
+
+  const collection = await db.collection('users')
+  const existing = await collection.findOne({ username }, { projection: { _id: 1 } })
+  res.status(200).send({ exists: !!existing })
+}
+
+const delete_user = async (req, res) => {
+  const { username } = req.params
+
+  if (!username) {
+    return res.sendStatus(400)
+  }
+
+  if (req.user?.name === username) {
+    return res.status(400).send({ error: 'You cannot delete your own account' })
+  }
+
+  const collection = await db.collection('users')
+  const existing = await collection.findOne({ username })
+
+  if (!existing) {
+    return res.sendStatus(404)
+  }
+
+  await collection.deleteOne({ username })
+  res.sendStatus(204)
+}
+
+export { login, create_user, user_exists, delete_user }
