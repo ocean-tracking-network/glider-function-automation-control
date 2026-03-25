@@ -26,7 +26,7 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
-import { login, create_user } from './views/user.mjs'
+import { login, create_user, delete_user, user_exists } from './views/user.mjs'
 
 import { authenticateToken, requireAdmin } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
@@ -47,6 +47,8 @@ const port = 3000
 // user
 app.post('/login', login)
 app.post('/users', authenticateToken, requireAdmin, create_user)
+app.get('/users/:username/exists', authenticateToken, requireAdmin, user_exists)
+app.delete('/users/:username', authenticateToken, requireAdmin, delete_user)
 
 // glider
 app.get('/glider', authenticateToken, get_gliders)

@@ -125,6 +125,36 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const deleteUser = async (targetUsername) => {
+    try {
+      await apiClient.delete(`/users/${encodeURIComponent(targetUsername)}`)
+      return { success: true }
+    } catch (err) {
+      console.error('Error deleting user:', err)
+      if (err.response?.status === 404) {
+        return { success: false, error: 'User not found' }
+      } else if (err.response?.status === 403) {
+        return { success: false, error: 'You do not have permission to delete users' }
+      } else if (err.response?.status === 400) {
+        return { success: false, error: err.response?.data?.error || 'Invalid delete request' }
+      }
+      return { success: false, error: 'Failed to delete user' }
+    }
+  }
+
+  const userExists = async (targetUsername) => {
+    try {
+      const response = await apiClient.get(`/users/${encodeURIComponent(targetUsername)}/exists`)
+      return { success: true, exists: !!response.data?.exists }
+    } catch (err) {
+      console.error('Error checking user existence:', err)
+      if (err.response?.status === 403) {
+        return { success: false, exists: false, error: 'You do not have permission to manage users' }
+      }
+      return { success: false, exists: false, error: 'Failed to validate user' }
+    }
+  }
+
   return {
     username,
     token,
@@ -134,5 +164,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     logout,
     createUser,
+    deleteUser,
+    userExists,
   }
 })

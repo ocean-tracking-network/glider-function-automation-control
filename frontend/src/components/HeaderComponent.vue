@@ -1,11 +1,17 @@
 <script setup>
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
+import ModalComponent from './ModalComponent.vue';
 
 const version_number = "0.2.1"
 const userStore = useUserStore();
 const emit = defineEmits(['toggle-user-management']);
 const menuOpen = ref(false);
+const showDeleteModal = ref(false);
+const deleteUsername = ref('');
+const deleteMessage = ref('');
+const deleteMessageType = ref('');
+const deleting = ref(false);
 
 function logout() {
   userStore.logout();
@@ -15,6 +21,65 @@ function logout() {
 function openUserManagement() {
   emit('toggle-user-management');
   menuOpen.value = false;
+}
+
+async function deleteUser() {
+  showDeleteModal.value = true;
+  deleteUsername.value = '';
+  deleteMessage.value = '';
+  deleteMessageType.value = '';
+  menuOpen.value = false;
+}
+
+function closeDeleteModal() {
+  showDeleteModal.value = false;
+  deleteUsername.value = '';
+  deleteMessage.value = '';
+  deleteMessageType.value = '';
+}
+
+async function confirmDeleteUser() {
+  const normalizedUsername = deleteUsername.value.trim();
+
+  if (!normalizedUsername) {
+    deleteMessage.value = 'Username is required';
+    deleteMessageType.value = 'error';
+    return;
+  }
+
+  deleting.value = true;
+  const existsResult = await userStore.userExists(normalizedUsername);
+  deleting.value = false;
+
+  if (!existsResult.success) {
+    deleteMessage.value = existsResult.error || 'Failed to validate user';
+    deleteMessageType.value = 'error';
+    return;
+  }
+
+  if (!existsResult.exists) {
+    deleteMessage.value = 'User not found';
+    deleteMessageType.value = 'error';
+    return;
+  }
+
+  const confirmed = window.confirm(`Delete '${normalizedUsername}'? This cannot be undone.`);
+  if (!confirmed) {
+    return;
+  }
+
+  deleting.value = true;
+  const result = await userStore.deleteUser(normalizedUsername);
+  deleting.value = false;
+
+  if (result.success) {
+    deleteMessage.value = `User '${normalizedUsername}' deleted successfully`;
+    deleteMessageType.value = 'success';
+    deleteUsername.value = '';
+  } else {
+    deleteMessage.value = result.error || 'Failed to delete user';
+    deleteMessageType.value = 'error';
+  }
 }
 
 function toggleMenu() {
@@ -44,6 +109,9 @@ function toggleMenu() {
             <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
               Create User
             </button>
+            <button v-if="userStore.isAdmin" class="menu-item delete-item" @click="deleteUser">
+              Delete User
+            </button>
             <button class="menu-item logout-item" @click="logout">
               Logout
             </button>
@@ -53,6 +121,32 @@ function toggleMenu() {
     </div>
     <div class="placeholder" v-else></div>
   </div>
+  <ModalComponent
+    v-if="showDeleteModal"
+    header="Delete User"
+    :blur="true"
+    @close="closeDeleteModal"
+    @confirm="confirmDeleteUser"
+  >
+    <div class="delete-user-modal">
+      <div class="modal-message" :class="deleteMessageType" v-if="deleteMessage">
+        {{ deleteMessage }}
+      </div>
+      <input
+        v-model="deleteUsername"
+        type="text"
+        placeholder="Username"
+        autocomplete="off"
+      >
+      <p class="delete-user-note">This action permanently deletes the account.</p>
+      <div class="modal-actions">
+        <button type="button" class="danger-btn" @click="confirmDeleteUser" :disabled="deleting">
+          {{ deleting ? 'Deleting...' : 'Delete User' }}
+        </button>
+        <button type="button" @click="closeDeleteModal" :disabled="deleting">Close</button>
+      </div>
+    </div>
+  </ModalComponent>
 </template>
 
 <style scoped>
@@ -208,6 +302,14 @@ small {
   background-color: var(--color-border-hover);
 }
 
+.menu-item.delete-item {
+  color: #ff6b6b;
+}
+
+.menu-item.delete-item:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
 .menu-item.logout-item {
   border-top: 1px solid var(--color-border);
   color: #ff6b6b;
@@ -215,6 +317,65 @@ small {
 
 .menu-item.logout-item:hover {
   background-color: rgba(255, 107, 107, 0.1);
+}
+
+.delete-user-modal {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-message {
+  padding: 0.75rem;
+  margin: -1rem 0 1rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.modal-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.modal-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.modal-message.warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.delete-user-note {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal-actions button {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.danger-btn {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.danger-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .manage-users-btn,
