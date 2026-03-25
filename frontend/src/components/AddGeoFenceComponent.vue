@@ -228,19 +228,19 @@ function onMoveLatLon(evt) {
   // keep trailing placeholder row fixed at end
   if (from === last || to === last) return false
 
-  focus_in(to)
+  // focus_in(to)
 
   return true
 }
 
 function on_latlon_drag_start(evt) {
-  const start_index = evt?.oldIndex
-  focus_in(start_index)
+  // const start_index = evt?.oldIndex
+  // focus_in(start_index)
 }
 
 function on_latlon_drag_end(evt) {
-  const end_index = evt?.newIndex
-  focus_in(end_index)
+  // const end_index = evt?.newIndex
+  // focus_in(end_index)
 }
 
 onBeforeMount(() => {
@@ -323,6 +323,9 @@ onBeforeMount(() => {
             ref="uploadKmlFile" @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
+          <button :disabled="!can_apply_all_kml" class="border apply-all-kml-btn" @click="apply_all_kml_coordinates">
+            Apply All
+          </button>
           <div class="uploaded-kml-coordinates-selector-inner-contianer" ref="uploadedKmlListRef">
             <div class="kml-file-placemark-card" v-for="(geofence, index) in selected_kml_geo_json"
               :key="geofence.placemark + index" :data-kml-index="index">
@@ -342,9 +345,6 @@ onBeforeMount(() => {
                 @click="apply_kml_item(geofence, index)">Apply</button>
             </div>
           </div>
-          <button :disabled="!can_apply_all_kml" class="border apply-all-kml-btn" @click="apply_all_kml_coordinates">
-            Apply All
-          </button>
           <button :disabled="lock_fence || !props.canEdit" class="remove x-btn" @click="filesStore.clear_kml_file">
             x
           </button>
