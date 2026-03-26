@@ -13,6 +13,7 @@ const store = useGeoFencesStore()
 const { geofences, interactive_map, selected_fence, selected_kml_geo_json, show_alert_modal } = storeToRefs(store)
 const uploadKmlFile = useTemplateRef('uploadKmlFile')
 const dropZoneRef = useTemplateRef('dropZoneRef')
+const uploadedKmlListRef = useTemplateRef('uploadedKmlListRef')
 
 const props = defineProps({
   fenceKey: String,
@@ -22,10 +23,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(["geofenceupdate", "back"])
+const emit = defineEmits(["geofenceupdate", "back", "dirty-change"])
 
 const fence_key = ref("")
 const lock_fence = ref(true)
+const initial_snapshot = ref('')
 
 onBeforeMount(() => {
   if (props.fenceKey) {
@@ -87,6 +89,100 @@ function remove_idx(idx) {
   }
 }
 
+const valid_kml_placemarks = computed(() => {
+  return (selected_kml_geo_json.value ?? []).filter((placemark) => placemark?.isValid)
+})
+
+const can_apply_all_kml = computed(() => {
+  return props.canEdit && !lock_fence.value && valid_kml_placemarks.value.length > 0
+})
+
+function apply_all_kml_coordinates() {
+  if (!can_apply_all_kml.value || !selected_fence.value) {
+    return
+  }
+
+  const combined_coordinates = []
+
+  valid_kml_placemarks.value.forEach((placemark) => {
+    if (placemark.type === 'Point') {
+      if (placemark.coordinates?.[0]) {
+        combined_coordinates.push(placemark.coordinates[0])
+      }
+      return
+    }
+
+    if (placemark.type === 'Polygon') {
+      combined_coordinates.push(...(placemark.coordinates ?? []))
+    }
+  })
+
+  if (combined_coordinates.length === 0) {
+    return
+  }
+
+  const latlons = selected_fence.value.latlons ?? []
+  const last_latlon = latlons[latlons.length - 1]
+  const has_trailing_blank = Array.isArray(last_latlon) && !last_latlon[0] && !last_latlon[1]
+
+  if (has_trailing_blank) {
+    latlons.splice(latlons.length - 1, 0, ...combined_coordinates)
+  } else {
+    latlons.push(...combined_coordinates)
+  }
+}
+
+function scroll_to_next_kml_item(index) {
+  const next_index = index + 1
+  if (!uploadedKmlListRef.value) {
+    return
+  }
+
+  const next_card = uploadedKmlListRef.value.querySelector(`[data-kml-index="${next_index}"]`)
+  if (!next_card) {
+    return
+  }
+
+  next_card.scrollIntoView({
+    behavior: 'smooth',
+    block: 'center',
+    inline: 'nearest',
+  })
+}
+
+function apply_kml_item(geofence, index) {
+  store.apply_coordinates_from_kml_file(geofence.coordinates)
+  scroll_to_next_kml_item(index)
+}
+
+function normalize_latlons(latlons) {
+  if (!Array.isArray(latlons)) {
+    return []
+  }
+
+  const normalized = latlons.map((latlon) => {
+    if (!Array.isArray(latlon)) {
+      return ['', '']
+    }
+    return [latlon[0] ?? '', latlon[1] ?? '']
+  })
+
+  const last_latlon = normalized[normalized.length - 1]
+  if (last_latlon && !last_latlon[0] && !last_latlon[1]) {
+    normalized.pop()
+  }
+
+  return normalized
+}
+
+function create_snapshot() {
+  return JSON.stringify({
+    name: selected_fence.value?.name ?? '',
+    notify: selected_fence.value?.notify ?? false,
+    latlons: normalize_latlons(selected_fence.value?.latlons),
+  })
+}
+
 const overflowed = computed(() => {
   if (selected_fence.value.latlons.length >= 6) {
     return true
@@ -101,6 +197,14 @@ const back_display = computed(() => {
 watch(() => geofences.value, async (new_fence, old_fence) => {
   on_input()
 }, { deep: true })
+
+watch(
+  [selected_fence],
+  () => {
+    emit('dirty-change', create_snapshot() !== initial_snapshot.value)
+  },
+  { deep: true },
+)
 
 watch(fence_key, () => {
   console.log(fence_key.value)
@@ -119,16 +223,35 @@ function onMoveLatLon(evt) {
   const last = rows.length - 1
 
   const from = evt.draggedContext?.index
-  const to = evt.relatedContext?.index
+  const to = evt.draggedContext?.futureIndex
 
   // keep trailing placeholder row fixed at end
   if (from === last || to === last) return false
+
+  // focus_in(to)
+
   return true
 }
 
+function on_latlon_drag_start(evt) {
+  // const start_index = evt?.oldIndex
+  // focus_in(start_index)
+}
+
+function on_latlon_drag_end(evt) {
+  // const end_index = evt?.newIndex
+  // focus_in(end_index)
+}
+
+onBeforeMount(() => {
+  initial_snapshot.value = create_snapshot()
+  emit('dirty-change', false)
+})
+
 </script>
 <template>
-  <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''"></ModalComponent>
+  <ModalComponent v-if="show_alert_modal" :alert-text="show_alert_modal" @close="show_alert_modal = ''">
+  </ModalComponent>
 
   <div class="geofence-container">
     <div class="main-container">
@@ -139,8 +262,9 @@ function onMoveLatLon(evt) {
       </div>
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
-          <draggable :move="onMoveLatLon" :list="selected_fence.latlons" :item-key="(_, index) => `latlon-${index}`"
-            handle=".drag-handle" :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
+          <draggable :move="onMoveLatLon" :list="selected_fence.latlons" @start="on_latlon_drag_start"
+            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`" handle=".drag-handle"
+            :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
             <template #item="{ element: lat_lon, index }">
               <div class="inputs">
                 <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
@@ -199,9 +323,12 @@ function onMoveLatLon(evt) {
             ref="uploadKmlFile" @change="filesStore.upload_kml_file" />
         </div>
         <div v-else class="uploaded-kml-coordinates-selector-contianer">
-          <div class="uploaded-kml-coordinates-selector-inner-contianer">
+          <button :disabled="!can_apply_all_kml" class="border apply-all-kml-btn" @click="apply_all_kml_coordinates">
+            Apply All
+          </button>
+          <div class="uploaded-kml-coordinates-selector-inner-contianer" ref="uploadedKmlListRef">
             <div class="kml-file-placemark-card" v-for="(geofence, index) in selected_kml_geo_json"
-              :key="geofence.placemark + index">
+              :key="geofence.placemark + index" :data-kml-index="index">
               <div class="kml-file-placemark-card-placemark">
                 <span><b>Placemark:</b></span>
                 <p>{{ geofence.placemark }}</p>
@@ -215,7 +342,7 @@ function onMoveLatLon(evt) {
                 <p>#{{ geofence.coordinates.length ?? 0 }}</p>
               </div>
               <button :disabled="!geofence.isValid || lock_fence || !props.canEdit" class="border"
-                @click="store.apply_coordinates_from_kml_file(geofence.coordinates)">Apply</button>
+                @click="apply_kml_item(geofence, index)">Apply</button>
             </div>
           </div>
           <button :disabled="lock_fence || !props.canEdit" class="remove x-btn" @click="filesStore.clear_kml_file">
@@ -286,15 +413,14 @@ function onMoveLatLon(evt) {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-top: 16px;
   border-top: 1px solid var(--color-border, lightgray);
+  padding: 16px 10px;
 }
 
-.controls-container > div {
+.controls-container>div {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-left: 10px;
 }
 
 .upload-kml-container {
@@ -382,6 +508,12 @@ function onMoveLatLon(evt) {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.apply-all-kml-btn {
+  width: 100%;
+  margin: 0;
+  margin-top: 12px;
 }
 
 .kml-file-placemark-card {
