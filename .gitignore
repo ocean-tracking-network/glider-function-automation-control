@@ -31,5 +31,7 @@ coverage
 
 local.json
 uploads/
+data/
+*.pyc
 
 backend/.env

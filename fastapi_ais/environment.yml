@@ -1,0 +1,8 @@
+name: fastapi-ais
+channels:
+  - defaults
+dependencies:
+  - python=3.13
+  - fastapi
+  - pymongo
+  - pandas
