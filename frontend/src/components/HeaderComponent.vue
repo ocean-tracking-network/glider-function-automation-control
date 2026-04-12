@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
 
@@ -8,10 +8,83 @@ const userStore = useUserStore();
 const emit = defineEmits(['toggle-user-management']);
 const menuOpen = ref(false);
 const showDeleteModal = ref(false);
+const showDeleteConfirmModal = ref(false);
+const roleToDelete = ref('');
+const userSearch = ref('');
 const deleteUsername = ref('');
+const deletableUsers = ref([]);
+const loadingDeletableUsers = ref(false);
 const deleteMessage = ref('');
 const deleteMessageType = ref('');
 const deleting = ref(false);
+
+const sortedDeletableUsers = computed(() => {
+  return [...deletableUsers.value].sort((a, b) => {
+    if (a.role !== b.role) {
+      return a.role === 'admin' ? -1 : 1;
+    }
+    return a.username.localeCompare(b.username);
+  });
+});
+
+const usersForSelectedRole = computed(() => {
+  return sortedDeletableUsers.value.filter((user) => user.role === roleToDelete.value);
+});
+
+const filteredUsersForSelectedRole = computed(() => {
+  const searchText = userSearch.value.trim().toLowerCase();
+  return usersForSelectedRole.value.filter((user) => {
+    return user.username.toLowerCase().includes(searchText);
+  });
+});
+
+const hasAdminUsers = computed(() => deletableUsers.value.some((user) => user.role === 'admin'));
+const hasViewerUsers = computed(() => deletableUsers.value.some((user) => user.role === 'viewer'));
+const isValidSelectedUser = computed(() => {
+  return filteredUsersForSelectedRole.value.some((user) => user.username === deleteUsername.value);
+});
+
+const selectedUserLastLogin = computed(() => {
+  const matchedUser = deletableUsers.value.find((user) => user.username === deleteUsername.value);
+  return matchedUser?.lastLogin || null;
+});
+
+function formatLastLogin(dateString) {
+  if (!dateString) return 'Never logged in';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffSecs = Math.floor(diffMs / 1000);
+  const diffMins = Math.floor(diffSecs / 60);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+  
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+  });
+}
+
+function setDeleteMessage(type, text) {
+  deleteMessageType.value = type;
+  deleteMessage.value = text;
+}
+
+function resetDeleteState() {
+  roleToDelete.value = '';
+  userSearch.value = '';
+  deleteUsername.value = '';
+  deletableUsers.value = [];
+  loadingDeletableUsers.value = false;
+  deleteMessage.value = '';
+  deleteMessageType.value = '';
+}
 
 function logout() {
   userStore.logout();
@@ -25,60 +98,77 @@ function openUserManagement() {
 
 async function deleteUser() {
   showDeleteModal.value = true;
-  deleteUsername.value = '';
-  deleteMessage.value = '';
-  deleteMessageType.value = '';
+  resetDeleteState();
+  loadingDeletableUsers.value = true;
   menuOpen.value = false;
+
+  const usersResult = await userStore.getDeletableUsers();
+  loadingDeletableUsers.value = false;
+
+  if (!usersResult.success) {
+    setDeleteMessage('error', usersResult.error || 'Failed to load users');
+    return;
+  }
+
+  deletableUsers.value = usersResult.users;
+}
+
+function selectRole(role) {
+  roleToDelete.value = role;
+  userSearch.value = '';
+  deleteUsername.value = '';
 }
 
 function closeDeleteModal() {
   showDeleteModal.value = false;
-  deleteUsername.value = '';
-  deleteMessage.value = '';
-  deleteMessageType.value = '';
+  showDeleteConfirmModal.value = false;
+  resetDeleteState();
 }
 
-async function confirmDeleteUser() {
-  const normalizedUsername = deleteUsername.value.trim();
+function confirmDeleteUser() {
+  const selectedUsername = deleteUsername.value;
 
-  if (!normalizedUsername) {
-    deleteMessage.value = 'Username is required';
-    deleteMessageType.value = 'error';
+  if (!selectedUsername) {
+    setDeleteMessage('error', 'Please select a user');
+    return;
+  }
+
+  if (!isValidSelectedUser.value) {
+    setDeleteMessage('error', 'Please choose a valid user from the list');
+    return;
+  }
+
+  showDeleteConfirmModal.value = true;
+}
+
+function closeDeleteConfirmModal() {
+  showDeleteConfirmModal.value = false;
+}
+
+async function executeDeleteUser() {
+  const selectedUsername = deleteUsername.value;
+
+  if (!selectedUsername) {
+    showDeleteConfirmModal.value = false;
     return;
   }
 
   deleting.value = true;
-  const existsResult = await userStore.userExists(normalizedUsername);
+  const result = await userStore.deleteUser(selectedUsername);
   deleting.value = false;
-
-  if (!existsResult.success) {
-    deleteMessage.value = existsResult.error || 'Failed to validate user';
-    deleteMessageType.value = 'error';
-    return;
-  }
-
-  if (!existsResult.exists) {
-    deleteMessage.value = 'User not found';
-    deleteMessageType.value = 'error';
-    return;
-  }
-
-  const confirmed = window.confirm(`Delete '${normalizedUsername}'? This cannot be undone.`);
-  if (!confirmed) {
-    return;
-  }
-
-  deleting.value = true;
-  const result = await userStore.deleteUser(normalizedUsername);
-  deleting.value = false;
+  showDeleteConfirmModal.value = false;
 
   if (result.success) {
-    deleteMessage.value = `User '${normalizedUsername}' deleted successfully`;
-    deleteMessageType.value = 'success';
+    setDeleteMessage('success', `User '${selectedUsername}' deleted successfully`);
+    deletableUsers.value = deletableUsers.value.filter((user) => user.username !== selectedUsername);
     deleteUsername.value = '';
+
+    const remainingInRole = usersForSelectedRole.value;
+    if (remainingInRole.length === 0) {
+      setDeleteMessage('success', 'User deleted successfully. There are no more users with this role.');
+    }
   } else {
-    deleteMessage.value = result.error || 'Failed to delete user';
-    deleteMessageType.value = 'error';
+    setDeleteMessage('error', result.error || 'Failed to delete user');
   }
 }
 
@@ -122,9 +212,10 @@ function toggleMenu() {
     <div class="placeholder" v-else></div>
   </div>
   <ModalComponent
-    v-if="showDeleteModal"
+    v-if="showDeleteModal && !showDeleteConfirmModal"
     header="Delete User"
     :blur="true"
+    :wide="true"
     @close="closeDeleteModal"
     @confirm="confirmDeleteUser"
   >
@@ -132,18 +223,108 @@ function toggleMenu() {
       <div class="modal-message" :class="deleteMessageType" v-if="deleteMessage">
         {{ deleteMessage }}
       </div>
-      <input
-        v-model="deleteUsername"
-        type="text"
-        placeholder="Username"
-        autocomplete="off"
-      >
+
+      <p v-if="loadingDeletableUsers" class="delete-user-loading">Loading users...</p>
+
+      <div v-if="!loadingDeletableUsers && deletableUsers.length > 0">
+        <label class="delete-user-label">Select role to delete from:</label>
+        <div class="role-selector">
+          <button
+            type="button"
+            class="role-btn role-btn-admin"
+            :class="{ active: roleToDelete === 'admin' }"
+            @click="selectRole('admin')"
+            :disabled="deleting || !hasAdminUsers"
+          >
+            Admin
+          </button>
+          <button
+            type="button"
+            class="role-btn role-btn-viewer"
+            :class="{ active: roleToDelete === 'viewer' }"
+            @click="selectRole('viewer')"
+            :disabled="deleting || !hasViewerUsers"
+          >
+            Viewer
+          </button>
+        </div>
+
+        <div v-if="roleToDelete" class="user-list-section">
+          <label for="delete-user-list" class="delete-user-label">Select user to delete</label>
+          <input
+            v-model="userSearch"
+            type="text"
+            class="delete-user-search"
+            placeholder="Search users..."
+            autocomplete="off"
+          />
+          <div class="user-list-row">
+            <div class="delete-user-select-wrap">
+              <select
+                id="delete-user-list"
+                v-model="deleteUsername"
+                class="delete-user-list"
+                size="6"
+                :disabled="deleting || filteredUsersForSelectedRole.length === 0"
+              >
+                <option
+                  v-for="user in filteredUsersForSelectedRole"
+                  :key="user.username"
+                  :value="user.username"
+                >
+                  {{ user.username }}
+                </option>
+              </select>
+            </div>
+            <div class="selected-user-info">
+              <div class="info-username">{{ deleteUsername || 'No user selected' }}</div>
+              <div class="info-lastlogin">
+                <span class="login-label">Last Login:</span>
+                <span class="login-value">
+                  {{ deleteUsername ? formatLastLogin(selectedUserLastLogin) : 'Select a user from the list' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <p class="delete-user-note">This action permanently deletes the account.</p>
       <div class="modal-actions">
-        <button type="button" class="danger-btn" @click="confirmDeleteUser" :disabled="deleting">
-          {{ deleting ? 'Deleting...' : 'Delete User' }}
+        <button
+          type="button"
+          class="danger-btn"
+          @click="confirmDeleteUser"
+          :disabled="deleting || loadingDeletableUsers || !deleteUsername"
+        >
+          Delete User
         </button>
         <button type="button" @click="closeDeleteModal" :disabled="deleting">Close</button>
+      </div>
+    </div>
+  </ModalComponent>
+
+  <ModalComponent
+    v-if="showDeleteConfirmModal"
+    header="Confirm Deletion"
+    :blur="true"
+    @close="closeDeleteConfirmModal"
+    @confirm="executeDeleteUser"
+  >
+    <div class="delete-user-modal">
+      <p class="delete-user-note">
+        Delete <strong>{{ deleteUsername }}</strong>? This cannot be undone.
+      </p>
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="danger-btn"
+          @click="executeDeleteUser"
+          :disabled="deleting"
+        >
+          Yes, Delete User
+        </button>
+        <button type="button" @click="closeDeleteConfirmModal" :disabled="deleting">Cancel</button>
       </div>
     </div>
   </ModalComponent>
@@ -344,15 +525,173 @@ small {
   border: 1px solid #f5c6cb;
 }
 
-.modal-message.warning {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
-}
-
 .delete-user-note {
   margin: 0 0 1rem;
   font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.delete-user-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.delete-user-search {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.75rem;
+  box-sizing: border-box;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border-hover);
+  border-radius: 0.55rem;
+  background: var(--color-background);
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.delete-user-search:focus {
+  outline: none;
+  border-color: var(--color-border);
+}
+
+.role-selector {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.role-btn {
+  flex: 0 1 10rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--color-background-soft);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.role-btn-admin {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+.role-btn-viewer {
+  color: #4dabf7;
+  border-color: #4dabf7;
+}
+
+.role-btn-admin.active,
+.role-btn-viewer.active {
+  color: white;
+}
+
+.role-btn-admin.active {
+  background-color: #ff6b6b;
+}
+
+.role-btn-viewer.active {
+  background-color: #4dabf7;
+}
+
+.selected-user-info {
+  width: 16rem;
+  margin-top: 0;
+  align-self: start;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--color-background-soft), var(--color-background));
+  border: 1px solid var(--color-border-hover);
+  border-radius: 0.6rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.info-username {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.info-lastlogin {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.login-label {
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.login-value {
+  opacity: 0.7;
+}
+
+.role-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.user-list-section {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-list-row {
+  display: grid;
+  grid-template-columns: minmax(18rem, 1fr) 16rem;
+  gap: 1rem;
+  align-items: start;
+}
+
+.delete-user-select-wrap {
+  margin-bottom: 0;
+  border: 1px solid var(--color-border-hover);
+  border-radius: 0.6rem;
+  background: linear-gradient(180deg, var(--color-background-soft), var(--color-background));
+  overflow: hidden;
+}
+
+.delete-user-list {
+  width: 100%;
+  min-height: 11rem;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  padding: 0.25rem;
+  color: var(--color-text);
+}
+
+.delete-user-list:focus {
+  outline: none;
+}
+
+.delete-user-list option:checked {
+  background: linear-gradient(90deg, rgba(77, 171, 247, 0.25), rgba(77, 171, 247, 0.12));
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.delete-user-loading {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
   color: var(--color-text);
 }
 
@@ -360,12 +699,15 @@ small {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.5rem;
 }
 
 .modal-actions button {
-  width: 100%;
+  width: min(100%, 14rem);
   min-width: 0;
   margin: 0;
+  text-align: center;
 }
 
 .danger-btn {
@@ -378,50 +720,6 @@ small {
   cursor: not-allowed;
 }
 
-.manage-users-btn,
-.logout-btn {
-  background-color: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.manage-users-btn {
-  /* background-color: #4caf50;
-  color: white;
-  border-color: #4caf50; */
-    background-color: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.manage-users-btn:hover {
-  background-color: #45a049;
-  border-color: #45a049;
-}
-
-.logout-btn:hover {
-  background-color: var(--color-border-hover);
-  border-color: var(--color-text);
-  color: var(--color-text);
-}
-
-.manage-users-btn:active,
-.logout-btn:active {
-  transform: scale(0.98);
-}
-
 @media (max-width: 768px) {
   .header-wrapper {
     flex-direction: column;
@@ -430,6 +728,15 @@ small {
 
   .header-title {
     text-align: center;
+  }
+
+  .user-list-row {
+    grid-template-columns: 1fr;
+  }
+
+  .selected-user-info {
+    width: 100%;
+    margin-top: 0;
   }
 }
 </style>

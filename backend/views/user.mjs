@@ -36,6 +36,9 @@ const login = async (req, res) => {
     role: user.role,
   })
 
+
+  await collection.updateOne({ username }, { $set: { lastLogin: new Date() } })
+
   res.status(200).send({ token, role: user.role, username: user.username })
 }
 
@@ -75,6 +78,16 @@ const create_user = async (req, res) => {
   res.status(201).send({ _id: result.insertedId, username, role: normalizedRole })
 }
 
+const get_deletable_users = async (req, res) => {
+  const collection = await db.collection('users')
+  const users = await collection
+    .find({ username: { $ne: req.user?.name } }, { projection: { _id: 0, username: 1, role: 1, lastLogin: 1 } })
+    .sort({ username: 1 })
+    .toArray()
+
+  res.status(200).send({ users })
+}
+
 const user_exists = async (req, res) => {
   const { username } = req.params
 
@@ -109,4 +122,4 @@ const delete_user = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { login, create_user, user_exists, delete_user }
+export { login, create_user, get_deletable_users, user_exists, delete_user }
