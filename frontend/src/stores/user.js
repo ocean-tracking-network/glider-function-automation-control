@@ -125,6 +125,26 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
+  const getDeletableUsers = async () => {
+    try {
+      const response = await apiClient.get('/users')
+      const users = Array.isArray(response.data?.users) ? response.data.users : []
+      const normalizedUsers = users.map((user) => ({
+        username: user?.username,
+        role: user?.role === 'admin' ? 'admin' : 'viewer',
+        lastLogin: user?.lastLogin,
+      })).filter((user) => !!user.username)
+
+      return { success: true, users: normalizedUsers }
+    } catch (err) {
+      console.error('Error fetching deletable users:', err)
+      if (err.response?.status === 403) {
+        return { success: false, users: [], error: 'You do not have permission to manage users' }
+      }
+      return { success: false, users: [], error: 'Failed to load users' }
+    }
+  }
+
   const deleteUser = async (targetUsername) => {
     try {
       await apiClient.delete(`/users/${encodeURIComponent(targetUsername)}`)
@@ -164,6 +184,7 @@ export const useUserStore = defineStore('user', () => {
     login,
     logout,
     createUser,
+    getDeletableUsers,
     deleteUser,
     userExists,
   }

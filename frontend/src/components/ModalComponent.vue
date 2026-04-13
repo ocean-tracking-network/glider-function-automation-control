@@ -65,7 +65,7 @@ onMounted(() => {
 }
 
 .modal.wide {
-  width: min(90vw, 28rem);
+  width: min(92vw, 38rem);
   max-width: calc(100vw - 2rem);
   box-sizing: border-box;
   overflow-wrap: anywhere;
