@@ -223,11 +223,13 @@ watch(selected_idx, (new_idx) => {
     idx_marker.value.removeFrom(initialMap.value)
     idx_marker.value = null
   }
-  if (store.selected_fence) {
-    const lat_lon = store.selected_fence.latlons[new_idx]
-    if (lat_lon[0] && lat_lon[1]) {
-      idx_marker.value = L.marker(lat_lon).addTo(initialMap.value)
-    }
+  if (!store.selected_fence || new_idx == null) {
+    return
+  }
+
+  const lat_lon = store.selected_fence.latlons?.[new_idx]
+  if (lat_lon?.[0] && lat_lon?.[1]) {
+    idx_marker.value = L.marker(lat_lon).addTo(initialMap.value)
   }
 })
 

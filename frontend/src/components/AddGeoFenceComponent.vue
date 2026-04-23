@@ -28,6 +28,8 @@ const emit = defineEmits(["geofenceupdate", "back", "dirty-change"])
 const fence_key = ref("")
 const lock_fence = ref(true)
 const initial_snapshot = ref('')
+const pressed_handle_index = ref(null)
+const is_dragging_latlon = ref(false)
 
 onBeforeMount(() => {
   if (props.fenceKey) {
@@ -74,6 +76,35 @@ function focus_out(idx) {
 
 function focus_in(idx) {
   store.select_idx(idx)
+}
+
+function clear_focus() {
+  store.select_idx(null)
+}
+
+function on_handle_pointer_down(index) {
+  if (!props.canEdit || lock_fence.value || index >= selected_fence.value.latlons.length - 1) {
+    return
+  }
+
+  pressed_handle_index.value = index
+  is_dragging_latlon.value = false
+  focus_in(index)
+}
+
+function on_handle_pointer_up(index) {
+  if (pressed_handle_index.value !== index) {
+    return
+  }
+
+  pressed_handle_index.value = null
+
+  if (is_dragging_latlon.value) {
+    is_dragging_latlon.value = false
+    return
+  }
+
+  clear_focus()
 }
 
 function onDrop(files) {
@@ -228,19 +259,19 @@ function onMoveLatLon(evt) {
   // keep trailing placeholder row fixed at end
   if (from === last || to === last) return false
 
-  // focus_in(to)
-
   return true
 }
 
 function on_latlon_drag_start(evt) {
-  // const start_index = evt?.oldIndex
-  // focus_in(start_index)
+  const start_index = evt?.oldIndex
+  is_dragging_latlon.value = true
+  focus_in(start_index)
 }
 
 function on_latlon_drag_end(evt) {
-  // const end_index = evt?.newIndex
-  // focus_in(end_index)
+  const end_index = evt?.newIndex
+  pressed_handle_index.value = null
+  focus_in(end_index)
 }
 
 onBeforeMount(() => {
@@ -267,7 +298,9 @@ onBeforeMount(() => {
             :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
             <template #item="{ element: lat_lon, index }">
               <div class="inputs">
-                <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
+                <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle"
+                  @pointerdown="on_handle_pointer_down(index)" @pointerup="on_handle_pointer_up(index)"
+                  @pointercancel="on_handle_pointer_up(index)">
                   ⋮⋮
                 </button>
                 <button v-if="index >= selected_fence.latlons.length - 1" type="button" disabled="true"
