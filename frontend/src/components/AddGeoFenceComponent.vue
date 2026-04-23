@@ -82,7 +82,15 @@ function clear_focus() {
   store.select_idx(null)
 }
 
-function on_handle_pointer_down(index) {
+function is_non_drag_row_target(event) {
+  return event?.target?.closest('input, .x-btn, .no-x-btn, .no-drag-handle')
+}
+
+function on_row_pointer_down(index, event) {
+  if (is_non_drag_row_target(event)) {
+    return
+  }
+
   if (!props.canEdit || lock_fence.value || index >= selected_fence.value.latlons.length - 1) {
     return
   }
@@ -92,7 +100,11 @@ function on_handle_pointer_down(index) {
   focus_in(index)
 }
 
-function on_handle_pointer_up(index) {
+function on_row_pointer_up(index, event) {
+  if (is_non_drag_row_target(event)) {
+    return
+  }
+
   if (pressed_handle_index.value !== index) {
     return
   }
@@ -117,6 +129,9 @@ function onDrop(files) {
 function remove_idx(idx) {
   if (props.canEdit && !lock_fence.value) {
     selected_fence.value.latlons.splice(idx, 1)
+    if (idx === store.selected_idx) {
+      clear_focus()
+    }
   }
 }
 
@@ -294,13 +309,13 @@ onBeforeMount(() => {
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
           <draggable :move="onMoveLatLon" :list="selected_fence.latlons" @start="on_latlon_drag_start"
-            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`" handle=".drag-handle"
+            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`"
+            filter="input, .x-btn, .no-x-btn, .no-drag-handle" :prevent-on-filter="false"
             :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
             <template #item="{ element: lat_lon, index }">
-              <div class="inputs">
-                <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle"
-                  @pointerdown="on_handle_pointer_down(index)" @pointerup="on_handle_pointer_up(index)"
-                  @pointercancel="on_handle_pointer_up(index)">
+              <div class="inputs" @pointerdown="on_row_pointer_down(index, $event)"
+                @pointerup="on_row_pointer_up(index, $event)" @pointercancel="on_row_pointer_up(index, $event)">
+                <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
                   ⋮⋮
                 </button>
                 <button v-if="index >= selected_fence.latlons.length - 1" type="button" disabled="true"
@@ -407,6 +422,21 @@ onBeforeMount(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.no-x-btn {
+  visibility: hidden;
+}
+
+.inputs {
+  cursor: grab;
+}
+
+.inputs:has(input:hover),
+.inputs:has(input:focus),
+.inputs:has(.x-btn:hover),
+.inputs:has(.no-x-btn:hover) {
+  cursor: default;
 }
 
 .geofence-container {
