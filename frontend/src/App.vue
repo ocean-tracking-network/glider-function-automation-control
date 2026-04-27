@@ -33,6 +33,7 @@ const { loggedin, isAdmin } = storeToRefs(userStore)
 const fileUpload = useTemplateRef('fileUpload')
 const file_tab_select = ref("")
 const showUserManagement = ref(false)
+const geofenceDrawerOffset = ref(0)
 
 function fileMoveCallback(evt, originalEvent) {
   console.log(evt)
@@ -139,6 +140,10 @@ function toggleUserManagement() {
   showUserManagement.value = !showUserManagement.value
 }
 
+function onGeofenceDrawerOffsetChange(offset) {
+  geofenceDrawerOffset.value = offset
+}
+
 </script>
 <template>
   <div>
@@ -148,7 +153,7 @@ function toggleUserManagement() {
       </header>
 
       <!-- PAGE ADMIN/VIEWER UI/UX CONTROLLED HERE -->
-      <main>
+      <main :style="{ '--geofence-drawer-offset': geofenceDrawerOffset + 'px' }">
         <div id="main-flex">
 
           <!-- <div id="map"> -->
@@ -158,7 +163,7 @@ function toggleUserManagement() {
           </div>
           <div id="side">
             <GliderTabComponent />
-            <GeoFenceComponent id="geo" />
+            <GeoFenceComponent id="geo" @drawer-offset-change="onGeofenceDrawerOffsetChange" />
 
             <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
               :add_btn="false" @delete="delete_event_enter" :standard_delete="false" :can_delete="isAdmin"
@@ -207,6 +212,17 @@ function toggleUserManagement() {
   gap: 1rem;
   margin-top: 1rem;
   /* height: 670px; */
+}
+
+main {
+  margin-right: var(--geofence-drawer-offset, 0px);
+  transition: margin-right 0.25s ease;
+}
+
+@media (max-width: 1200px) {
+  main {
+    margin-right: 0;
+  }
 }
 
 #side {

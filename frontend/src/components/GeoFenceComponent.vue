@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
 import ModalComponent from './ModalComponent.vue';
@@ -22,6 +22,8 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
+
+const emit = defineEmits(['drawer-offset-change'])
 
 const { geofences, selected_fence } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
@@ -102,11 +104,22 @@ function on_click(e) {
     return
   }
   is_create_mode.value = false
-  geofence_is_dirty.value = false
   selected_fence_local.value = e.key
-  geofence_editor.value = true
   store.select(e.key)
-  //console.log("ONCLICK")
+}
+
+function open_selected_geofence_editor() {
+  if (!selected_fence_local.value) {
+    return
+  }
+  is_create_mode.value = false
+  geofence_is_dirty.value = false
+  geofence_editor.value = true
+}
+
+function on_double_click(e) {
+  on_click(e)
+  open_selected_geofence_editor()
 }
 
 //RESTRICT REMOVE TO ADMIN
@@ -147,6 +160,11 @@ function stopResize() {
   document.removeEventListener('mouseup', stopResize)
 }
 
+function emitDrawerOffset() {
+  const offset = geofence_editor.value ? drawerWidth.value + 16 : 0
+  emit('drawer-offset-change', offset)
+}
+
 const latlons = computed(() => {
   let ret = []
   Object.keys(geofences.value).forEach((key, index) => {
@@ -171,10 +189,13 @@ watch(selected_fence, (new_val) => {
     return
   }
   selected_fence_local.value = new_val
-  if (new_val != '') {
-    is_create_mode.value = false
-    geofence_editor.value = true
-  }
+})
+
+watch([geofence_editor, drawerWidth], emitDrawerOffset, { immediate: true })
+
+onBeforeUnmount(() => {
+  stopResize()
+  emit('drawer-offset-change', 0)
 })
 
 
@@ -183,8 +204,13 @@ watch(selected_fence, (new_val) => {
 <template>
   <div class="geofence-section">
     <div class="geofence-list">
-      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" :list="latlons" :draggable="false"
+      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" @dblclick="on_double_click" :list="latlons" :draggable="false"
         :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin" title="Geofences" id="geo" />
+    </div>
+    <div class="geofence-actions">
+      <button type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
+        Edit Selected Geofence
+      </button>
     </div>
 
 
@@ -228,6 +254,12 @@ watch(selected_fence, (new_val) => {
   flex: 1;
   height: 100%;
   overflow: hidden;
+}
+
+.geofence-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
 }
 
 #geo {
