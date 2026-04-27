@@ -190,8 +190,12 @@ const overflowed = computed(() => {
   return false
 })
 
+const has_unsaved_changes = computed(() => {
+  return create_snapshot() !== initial_snapshot.value
+})
+
 const back_display = computed(() => {
-  return lock_fence.value ? "Back" : "Save/Back"
+  return has_unsaved_changes.value ? "Save/Back" : "Back"
 })
 
 watch(() => geofences.value, async (new_fence, old_fence) => {
@@ -201,7 +205,7 @@ watch(() => geofences.value, async (new_fence, old_fence) => {
 watch(
   [selected_fence],
   () => {
-    emit('dirty-change', create_snapshot() !== initial_snapshot.value)
+    emit('dirty-change', has_unsaved_changes.value)
   },
   { deep: true },
 )
@@ -256,7 +260,7 @@ onBeforeMount(() => {
   <div class="geofence-container">
     <div class="main-container">
       <div class="header">
-        <button id="back-btn" class="border" @click="emit('back', !lock_fence)">{{ back_display }}</button>
+        <button id="back-btn" class="border" @click="emit('back', has_unsaved_changes)">{{ back_display }}</button>
         <input :disabled="lock_fence || !props.canEdit" class="text-input" id="name-input" v-model="selected_fence.name"
           placeholder="Name" type="text">
       </div>
