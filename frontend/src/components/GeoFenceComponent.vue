@@ -22,8 +22,9 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
+const pending_fence_key = ref(null)
 
-const { geofences, selected_fence } = storeToRefs(store)
+const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
 
 //GET USER ROLE FROM STORED USER
@@ -90,10 +91,22 @@ function request_close_drawer() {
 
 function confirm_close_save() {
   back(true)
+  if (pending_fence_key.value) {
+    nextTick(() => {
+      is_create_mode.value = false
+      geofence_is_dirty.value = false
+      selected_fence_local.value = pending_fence_key.value
+      geofence_editor.value = true
+      store.select(pending_fence_key.value)
+      pending_fence_key.value = null
+    })
+  }
 }
 
 function confirm_close_discard() {
   back(false)
+  pending_fence_key.value = null
+  //console.log("ONCLICK")
 }
 
 function on_click(e) {
@@ -101,12 +114,17 @@ function on_click(e) {
     just_removed.value = false;
     return
   }
+  if (geofence_is_dirty.value) {
+    pending_fence_key.value = e.key
+    show_close_confirm_modal.value = true
+    return
+  }
   is_create_mode.value = false
   geofence_is_dirty.value = false
   selected_fence_local.value = e.key
   geofence_editor.value = true
   store.select(e.key)
-  //console.log("ONCLICK")
+
 }
 
 //RESTRICT REMOVE TO ADMIN
@@ -166,7 +184,7 @@ const latlons = computed(() => {
   return ret;
 })
 
-watch(selected_fence, (new_val) => {
+watch(selected_fence_key, (new_val) => {
   if (is_create_mode.value) {
     return
   }
@@ -208,8 +226,13 @@ watch(selected_fence, (new_val) => {
             </button>
           </div>
           <div class="drawer-content">
-            <AddGeoFenceComponent @back="back" @dirty-change="geofence_is_dirty = $event"
-              :fenceKey="selected_fence_local" :canEdit="isAdmin" />
+            <AddGeoFenceComponent
+              :key="selected_fence_local || 'create-geofence'"
+              @back="back"
+              @dirty-change="geofence_is_dirty = $event"
+              :fenceKey="selected_fence_local"
+              :canEdit="isAdmin"
+            />
           </div>
         </div>
       </div>
