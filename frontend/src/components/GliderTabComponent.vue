@@ -98,8 +98,8 @@ function hide_add_modal() {
           class="x-btn"
         >X</button>
       </button>
-      <button v-if="isAdmin" class="gliders" id="add" @click="show_add_modal = true">+</button>
     </div>
+    <button v-if="isAdmin" class="add-btn" @click="show_add_modal = true">+</button>
   </div>
 </template>
 <style scoped>
@@ -122,13 +122,20 @@ function hide_add_modal() {
 #button-div {
   display: flex;
   flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
-#add {
+.add-btn {
+  flex: 0 0 auto;
   width: 2rem;
   font-size: x-large;
   padding-top: 0;
   padding-bottom: 0;
+  border-left: 2px solid var(--color-text);
 }
 
 .x-btn:hover {
@@ -152,6 +159,8 @@ function hide_add_modal() {
   border-right-color: var(--color-text);
   padding: .5rem;
   width: 110px;
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .gliders:hover {

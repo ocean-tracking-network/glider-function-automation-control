@@ -209,15 +209,24 @@ function onGeofenceDrawerOffsetChange(offset) {
 
 #main-flex {
   display: flex;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 1.5rem;
   margin-top: 1rem;
   /* height: 670px; */
 }
 
-main {
+#main-flex > div {
+  min-width: 0;
+}
+
+#main-flex > div:first-child {
+  flex: 0 0 500px;
+}
+
+/* main {
   margin-right: var(--geofence-drawer-offset, 0px);
   transition: margin-right 0.25s ease;
-}
+} */
 
 @media (max-width: 1200px) {
   main {
@@ -228,6 +237,8 @@ main {
 #side {
   display: flex;
   flex-wrap: wrap;
+  flex: 1 1 0;
+  min-width: 0;
   /* gap: 1rem; */
 }
 

@@ -36,7 +36,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['add_btn', 'click', 'delete', 'tab_select', 'tab_rename'])
+const emit = defineEmits(['add_btn', 'click', 'dblclick', 'delete', 'tab_select', 'tab_rename'])
 const selected_tab = ref("")
 const new_tabs = ref([])
 
@@ -119,6 +119,7 @@ const all_tabs = computed(() => {
         :can_delete="props.can_delete"
         :move="props.move"
         @click="emit('click', $event)"
+        @dblclick="emit('dblclick', $event)"
         @delete="delete_element"
       />
       <div class="footer">
