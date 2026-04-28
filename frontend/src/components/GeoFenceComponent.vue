@@ -91,15 +91,32 @@ function request_close_drawer() {
 
 function confirm_close_save() {
   back(true)
+  if (pending_fence_key.value) {
+    nextTick(() => {
+      is_create_mode.value = false
+      geofence_is_dirty.value = false
+      selected_fence_local.value = pending_fence_key.value
+      geofence_editor.value = true
+      store.select(pending_fence_key.value)
+      pending_fence_key.value = null
+    })
+  }
 }
 
 function confirm_close_discard() {
   back(false)
+  pending_fence_key.value = null
+  //console.log("ONCLICK")
 }
 
 function on_click(e) {
   if (just_removed.value) {
     just_removed.value = false;
+    return
+  }
+  if (geofence_is_dirty.value) {
+    pending_fence_key.value = e.key
+    show_close_confirm_modal.value = true
     return
   }
   is_create_mode.value = false
@@ -266,8 +283,13 @@ onBeforeUnmount(() => {
             </button>
           </div>
           <div class="drawer-content">
-            <AddGeoFenceComponent @back="back" @dirty-change="geofence_is_dirty = $event"
-              :fenceKey="selected_fence_local" :canEdit="isAdmin" />
+            <AddGeoFenceComponent
+              :key="selected_fence_local || 'create-geofence'"
+              @back="back"
+              @dirty-change="geofence_is_dirty = $event"
+              :fenceKey="selected_fence_local"
+              :canEdit="isAdmin"
+            />
           </div>
         </div>
       </div>
