@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
 import ModalComponent from './ModalComponent.vue';
@@ -22,7 +22,7 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
-const pending_fence_key = ref(null)
+const emit = defineEmits(['drawer-offset-change'])
 
 const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
@@ -120,11 +120,55 @@ function on_click(e) {
     return
   }
   is_create_mode.value = false
-  geofence_is_dirty.value = false
   selected_fence_local.value = e.key
-  geofence_editor.value = true
   store.select(e.key)
+}
 
+function open_selected_geofence_editor() {
+  if (!selected_fence_local.value) {
+    return
+  }
+  is_create_mode.value = false
+  geofence_is_dirty.value = false
+  geofence_editor.value = true
+}
+
+function deselect_selected_geofence_editor() {
+  if (!selected_fence_local.value) {
+    return
+  }
+  selected_fence_local.value = ""
+  store.deselect()
+}
+
+function handle_outside_click(event) {
+  if (!selected_fence_local.value && !selected_fence.value) {
+    return
+  }
+
+  const event_path = typeof event.composedPath === 'function' ? event.composedPath() : []
+  const clicked_inside_map = event_path.some((node) => {
+    if (!(node instanceof Element)) {
+      return false
+    }
+
+    return node.id === 'map' || node.closest('#map') || node.classList.contains('leaflet-container')
+  })
+
+  if (!(event.target instanceof Element)) {
+    return
+  }
+
+  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || clicked_inside_map) {
+    return
+  }
+
+  deselect_selected_geofence_editor()
+}
+
+function on_double_click(e) {
+  on_click(e)
+  open_selected_geofence_editor()
 }
 
 //RESTRICT REMOVE TO ADMIN
@@ -165,6 +209,11 @@ function stopResize() {
   document.removeEventListener('mouseup', stopResize)
 }
 
+function emitDrawerOffset() {
+  const offset = geofence_editor.value ? drawerWidth.value + 16 : 0
+  emit('drawer-offset-change', offset)
+}
+
 const latlons = computed(() => {
   let ret = []
   Object.keys(geofences.value).forEach((key, index) => {
@@ -178,6 +227,7 @@ const latlons = computed(() => {
     ret.push({
       ...new_obj,
       key: key,
+      selected: selected_fence_local.value === key,
       bold: (selected_glider.value && eventsStore.glider_has_geofence_event(selected_glider.value._id, key))
     })
   })
@@ -189,10 +239,18 @@ watch(selected_fence_key, (new_val) => {
     return
   }
   selected_fence_local.value = new_val
-  if (new_val != '') {
-    is_create_mode.value = false
-    geofence_editor.value = true
-  }
+})
+
+watch([geofence_editor, drawerWidth], emitDrawerOffset, { immediate: true })
+
+onMounted(() => {
+  document.addEventListener('click', handle_outside_click)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handle_outside_click)
+  stopResize()
+  emit('drawer-offset-change', 0)
 })
 
 
@@ -201,9 +259,17 @@ watch(selected_fence_key, (new_val) => {
 <template>
   <div class="geofence-section">
     <div class="geofence-list">
-      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" :list="latlons" :draggable="false"
+      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" @dblclick="on_double_click" :list="latlons" :draggable="false"
         :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin" title="Geofences" id="geo" />
     </div>
+    <!-- <div class="geofence-actions"> -->
+      <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
+        Edit Geofence
+      </button>
+            <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="deselect_selected_geofence_editor">
+        Deselect Geofence
+      </button> -->
+    <!-- </div> -->
 
 
     <transition name="slide-drawer">
@@ -251,6 +317,20 @@ watch(selected_fence_key, (new_val) => {
   flex: 1;
   height: 100%;
   overflow: hidden;
+}
+
+.geofence-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.4rem;
+}
+
+.geofence-extra {
+border-radius: 3px;
+border-width: 2px 2px 2px 2px;
+padding: 2px 4px 2px 4px;
+margin-left: 5px;
+margin-right:5px;
 }
 
 #geo {
