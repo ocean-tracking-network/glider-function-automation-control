@@ -146,11 +146,20 @@ function handle_outside_click(event) {
     return
   }
 
+  const event_path = typeof event.composedPath === 'function' ? event.composedPath() : []
+  const clicked_inside_map = event_path.some((node) => {
+    if (!(node instanceof Element)) {
+      return false
+    }
+
+    return node.id === 'map' || node.closest('#map') || node.classList.contains('leaflet-container')
+  })
+
   if (!(event.target instanceof Element)) {
     return
   }
 
-  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || event.target.closest('#map')) {
+  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || clicked_inside_map) {
     return
   }
 
