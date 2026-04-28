@@ -8,6 +8,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  selected: {
+    type: Boolean,
+    default: false,
+  },
 })
 const emit = defineEmits(["remove"])
 const filesStore = useFilesStore()
@@ -22,7 +26,7 @@ const classBold = computed(() => {
 
 </script>
 <template>
-  <div class="border">
+  <div :class="{ border: true, selected: props.selected }">
     <p :style="{ color: styleColor }"
       :class="{ filename: true, bold: classBold}">{{
         element.name }}</p>
@@ -59,6 +63,12 @@ p {
 .border:hover {
   transition: .2s;
   border-color: lightblue;
+}
+
+.selected {
+  font-weight: bold;
+  background-color: var(--color-border-hover);
+  border-color: var(--color-text);
 }
 
 .del:hover {

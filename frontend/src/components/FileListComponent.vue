@@ -59,7 +59,7 @@ function delete_element(index, element_id) {
   <draggable :sort="sort" :list="list" :group="group" itemKey="id" class="list-group files-container">
     <template #item="{ element, index }">
       <a class="clickable" href="#" @click.prevent="emit('click', element)" @dblclick.prevent="emit('dblclick', element)">
-        <FileComponent :canDelete="props.can_delete" @remove="delete_element(index, element)" :element="element"
+        <FileComponent :canDelete="props.can_delete" :selected="element.selected" @remove="delete_element(index, element)" :element="element"
           class="files list-group-item" />
       </a>
     </template>

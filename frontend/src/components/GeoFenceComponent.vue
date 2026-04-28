@@ -1,6 +1,6 @@
 <script setup>
 
-import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
 import ModalComponent from './ModalComponent.vue';
@@ -22,10 +22,9 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
-
 const emit = defineEmits(['drawer-offset-change'])
 
-const { geofences, selected_fence } = storeToRefs(store)
+const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
 
 //GET USER ROLE FROM STORED USER
@@ -117,6 +116,30 @@ function open_selected_geofence_editor() {
   geofence_editor.value = true
 }
 
+function deselect_selected_geofence_editor() {
+  if (!selected_fence_local.value) {
+    return
+  }
+  selected_fence_local.value = ""
+  store.deselect()
+}
+
+function handle_outside_click(event) {
+  if (!selected_fence_local.value && !selected_fence.value) {
+    return
+  }
+
+  if (!(event.target instanceof Element)) {
+    return
+  }
+
+  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable')) {
+    return
+  }
+
+  deselect_selected_geofence_editor()
+}
+
 function on_double_click(e) {
   on_click(e)
   open_selected_geofence_editor()
@@ -178,13 +201,14 @@ const latlons = computed(() => {
     ret.push({
       ...new_obj,
       key: key,
+      selected: selected_fence_local.value === key,
       bold: (selected_glider.value && eventsStore.glider_has_geofence_event(selected_glider.value._id, key))
     })
   })
   return ret;
 })
 
-watch(selected_fence, (new_val) => {
+watch(selected_fence_key, (new_val) => {
   if (is_create_mode.value) {
     return
   }
@@ -193,7 +217,12 @@ watch(selected_fence, (new_val) => {
 
 watch([geofence_editor, drawerWidth], emitDrawerOffset, { immediate: true })
 
+onMounted(() => {
+  document.addEventListener('click', handle_outside_click)
+})
+
 onBeforeUnmount(() => {
+  document.removeEventListener('click', handle_outside_click)
   stopResize()
   emit('drawer-offset-change', 0)
 })
@@ -207,11 +236,14 @@ onBeforeUnmount(() => {
       <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" @dblclick="on_double_click" :list="latlons" :draggable="false"
         :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin" title="Geofences" id="geo" />
     </div>
-    <div class="geofence-actions">
-      <button type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
-        Edit Selected Geofence
+    <!-- <div class="geofence-actions"> -->
+      <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
+        Edit Geofence
       </button>
-    </div>
+            <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="deselect_selected_geofence_editor">
+        Deselect Geofence
+      </button> -->
+    <!-- </div> -->
 
 
     <transition name="slide-drawer">
@@ -260,6 +292,14 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.4rem;
+}
+
+.geofence-extra {
+border-radius: 3px;
+border-width: 2px 2px 2px 2px;
+padding: 2px 4px 2px 4px;
+margin-left: 5px;
+margin-right:5px;
 }
 
 #geo {
