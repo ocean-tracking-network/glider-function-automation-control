@@ -1,5 +1,6 @@
 import db from '../db/conn.mjs'
-import { updateOne, deleteOne } from '../utils/db_utils.mjs'
+import { updateOne } from '../utils/db_utils.mjs'
+import { deleteGeofenceCascade } from '../utils/cascade_delete.mjs'
 
 const get_geofences = async (req, res) => {
   let collection = await db.collection('geofences')
@@ -43,15 +44,12 @@ const post_geofences = async (req, res, next) => {
 }
 
 const delete_geofences = async (req, res) => {
-  // delete events attached to the geofence
-  const event_collection = await db.collection('events')
-  const event_results = await event_collection.deleteMany({ geofence: req.params.id })
-  const geofence_result = deleteOne('geofences', req.params.id)
-  const ret = {
-    events: event_results,
-    geofence: geofence_result,
+  try {
+    const result = await deleteGeofenceCascade(req.params.id, db)
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(error.statusCode ?? 500).send({ error: error.message })
   }
-  res.send(ret).status(200)
 }
 
 const patch_geofences = async (req, res) => {
