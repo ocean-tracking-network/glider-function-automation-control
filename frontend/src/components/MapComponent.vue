@@ -84,25 +84,31 @@ const on_polygon_click = (e) => {
   store.select(polygon_to_geofence_map.value[e.target._leaflet_id])
 }
 
-function set_glider_track() {
-  if (!selected_glider.value) return
-  if (!Array.isArray(selected_glider.value.track)) return
 
-  if (glider_track_polyline.value != null) {
+function clear_glider_map_elements() {
+  if (glider_track_polyline.value) {
     glider_track_polyline.value.removeFrom(initialMap.value)
+    glider_track_polyline.value = null
+  }
+  if (glider_track_points.value) {
     glider_track_points.value.forEach((ele) => {
       ele.removeFrom(initialMap.value)
     })
-    if (typeof (glider_current_location.value) == Array) {
+    glider_track_points.value = []
+  }
+  if (glider_current_location.value) {
+    if (Array.isArray(glider_current_location.value)) {
       glider_current_location.value.forEach((ele) => {
         ele.removeFrom(initialMap.value)
       })
     } else {
       glider_current_location.value.removeFrom(initialMap.value)
     }
+    glider_current_location.value = null
   }
-  if (glider_next_waypoint.value != null) {
+  if (glider_next_waypoint.value) {
     glider_next_waypoint.value.removeFrom(initialMap.value)
+    glider_next_waypoint.value = null
   }
   if (all_glider_markers.value.length > 0) {
     all_glider_markers.value.forEach((glider_marker) => {
@@ -110,9 +116,14 @@ function set_glider_track() {
     })
     all_glider_markers.value = []
   }
+}
+
+function set_glider_track() {
+  clear_glider_map_elements()
+  if (!selected_glider.value || !Array.isArray(selected_glider.value.track)) return
+
   let tracks = []
   glider_track_points.value = []
-  console.log(typeof (selected_glider.value.track[0]))
   selected_glider.value.track.forEach((element) => {
     tracks.push([convert_gps(element.lat), convert_gps(element.lon)])
     glider_track_points.value.push(
