@@ -158,10 +158,24 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   }
 
   const deleteGeofence = (id) => {
+    delete geofences.value[id]
+    if (selected_fence_key.value === id) {
+      deselect()
+    }
+
+    // Trigger map update
+    set_force_map_update(true)
+
+    // confirm deletion on backend
     const url = '/geofence/' + id
     apiClient.delete(url).then((res) => {
+      // Refresh
       getGeofences()
       eventsStore.get_events()
+    }).catch((error) => {
+      // if deletion fails, reload all geofences to restore state
+      console.error('Failed to delete geofence:', error)
+      getGeofences()
     })
   }
 
