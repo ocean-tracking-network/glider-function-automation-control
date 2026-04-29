@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
 
@@ -7,6 +7,7 @@ const version_number = "0.2.1"
 const userStore = useUserStore();
 const emit = defineEmits(['toggle-user-management']);
 const menuOpen = ref(false);
+const menuContainer = ref(null);
 const showDeleteModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const roleToDelete = ref('');
@@ -175,6 +176,20 @@ async function executeDeleteUser() {
 function toggleMenu() {
   menuOpen.value = !menuOpen.value;
 }
+
+function handleClickOutside(event) {
+  if (menuContainer.value && !menuContainer.value.contains(event.target)) {
+    menuOpen.value = false;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
 <template>
@@ -189,7 +204,7 @@ function toggleMenu() {
           <span class="username">{{ userStore.username }}</span>
           <span class="role" :class="userStore.role">{{ userStore.role }}</span>
         </div>
-        <div class="menu-container">
+        <div class="menu-container" ref="menuContainer">
           <button class="hamburger-btn" @click="toggleMenu" :class="{ active: menuOpen }">
             <span></span>
             <span></span>
