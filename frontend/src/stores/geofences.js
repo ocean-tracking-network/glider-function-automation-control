@@ -14,6 +14,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const interactive_map = ref(false)
   const force_map_update = ref(false)
   const selected_kml_geo_json = ref(null)
+  const onSelectGeofenceHandler = ref(null)
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
@@ -96,7 +97,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const getGeofences = () => {
     geofences.value = {}
     const url = '/geofence'
-    apiClient.get(url).then((res) => {
+    return apiClient.get(url).then((res) => {
       res.data.forEach((ele) => {
         geofences.value[ele._id] = {
           latlons: ele.latlons,
@@ -110,36 +111,34 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   }
 
   const saveGeoFence = () => {
+    // if (!Object.keys(geofences.value).includes(temp_fence_key.toString())) {
+    //   return
+    // }
+
     const geofence = geofences.value[temp_fence_key]
     const url = '/geofence'
     if (!geofence.name && geofence.latlons.length == 1) {
-      return false
+      return Promise.resolve(false)
     }
     const data = {
       name: geofence.name ? geofence.name : 'Untitled',
       latlons: geofence.latlons,
       notify: geofence.notify,
     }
-    apiClient.post(url, data).then((res) => {
-      getGeofences()
+    return apiClient.post(url, data).then((res) => {
+      return getGeofences()
     })
-    return true
   }
 
   const saveOrUpdateGeofence = () => {
     if (selected_fence_key.value == temp_fence_key) {
       console.log('SAVE')
-      const res = saveGeoFence()
-      if (!res) {
-        delete geofences.value[temp_fence_key]
-      }
+      return saveGeoFence()
     } else if (selected_fence_key.value != '') {
       console.log('UPDATE')
-      updateGeofence()
+      return updateGeofence()
     }
-    // if (!Object.keys(geofences.value).includes(temp_fence_key.toString())) {
-    //   return
-    // }
+    return Promise.resolve()
   }
 
   const updateGeofence = () => {
@@ -151,9 +150,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     }
     console.log(data)
     const url = '/geofence/' + selected_fence_key.value
-    apiClient.patch(url, data).then((res) => {
-      //console.log(res)
-      getGeofences()
+    return apiClient.patch(url, data).then((res) => {
+      return getGeofences()
     })
   }
 
@@ -225,6 +223,18 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     set_force_map_update(true)
   }
 
+  function selectGeofence(key) {
+    if (onSelectGeofenceHandler.value) {
+      onSelectGeofenceHandler.value(key)
+    } else {
+      select(key)
+    }
+  }
+
+  function setSelectGeofenceHandler(handler) {
+    onSelectGeofenceHandler.value = handler
+  }
+
   function deselect() {
     selected_fence.value = ''
     selected_fence_key.value = ''
@@ -257,6 +267,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     add,
     remove,
     select,
+    selectGeofence,
+    setSelectGeofenceHandler,
     deselect,
     saveOrUpdateGeofence,
     deleteGeofence,
