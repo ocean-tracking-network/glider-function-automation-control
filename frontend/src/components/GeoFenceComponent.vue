@@ -146,6 +146,10 @@ function handle_outside_click(event) {
     return
   }
 
+  if (geofence_editor.value) {
+    return
+  }
+
   const event_path = typeof event.composedPath === 'function' ? event.composedPath() : []
   const clicked_inside_map = event_path.some((node) => {
     if (!(node instanceof Element)) {
