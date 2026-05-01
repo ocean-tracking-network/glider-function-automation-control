@@ -81,6 +81,10 @@ function create_polygons() {
 }
 
 const on_polygon_click = (e) => {
+  if (e.originalEvent) {
+    e.originalEvent.preventDefault()
+    e.originalEvent.stopPropagation()
+  }
   store.selectGeofence(polygon_to_geofence_map.value[e.target._leaflet_id])
 }
 
@@ -176,6 +180,10 @@ function set_glider_track() {
 
 function map_click(e) {
   if (!isAdmin.value) {
+    return
+  }
+  const clicked_layer = e?.originalEvent?.target
+  if (clicked_layer instanceof Element && clicked_layer.closest('.leaflet-interactive')) {
     return
   }
   if (store.selected_fence && interactive_map.value) {

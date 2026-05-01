@@ -131,14 +131,22 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   }
 
   const saveOrUpdateGeofence = () => {
+    let promise
     if (selected_fence_key.value == temp_fence_key) {
       console.log('SAVE')
-      return saveGeoFence()
+      promise = saveGeoFence()
     } else if (selected_fence_key.value != '') {
       console.log('UPDATE')
-      return updateGeofence()
+      promise = updateGeofence()
+    } else {
+      return Promise.resolve()
     }
-    return Promise.resolve()
+    return promise.then((result) => {
+      if (result !== false) {
+        interactive_map.value = false
+      }
+      return result
+    })
   }
 
   const updateGeofence = () => {
