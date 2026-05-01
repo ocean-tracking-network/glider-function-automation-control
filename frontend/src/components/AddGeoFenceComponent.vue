@@ -28,6 +28,8 @@ const emit = defineEmits(["geofenceupdate", "back", "dirty-change"])
 const fence_key = ref("")
 const lock_fence = ref(true)
 const initial_snapshot = ref('')
+const pressed_handle_index = ref(null)
+const is_dragging_latlon = ref(false)
 
 onBeforeMount(() => {
   if (props.fenceKey) {
@@ -76,6 +78,47 @@ function focus_in(idx) {
   store.select_idx(idx)
 }
 
+function clear_focus() {
+  store.select_idx(null)
+}
+
+function is_non_drag_row_target(event) {
+  return event?.target?.closest('input, .x-btn, .no-x-btn, .no-drag-handle')
+}
+
+function on_row_pointer_down(index, event) {
+  if (is_non_drag_row_target(event)) {
+    return
+  }
+
+  if (!props.canEdit || lock_fence.value || index >= selected_fence.value.latlons.length - 1) {
+    return
+  }
+
+  pressed_handle_index.value = index
+  is_dragging_latlon.value = false
+  focus_in(index)
+}
+
+function on_row_pointer_up(index, event) {
+  if (is_non_drag_row_target(event)) {
+    return
+  }
+
+  if (pressed_handle_index.value !== index) {
+    return
+  }
+
+  pressed_handle_index.value = null
+
+  if (is_dragging_latlon.value) {
+    is_dragging_latlon.value = false
+    return
+  }
+
+  clear_focus()
+}
+
 function onDrop(files) {
   if (!props.canEdit || lock_fence.value) {
     return
@@ -86,6 +129,9 @@ function onDrop(files) {
 function remove_idx(idx) {
   if (props.canEdit && !lock_fence.value) {
     selected_fence.value.latlons.splice(idx, 1)
+    if (idx === store.selected_idx) {
+      clear_focus()
+    }
   }
 }
 
@@ -232,19 +278,19 @@ function onMoveLatLon(evt) {
   // keep trailing placeholder row fixed at end
   if (from === last || to === last) return false
 
-  // focus_in(to)
-
   return true
 }
 
 function on_latlon_drag_start(evt) {
-  // const start_index = evt?.oldIndex
-  // focus_in(start_index)
+  const start_index = evt?.oldIndex
+  is_dragging_latlon.value = true
+  focus_in(start_index)
 }
 
 function on_latlon_drag_end(evt) {
-  // const end_index = evt?.newIndex
-  // focus_in(end_index)
+  const end_index = evt?.newIndex
+  pressed_handle_index.value = null
+  focus_in(end_index)
 }
 
 onBeforeMount(() => {
@@ -267,10 +313,12 @@ onBeforeMount(() => {
       <div class="lat-lon-container">
         <div id="main-container" :class="{ overflow: overflowed }">
           <draggable :move="onMoveLatLon" :list="selected_fence.latlons" @start="on_latlon_drag_start"
-            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`" handle=".drag-handle"
+            @end="on_latlon_drag_end" :item-key="(_, index) => `latlon-${index}`"
+            filter="input, .x-btn, .no-x-btn, .no-drag-handle" :prevent-on-filter="false"
             :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
             <template #item="{ element: lat_lon, index }">
-              <div class="inputs">
+              <div class="inputs" @pointerdown="on_row_pointer_down(index, $event)"
+                @pointerup="on_row_pointer_up(index, $event)" @pointercancel="on_row_pointer_up(index, $event)">
                 <button v-if="index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
                   ⋮⋮
                 </button>
@@ -378,6 +426,21 @@ onBeforeMount(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.no-x-btn {
+  visibility: hidden;
+}
+
+.inputs {
+  cursor: grab;
+}
+
+.inputs:has(input:hover),
+.inputs:has(input:focus),
+.inputs:has(.x-btn:hover),
+.inputs:has(.no-x-btn:hover) {
+  cursor: default;
 }
 
 .geofence-container {

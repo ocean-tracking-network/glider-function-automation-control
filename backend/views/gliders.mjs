@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb'
 import db from '../db/conn.mjs'
-import { deleteOne, updateOne } from '../utils/db_utils.mjs'
+import { updateOne } from '../utils/db_utils.mjs'
+import { deleteGliderCascade } from '../utils/cascade_delete.mjs'
 import { get_active_deployment_details, get_available_scripts } from '../utils/sfmc_api.mjs'
 
 const get_gliders = async (req, res) => {
@@ -59,15 +60,12 @@ const update_gliders = async (req, res) => {
 }
 
 const delete_gliders = async (req, res) => {
-  // Delete events associated with this glider
-  const event_collection = await db.collection('events')
-  const event_results = await event_collection.deleteMany({ glider: req.params.id })
-  const glider_result = deleteOne('gliders', req.params.id)
-  const ret = {
-    events: event_results,
-    glider: glider_result,
+  try {
+    const result = await deleteGliderCascade(req.params.id, db)
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(error.statusCode ?? 500).send({ error: error.message })
   }
-  res.send(ret).status(200)
 }
 
 const post_gliders_track = async (req, res) => {

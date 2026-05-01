@@ -1,5 +1,6 @@
 import db from '../db/conn.mjs'
-import { deleteOne, updateOne } from '../utils/db_utils.mjs'
+import { updateOne } from '../utils/db_utils.mjs'
+import { deleteFileCascade } from '../utils/cascade_delete.mjs'
 
 const get_files = async (req, res) => {
   let collection = await db.collection('files')
@@ -30,14 +31,12 @@ const post_files = async (req, res) => {
 
 const delete_files = async (req, res) => {
   const id = req.params.id
-  if (!id) {
-    res.send({ error: 'Need to supply an ID' }).status(400)
-    return
+  try {
+    const result = await deleteFileCascade(id, db)
+    res.status(200).send(result)
+  } catch (error) {
+    res.status(error.statusCode ?? 500).send({ error: error.message })
   }
-  const eventCollection = await db.collection('events')
-  eventCollection.deleteMany({ file: id })
-  let result = await deleteOne('files', id)
-  res.send(result).status(200)
 }
 
 const update_files = async (req, res) => {
