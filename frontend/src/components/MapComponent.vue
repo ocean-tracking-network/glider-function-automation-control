@@ -81,7 +81,7 @@ function create_polygons() {
 }
 
 const on_polygon_click = (e) => {
-  store.select(polygon_to_geofence_map.value[e.target._leaflet_id])
+  store.selectGeofence(polygon_to_geofence_map.value[e.target._leaflet_id])
 }
 
 

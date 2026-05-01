@@ -22,6 +22,8 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
+const pending_fence_key = ref(null)
+const pending_from_map = ref(false)
 const emit = defineEmits(['drawer-offset-change'])
 
 const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
@@ -66,18 +68,21 @@ function back(save) {
   if (!isAdmin.value) {
     save = false
   }
+  let savePromise = Promise.resolve()
   if (save) {
-    store.saveOrUpdateGeofence()
+    savePromise = store.saveOrUpdateGeofence() || Promise.resolve()
   }
   else {
-    store.getGeofences()
+    savePromise = store.getGeofences() || Promise.resolve()
   }
-  geofence_editor.value = false
-  is_create_mode.value = false
-  geofence_is_dirty.value = false
-  show_close_confirm_modal.value = false
-  store.deselect()
-  selected_fence_local.value = ""
+  return savePromise.then(() => {
+    geofence_editor.value = false
+    is_create_mode.value = false
+    geofence_is_dirty.value = false
+    show_close_confirm_modal.value = false
+    store.deselect()
+    selected_fence_local.value = ""
+  })
 }
 
 function request_close_drawer() {
@@ -90,26 +95,65 @@ function request_close_drawer() {
 }
 
 function confirm_close_save() {
-  back(true)
-  if (pending_fence_key.value) {
-    nextTick(() => {
+  if (pending_from_map.value) {
+    const savePromise = store.saveOrUpdateGeofence() || Promise.resolve()
+    savePromise.then(() => {
       is_create_mode.value = false
       geofence_is_dirty.value = false
       selected_fence_local.value = pending_fence_key.value
-      geofence_editor.value = true
       store.select(pending_fence_key.value)
       pending_fence_key.value = null
+      pending_from_map.value = false
+      show_close_confirm_modal.value = false
+    })
+  } else {
+    back(true).then(() => {
+      if (pending_fence_key.value) {
+        is_create_mode.value = false
+        geofence_is_dirty.value = false
+        selected_fence_local.value = pending_fence_key.value
+        if (!pending_from_map.value) {
+          geofence_editor.value = true
+        }
+        store.select(pending_fence_key.value)
+        pending_fence_key.value = null
+        pending_from_map.value = false
+      }
     })
   }
 }
 
 function confirm_close_discard() {
-  back(false)
-  pending_fence_key.value = null
-  //console.log("ONCLICK")
+  if (pending_from_map.value) {
+    const reloadPromise = store.getGeofences() || Promise.resolve()
+    reloadPromise.then(() => {
+      is_create_mode.value = false
+      geofence_is_dirty.value = false
+      selected_fence_local.value = pending_fence_key.value
+      store.select(pending_fence_key.value)
+      pending_fence_key.value = null
+      pending_from_map.value = false
+      show_close_confirm_modal.value = false
+    })
+  } else {
+    back(false).then(() => {
+      if (pending_fence_key.value) {
+        is_create_mode.value = false
+        geofence_is_dirty.value = false
+        selected_fence_local.value = pending_fence_key.value
+        if (!pending_from_map.value) {
+          geofence_editor.value = true
+        }
+        store.select(pending_fence_key.value)
+        pending_fence_key.value = null
+        pending_from_map.value = false
+      }
+    })
+  }
 }
 
 function on_click(e) {
+  //console.log("ONCLICK")
   if (just_removed.value) {
     just_removed.value = false;
     return
@@ -175,16 +219,28 @@ function on_double_click(e) {
   open_selected_geofence_editor()
 }
 
+function handle_geofence_selection(fenceKey) {
+  if (geofence_is_dirty.value) {
+    pending_fence_key.value = fenceKey
+    pending_from_map.value = true
+    show_close_confirm_modal.value = true
+    return
+  }
+  is_create_mode.value = false
+  selected_fence_local.value = fenceKey
+  store.select(fenceKey)
+}
+
 //RESTRICT REMOVE TO ADMIN
 function remove(element) {
   if (!isAdmin.value) {
     return
   }
-  back(false)
   just_removed.value = true
   if (confirm("WARNING!\nAre you sure you want to remove this geofence?") == true) {
-
-    store.deleteGeofence(element.key)
+    back(false).then(() => {
+      store.deleteGeofence(element.key)
+    })
   }
 }
 
@@ -249,11 +305,13 @@ watch([geofence_editor, drawerWidth], emitDrawerOffset, { immediate: true })
 
 onMounted(() => {
   document.addEventListener('click', handle_outside_click)
+  store.setSelectGeofenceHandler(handle_geofence_selection)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handle_outside_click)
   stopResize()
+  store.setSelectGeofenceHandler(null)
   emit('drawer-offset-change', 0)
 })
 
