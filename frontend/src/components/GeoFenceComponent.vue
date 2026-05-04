@@ -207,7 +207,7 @@ function handle_outside_click(event) {
     return
   }
 
-  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || clicked_inside_map) {
+  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || event.target.closest('#enter') || event.target.closest('#exit') || clicked_inside_map) {
     return
   }
 

@@ -28,16 +28,16 @@ function option_click(option) {
 <template>
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_drop_down" />
-  <div class="dropdown">
-    <button :disabled="props.disabled" @click="show_dropdown = props.disabled ? false : !show_dropdown"
+  <div class="dropdown" @click.stop>
+    <button :disabled="props.disabled" @click.stop="show_dropdown = props.disabled ? false : !show_dropdown"
       class="dropbtn border">
       <p>{{ props.selected ? props.selected : props.default }} </p>
       <DropDownIcon class="dropdown-icon" />
     </button>
-    <div v-if="show_dropdown" class="dropdown-content">
-      <input :disabled="props.disabled" @focusin="" type="text" placeholder="Search.." class="dropdown-search"
+    <div v-if="show_dropdown" class="dropdown-content" @click.stop>
+      <input :disabled="props.disabled" @focusin="" @click.stop type="text" placeholder="Search.." class="dropdown-search"
         v-model="filter_text">
-      <button :disabled="props.disabled" @click="option_click(option)" v-for="option in filtered_options">
+      <button :disabled="props.disabled" @click.stop="option_click(option)" v-for="option in filtered_options">
         {{ option }}
       </button>
     </div>
