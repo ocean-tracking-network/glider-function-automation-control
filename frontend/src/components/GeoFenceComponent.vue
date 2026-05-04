@@ -73,6 +73,9 @@ function back(save) {
     savePromise = store.saveOrUpdateGeofence() || Promise.resolve()
   }
   else {
+    if (is_create_mode.value) {
+      store.remove(123)
+    }
     savePromise = store.getGeofences() || Promise.resolve()
   }
   return savePromise.then(() => {
@@ -125,6 +128,9 @@ function confirm_close_save() {
 
 function confirm_close_discard() {
   if (pending_from_map.value) {
+    if (is_create_mode.value) {
+      store.remove(123)
+    }
     const reloadPromise = store.getGeofences() || Promise.resolve()
     reloadPromise.then(() => {
       is_create_mode.value = false
@@ -162,6 +168,9 @@ function on_click(e) {
     pending_fence_key.value = e.key
     show_close_confirm_modal.value = true
     return
+  }
+  if (is_create_mode.value) {
+    store.remove(123)
   }
   is_create_mode.value = false
   selected_fence_local.value = e.key
@@ -225,6 +234,9 @@ function handle_geofence_selection(fenceKey) {
     pending_from_map.value = true
     show_close_confirm_modal.value = true
     return
+  }
+  if (is_create_mode.value) {
+    store.remove(123)
   }
   is_create_mode.value = false
   selected_fence_local.value = fenceKey
