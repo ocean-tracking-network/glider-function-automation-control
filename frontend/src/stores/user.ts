@@ -7,6 +7,8 @@ import { useGeoFencesStore } from './geofences'
 import { useFilesStore } from './files'
 import { useEventsStore } from './events'
 import { useLogsStore } from './logs'
+import { AxiosError } from 'axios'
+import type { DeletableUser } from '@/lib/types'
 
 export const useUserStore = defineStore('user', () => {
   const gliderStore = useGlidersStore()
@@ -21,11 +23,11 @@ export const useUserStore = defineStore('user', () => {
   //ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
   const localStorage_role = 'GFAC_role'
 
-  const username = ref(null)
-  const token = ref(null)
+  const username = ref<string | null>(null)
+  const token = ref<string | null>(null)
 
   //ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
-  const role = ref(null)
+  const role = ref<string | null>(null)
 
   //isAdmin CONST ADDED
   const isAdmin = computed(() => role.value === 'admin')
@@ -41,10 +43,10 @@ export const useUserStore = defineStore('user', () => {
       localStorage.setItem(localStorage_token, stored_token)
       apiClient
         .get('/glider')
-        .then((res) => {
+        .then(() => {
           _login(stored_username, stored_token, stored_role || 'viewer')
         })
-        .catch((err) => {
+        .catch(() => {
           console.log('BAD GLIDER')
           localStorage.setItem(localStorage_token, '')
         })
@@ -63,7 +65,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   //ROLE/TOKEN CHECK
-  function _login(login_username, login_token, login_role) {
+  function _login(login_username: string, login_token: string, login_role: string) {
     username.value = login_username
     token.value = login_token
     role.value = login_role
@@ -79,7 +81,7 @@ export const useUserStore = defineStore('user', () => {
     })
   }
 
-  const login = (username, password) => {
+  const login = (username: string, password: string) => {
     const data = {
       username,
       password,
@@ -107,7 +109,7 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem(localStorage_role)
   }
 
-  const createUser = async (newUsername, newPassword, newRole) => {
+  const createUser = async (newUsername: string, newPassword: string, newRole: string) => {
     try {
       const data = {
         username: newUsername,
@@ -118,12 +120,14 @@ export const useUserStore = defineStore('user', () => {
       return { success: true, data: response.data }
     } catch (err) {
       console.error('Error creating user:', err)
-      if (err.response?.status === 409) {
-        return { success: false, error: 'Username already exists' }
-      } else if (err.response?.status === 403) {
-        return { success: false, error: 'You do not have permission to create users' }
-      } else if (err.response?.status === 400) {
-        return { success: false, error: 'Username and password are required' }
+      if (err instanceof AxiosError && err.response) {
+        if (err.response.status === 409) {
+          return { success: false, error: 'Username already exists' }
+        } else if (err.response.status === 403) {
+          return { success: false, error: 'You do not have permission to create users' }
+        } else if (err.response.status === 400) {
+          return { success: false, error: 'Username and password are required' }
+        }
       }
       return { success: false, error: 'Failed to create user' }
     }
@@ -134,51 +138,58 @@ export const useUserStore = defineStore('user', () => {
       const response = await apiClient.get('/users')
       const users = Array.isArray(response.data?.users) ? response.data.users : []
       const normalizedUsers = users
-        .map((user) => ({
+        .map((user: DeletableUser) => ({
           username: user?.username,
           role: user?.role === 'admin' ? 'admin' : 'viewer',
           lastLogin: user?.lastLogin,
         }))
-        .filter((user) => !!user.username)
+        .filter((user: DeletableUser) => !!user.username)
 
       return { success: true, users: normalizedUsers }
     } catch (err) {
       console.error('Error fetching deletable users:', err)
-      if (err.response?.status === 403) {
-        return { success: false, users: [], error: 'You do not have permission to manage users' }
+      if (err instanceof (AxiosError) && err.response) {
+        if (err.response?.status === 403) {
+          return { success: false, users: [], error: 'You do not have permission to manage users' }
+        }
       }
       return { success: false, users: [], error: 'Failed to load users' }
     }
   }
 
-  const deleteUser = async (targetUsername) => {
+  const deleteUser = async (targetUsername: string) => {
     try {
       await apiClient.delete(`/users/${encodeURIComponent(targetUsername)}`)
       return { success: true }
     } catch (err) {
       console.error('Error deleting user:', err)
-      if (err.response?.status === 404) {
-        return { success: false, error: 'User not found' }
-      } else if (err.response?.status === 403) {
-        return { success: false, error: 'You do not have permission to delete users' }
-      } else if (err.response?.status === 400) {
-        return { success: false, error: err.response?.data?.error || 'Invalid delete request' }
+      if (err instanceof AxiosError && err.response) {
+        if (err.response.status === 404) {
+          return { success: false, error: 'User not found' }
+        } else if (err.response.status === 403) {
+          return { success: false, error: 'You do not have permission to delete users' }
+        } else if (err.response.status === 400) {
+          return { success: false, error: err.response.data?.error || 'Invalid delete request' }
+        }
       }
+
       return { success: false, error: 'Failed to delete user' }
     }
   }
 
-  const userExists = async (targetUsername) => {
+  const userExists = async (targetUsername: string) => {
     try {
       const response = await apiClient.get(`/users/${encodeURIComponent(targetUsername)}/exists`)
       return { success: true, exists: !!response.data?.exists }
     } catch (err) {
       console.error('Error checking user existence:', err)
-      if (err.response?.status === 403) {
-        return {
+      if (err instanceof AxiosError && err.response) {
+        if (err.response.status === 403) {
+          return {
           success: false,
           exists: false,
           error: 'You do not have permission to manage users',
+        }
         }
       }
       return { success: false, exists: false, error: 'Failed to validate user' }

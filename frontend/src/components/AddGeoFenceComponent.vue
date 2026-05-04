@@ -123,7 +123,7 @@ function onDrop(files) {
   if (!props.canEdit || lock_fence.value) {
     return
   }
-  filesStore.upload_kml_file(null, files)
+  filesStore.upload_kml_file(files)
 }
 
 function remove_idx(idx) {

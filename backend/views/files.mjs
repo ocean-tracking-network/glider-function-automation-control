@@ -16,6 +16,7 @@ const post_files = async (req, res) => {
     category = category[0]
   }
   req.files.forEach(async (ele) => {
+    if (typeof(ele) == 'string') return
     new_docs.push({
       filename: ele.originalname,
       path: ele.path,
