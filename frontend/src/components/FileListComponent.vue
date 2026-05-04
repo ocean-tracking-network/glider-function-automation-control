@@ -18,10 +18,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  can_edit: {
+    type: Boolean,
+    default: false,
+  },
   move: Function,
 })
 
-const emit = defineEmits(['click', 'dblclick', 'delete'])
+const emit = defineEmits(['click', 'dblclick', 'delete', 'edit'])
 
 const sort = ref()
 const group = ref()
@@ -59,7 +63,7 @@ function delete_element(index, element_id) {
   <draggable :sort="sort" :list="list" :group="group" itemKey="id" class="list-group files-container">
     <template #item="{ element, index }">
       <a class="clickable" href="#" @click.prevent="emit('click', element)" @dblclick.prevent="emit('dblclick', element)">
-        <FileComponent :canDelete="props.can_delete" :selected="element.selected" @remove="delete_element(index, element)" :element="element"
+        <FileComponent :canDelete="props.can_delete" :canEdit="props.can_edit" :selected="element.selected" @remove="delete_element(index, element)" @edit="emit('edit', element)" :element="element"
           class="files list-group-item" />
       </a>
     </template>

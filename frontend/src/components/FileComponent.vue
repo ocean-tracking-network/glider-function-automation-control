@@ -8,12 +8,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  canEdit: {
+    type: Boolean,
+    default: false,
+  },
   selected: {
     type: Boolean,
     default: false,
   },
 })
-const emit = defineEmits(["remove"])
+const emit = defineEmits(["remove", "edit"])
 const filesStore = useFilesStore()
 
 const styleColor = computed(() => {
@@ -30,9 +34,10 @@ const classBold = computed(() => {
     <p :style="{ color: styleColor }"
       :class="{ filename: true, bold: classBold}">{{
         element.name }}</p>
-    <div class="buttons" v-if="props.canDelete">
+    <div class="buttons" v-if="props.canDelete || (props.canEdit && props.selected)">
+      <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit geofence" title="Edit geofence">✎</button>
       <!-- <button class="view">👁</button> -->
-      <button @click="emit('remove')" class="del">X</button>
+      <button v-if="props.canDelete" @click.stop="emit('remove')" class="del">X</button>
     </div>
   </div>
 </template>
@@ -49,10 +54,6 @@ const classBold = computed(() => {
 
 .filename {
   padding: 0;
-}
-
-p {
-  /* font-size: large; */
 }
 
 .buttons button {
@@ -73,6 +74,17 @@ p {
 
 .del:hover {
   color: red;
+}
+
+.edit:hover {
+  color: limegreen;
+}
+
+.edit {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #111;
 }
 
 .view:hover {

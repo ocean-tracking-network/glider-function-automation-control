@@ -73,6 +73,9 @@ function back(save) {
     savePromise = store.saveOrUpdateGeofence() || Promise.resolve()
   }
   else {
+    if (is_create_mode.value) {
+      store.remove(123)
+    }
     savePromise = store.getGeofences() || Promise.resolve()
   }
   return savePromise.then(() => {
@@ -125,6 +128,9 @@ function confirm_close_save() {
 
 function confirm_close_discard() {
   if (pending_from_map.value) {
+    if (is_create_mode.value) {
+      store.remove(123)
+    }
     const reloadPromise = store.getGeofences() || Promise.resolve()
     reloadPromise.then(() => {
       is_create_mode.value = false
@@ -162,6 +168,9 @@ function on_click(e) {
     pending_fence_key.value = e.key
     show_close_confirm_modal.value = true
     return
+  }
+  if (is_create_mode.value) {
+    store.remove(123)
   }
   is_create_mode.value = false
   selected_fence_local.value = e.key
@@ -207,16 +216,11 @@ function handle_outside_click(event) {
     return
   }
 
-  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || event.target.closest('#enter') || event.target.closest('#exit') || clicked_inside_map) {
+  if (event.target.closest('.drawer-panel') || event.target.closest('.clickable') || clicked_inside_map) {
     return
   }
 
   deselect_selected_geofence_editor()
-}
-
-function on_double_click(e) {
-  on_click(e)
-  open_selected_geofence_editor()
 }
 
 function handle_geofence_selection(fenceKey) {
@@ -225,6 +229,9 @@ function handle_geofence_selection(fenceKey) {
     pending_from_map.value = true
     show_close_confirm_modal.value = true
     return
+  }
+  if (is_create_mode.value) {
+    store.remove(123)
   }
   is_create_mode.value = false
   selected_fence_local.value = fenceKey
@@ -321,8 +328,21 @@ onBeforeUnmount(() => {
 <template>
   <div class="geofence-section">
     <div class="geofence-list">
-      <FilesBoxComponent @delete="remove" @add_btn="add_geo" @click="on_click" @dblclick="on_double_click" :list="latlons" :draggable="false"
-        :add_btn="isAdmin" :can_delete="isAdmin" :standard_delete="isAdmin" title="Geofences" id="geo" />
+      <FilesBoxComponent
+        id="geo"
+        :list="latlons"
+        :draggable="false"
+        :add_btn="isAdmin"
+        :can_delete="isAdmin"
+        :can_edit="isAdmin"
+        :standard_delete="isAdmin"
+        :dblclick="false"
+        title="Geofences"
+        @delete="remove"
+        @add_btn="add_geo"
+        @click="on_click"
+        @edit="open_selected_geofence_editor"
+      />
     </div>
     <!-- <div class="geofence-actions"> -->
       <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
@@ -379,20 +399,6 @@ onBeforeUnmount(() => {
   flex: 1;
   height: 100%;
   overflow: hidden;
-}
-
-.geofence-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.4rem;
-}
-
-.geofence-extra {
-border-radius: 3px;
-border-width: 2px 2px 2px 2px;
-padding: 2px 4px 2px 4px;
-margin-left: 5px;
-margin-right:5px;
 }
 
 #geo {
