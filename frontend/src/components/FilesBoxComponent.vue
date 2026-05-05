@@ -23,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  can_edit: {
+    type: Boolean,
+    default: false,
+  },
   move: Function,
   tabs: Array,
   tab_sort_key: String,
@@ -31,6 +35,10 @@ const props = defineProps({
     default: false,
   },
   add_btn: {
+    type: Boolean,
+    default: true,
+  },
+  dblclick: {
     type: Boolean,
     default: true,
   }
@@ -117,10 +125,12 @@ const all_tabs = computed(() => {
         :group="props.group"
         :sort="props.sort"
         :can_delete="props.can_delete"
+        :can_edit="props.can_edit"
         :move="props.move"
         @click="emit('click', $event)"
-        @dblclick="emit('dblclick', $event)"
+        v-on="props.dblclick ? { dblclick: (event) => emit('dblclick', event) } : {}"
         @delete="delete_element"
+        @edit="emit('edit', $event)"
       />
       <div class="footer">
         <slot>
