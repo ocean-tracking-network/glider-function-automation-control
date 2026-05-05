@@ -94,21 +94,31 @@ const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
 
 const ensureAdminUser = async () => {
   try {
+    const autoCreateAdmin = process.env.AUTO_CREATE_ADMIN?.toLowerCase() === 'true'
+    
+    if (!autoCreateAdmin) {
+      console.log('Auto admin creation is disabled (AUTO_CREATE_ADMIN=false)')
+      return
+    }
+    
     const collection = await db.collection('users')
     const adminExists = await collection.findOne({ role: 'admin' })
     
     if (!adminExists) {
+      const username = process.env.AUTO_CREATE_ADMIN_USERNAME || 'testadmin'
+      const password = process.env.AUTO_CREATE_ADMIN_PASSWORD || '123'
+      
       console.log('No admin user found. Creating default admin user...')
-      const passwordHash = await hashPassword('123')
+      const passwordHash = await hashPassword(password)
       await collection.insertOne({
-        username: 'testadmin',
+        username,
         passwordHash,
         role: 'admin',
         createdAt: new Date(),
       })
       console.log('Admin user created')
-      console.log('Username: testadmin')
-      console.log('Password: 123')
+      console.log('Username: ' + username)
+      console.log('Password: ' + password)
     } else {
       console.log('Admin user already exists')
     }
