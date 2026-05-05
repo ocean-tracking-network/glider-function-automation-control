@@ -25,6 +25,11 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
+import { 
+  get_boats,
+  get_boat_predict,
+  check_gliders_safe,
+} from './views/boats.mjs'
 import { login } from './views/user.mjs'
 
 import { authenticateToken } from './utils/auth.mjs'
@@ -32,6 +37,7 @@ import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import { delete_old_tracks, update_glider_positions, subscribe_sfmc_gliders } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
+import { update_boats } from './utils/boat_utils.mjs'
 
 const app = express()
 app.use(cors())
@@ -74,11 +80,17 @@ app.post('/events/:id/trigger', authenticateToken, trigger_events)
 app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, post_logs)
 
+// boats
+app.get("/boats/:end_offset", authenticateToken, get_boats);
+app.get("/boats/predict/:id/:start_offset/:end_offset/:interval", get_boat_predict); //NOT USED BY THE FRONTEND ATM
+app.get("/boats/test", check_gliders_safe);
+
 // Schedule
 const backend_schedule = scheduleJob(`*/${process.env.SCHEDULE_SECS} * * * * *`, async () => {
   await update_glider_positions()
   await update_geofences()
   await delete_old_tracks()
+  update_boats()
 })
 
 

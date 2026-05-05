@@ -212,4 +212,4 @@ const update_geofences = async () => {
   }
 }
 
-export { update_geofences }
+export { update_geofences, convert_gps, is_in_polygon }
