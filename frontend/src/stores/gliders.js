@@ -1,14 +1,33 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import apiClient from '@/apiClient'
+import apiClient, { getEvenSource } from '@/apiClient'
 
 export const useGlidersStore = defineStore('gliders', () => {
   const gliders = ref([])
   const selected_glider_id = ref(null)
 
+  const register_sse = () => {
+    const eventSource = getEvenSource()
+
+    eventSource.addEventListener('gliders.tracks.new', ({ data }) => {
+      // console.log('gliders.tracks.new: ', data)
+
+      const { glider_id, track } = JSON.parse(data)
+      gliders.value = gliders.value.map((glider) => {
+        if (glider._id !== glider_id) return glider
+
+        return {
+          ...glider,
+          track: [...(glider.track ?? []), track],
+        }
+      })
+    })
+  }
+
   const get_gliders = () => {
     apiClient.get('/glider').then((res) => {
       gliders.value = res.data
+      register_sse()
     })
   }
 

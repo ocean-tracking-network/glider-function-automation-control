@@ -1,4 +1,4 @@
-import apiClient from '@/apiClient'
+import apiClient, { createEventSource } from '@/apiClient'
 import { defineStore } from 'pinia'
 import { computed, nextTick, onMounted, ref } from 'vue'
 
@@ -6,27 +6,28 @@ import { useGlidersStore } from './gliders'
 import { useGeoFencesStore } from './geofences'
 import { useFilesStore } from './files'
 import { useEventsStore } from './events'
-
+import { useLogsStore } from './logs'
 
 export const useUserStore = defineStore('user', () => {
   const gliderStore = useGlidersStore()
   const goefenceStore = useGeoFencesStore()
   const filesStore = useFilesStore()
   const eventsStore = useEventsStore()
+  const logsStore = useLogsStore()
 
   const localStorage_username = 'GFAC_username'
   const localStorage_token = 'GFAC_token'
 
-//ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
+  //ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
   const localStorage_role = 'GFAC_role'
 
   const username = ref(null)
   const token = ref(null)
 
-//ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
+  //ROLE CONST ADDED TO ALLOW PRIVILEGE CONSIDERATION
   const role = ref(null)
 
-//isAdmin CONST ADDED
+  //isAdmin CONST ADDED
   const isAdmin = computed(() => role.value === 'admin')
 
   const loggedin = ref(false)
@@ -56,6 +57,9 @@ export const useUserStore = defineStore('user', () => {
     goefenceStore.getGeofences()
     filesStore.get_files()
     eventsStore.get_events()
+    logsStore.get_logs()
+    //init event source
+    createEventSource()
   }
 
   //ROLE/TOKEN CHECK
@@ -129,11 +133,13 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await apiClient.get('/users')
       const users = Array.isArray(response.data?.users) ? response.data.users : []
-      const normalizedUsers = users.map((user) => ({
-        username: user?.username,
-        role: user?.role === 'admin' ? 'admin' : 'viewer',
-        lastLogin: user?.lastLogin,
-      })).filter((user) => !!user.username)
+      const normalizedUsers = users
+        .map((user) => ({
+          username: user?.username,
+          role: user?.role === 'admin' ? 'admin' : 'viewer',
+          lastLogin: user?.lastLogin,
+        }))
+        .filter((user) => !!user.username)
 
       return { success: true, users: normalizedUsers }
     } catch (err) {
@@ -169,7 +175,11 @@ export const useUserStore = defineStore('user', () => {
     } catch (err) {
       console.error('Error checking user existence:', err)
       if (err.response?.status === 403) {
-        return { success: false, exists: false, error: 'You do not have permission to manage users' }
+        return {
+          success: false,
+          exists: false,
+          error: 'You do not have permission to manage users',
+        }
       }
       return { success: false, exists: false, error: 'Failed to validate user' }
     }
