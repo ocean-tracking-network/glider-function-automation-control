@@ -28,10 +28,11 @@ import {
 } from './views/events.mjs'
 import { login, create_user, get_deletable_users, delete_user, user_exists } from './views/user.mjs'
 
-import { authenticateToken, requireAdmin } from './utils/auth.mjs'
+import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
+import db from './db/conn.mjs'
 import './loadEnvironment.mjs'
 
 const app = express()
@@ -91,8 +92,35 @@ const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
   await delete_old_tracks()
 })
 
+const ensureAdminUser = async () => {
+  try {
+    const collection = await db.collection('users')
+    const adminExists = await collection.findOne({ role: 'admin' })
+    
+    if (!adminExists) {
+      console.log('No admin user found. Creating default admin user...')
+      const passwordHash = await hashPassword('123')
+      await collection.insertOne({
+        username: 'testadmin',
+        passwordHash,
+        role: 'admin',
+        createdAt: new Date(),
+      })
+      console.log('Admin user created')
+      console.log('Username: testadmin')
+      console.log('Password: 123')
+    } else {
+      console.log('Admin user already exists')
+    }
+  } catch (error) {
+    console.error('Error ensuring admin user:', error)
+  }
+}
+
 // app start
 app.listen(port, async () => {
+  await ensureAdminUser()
+  
   const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
   if (pause == 'false') {
     for (let i = 0; i < 20; i++) {
