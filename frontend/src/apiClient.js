@@ -16,8 +16,19 @@ const apiClient = axios.create({
   },
 })
 
+/** @type {EventSource} */
+let eventSource
+
+export const createEventSource = () => {
+  eventSource = new EventSource(`${generate_base_url()}/sse?token=${getToken()}`)
+}
+
+export const getEvenSource = () => eventSource
+
+export const getToken = () => localStorage.getItem('GFAC_token')
+
 apiClient.interceptors.request.use(function (config) {
-  const token = localStorage.getItem('GFAC_token')
+  const token = getToken()
   config.headers.Authorization = `token ${token}`
 
   return config

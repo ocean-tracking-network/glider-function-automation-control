@@ -1,4 +1,5 @@
 import db from '../db/conn.mjs'
+import { gliders_sse } from '../views/sse/gliders.mjs'
 import { create_log } from './log_utils.mjs'
 import { get_active_deployment_details } from './sfmc_api.mjs'
 
@@ -15,7 +16,7 @@ async function update_glider_waypoint(glider, sfmc_json) {
       { _id: glider._id },
       {
         $set: { next_waypoint: next_waypoint },
-      }
+      },
     )
   }
 }
@@ -35,7 +36,7 @@ async function delete_old_tracks() {
       { _id: glider._id },
       {
         $set: { track: tracks },
-      }
+      },
     )
   }
 }
@@ -51,8 +52,14 @@ async function update_glider_positions() {
     //// Random sfmc_json (with default) to simulate unique movement of gliders
     // sfmc_json = {
     //   'data': {
-    //     'gpsValidLat': glider.track.length > 0 ? glider.track[glider.track.length-1].lat + (Math.random() * (1 - -1) + -1) : 4859.91552734375,
-    //     'gpsValidLon': glider.track.length > 0 ? glider.track[glider.track.length-1].lon + (Math.random() * (1 - -1) + -1) : -6317.248046875,
+    //     'gpsValidLat':
+    //       glider.track.length > 0
+    //         ? glider.track[glider.track.length - 1].lat + (Math.random() * (1 - -1) + -1)
+    //         : 4859.91552734375,
+    //     'gpsValidLon':
+    //       glider.track.length > 0
+    //         ? glider.track[glider.track.length - 1].lon + (Math.random() * (1 - -1) + -1)
+    //         : -6317.248046875,
     //     'id': 275,
     //     'isGpsValid': true,
     //     'name': glider.name,
@@ -79,13 +86,17 @@ async function update_glider_positions() {
 
     if (last_track.lat != sfmc_json.gpsValidLat || last_track.lon != sfmc_json.gpsValidLon) {
       const filter = { _id: glider._id }
+      const track = {
+        lat: sfmc_json.gpsValidLat,
+        lon: sfmc_json.gpsValidLon,
+        date: new Date(),
+      }
       const _update_result = await collection.updateOne(filter, {
-        $push: { track: {
-          lat: sfmc_json.gpsValidLat,
-          lon: sfmc_json.gpsValidLon,
-          date: new Date(),
-        } },
+        $push: {
+          track: track,
+        },
       })
+      gliders_sse.broadcast_new_tracks(glider._id, track)
       console.log('updated track')
       create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
     } else {

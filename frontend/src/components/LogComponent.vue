@@ -1,40 +1,24 @@
 <script setup>
 import { useGlidersStore } from '@/stores/gliders';
-import apiClient from '@/apiClient';
-import { computed, onMounted, ref } from 'vue';
+import { useLogsStore } from '@/stores/logs';
+import { computed, ref } from 'vue';
+import { storeToRefs } from 'pinia';
 
 const gliderStore = useGlidersStore()
+const logsStore = useLogsStore()
+const { logs } = storeToRefs(logsStore)
 
-const logs = ref([])
 const filter_by_glider = ref(false)
-
-function get_logs() {
-  apiClient.get("/logs/").then((res) => {
-    logs.value = res.data
-    logs.value.sort((a, b) => {
-      return new Date(b.date) - new Date(a.date)
-    })
-  }).catch((err) => {
-    // This is bad, bad
-    setTimeout(get_logs, 2000)
-  })
-}
-
-onMounted(() => {
-  // placeholder logs. Not sure how or what they'll look like ye.
-  get_logs()
-})
 
 const filtered_logs = computed(() => {
   let ret = []
-  logs.value.forEach(ele => {
+  logs.value.forEach((ele) => {
     if (ele.glider && gliderStore.selected_glider && ele.glider == gliderStore.selected_glider._id) {
       ret.push(ele)
-    }
-    else if (!filter_by_glider.value || !gliderStore.selected_glider) {
+    } else if (!filter_by_glider.value || !gliderStore.selected_glider) {
       ret.push(ele)
     }
-  });
+  })
   return ret
 })
 
@@ -61,20 +45,21 @@ function is_log_glider_selected(log) {
   }
   return false
 }
-
 </script>
 <template>
   <div class="border">
     <div id="log-content-parent">
       <div id="log-content">
-        <div v-for="log in filtered_logs" :class="[log.level, 'log', { selected: is_log_glider_selected(log) }]">
+        <TransitionGroup name="log" tag="div">
+          <div v-for="log in filtered_logs" :key="log._id+log.date" :class="[log.level, 'log', { selected: is_log_glider_selected(log) }]">
           <!-- <p class="level">{{ log.level }}</p> -->
           <p class="date">{{ formatDate(new Date(log.date)) }}</p>
           <span class="message">
             <p v-if="log.glider">{{ get_glider_name(log) }}</p>
           </span>
           <p class="message">{{ log.message }}</p>
-        </div>
+          </div>
+        </TransitionGroup>
       </div>
       <span id="fade-overlay"></span>
     </div>
@@ -166,5 +151,16 @@ span {
 
 label {
   margin-right: .5rem;
+}
+
+/* Vue TransitionGroup log push-down animation */
+.log-move,
+.log-enter-active {
+  transition: all 0.6s ease;
+}
+
+.log-enter-from {
+  opacity: 0;
+  transform: translateY(-100%);
 }
 </style>

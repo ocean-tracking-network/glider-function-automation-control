@@ -3,8 +3,6 @@ import bcrypt from 'bcryptjs'
 
 const { sign, verify } = jwt
 
-
-
 function getTokenFromHeader(authHeader) {
   if (!authHeader) return null
   const parts = authHeader.split(' ')
@@ -16,7 +14,7 @@ function authenticateToken(req, res, next) {
     return next()
   }
   const authHeader = req.headers['authorization']
-  const token = getTokenFromHeader(authHeader)
+  const token = getTokenFromHeader(authHeader) ?? req.query.token
 
   if (!token) {
     return res.sendStatus(401)
@@ -49,7 +47,6 @@ function requireRole(roles) {
 
 const requireAdmin = requireRole(['admin'])
 
-
 //HASH PASSWORD WITH COST FACTOR OF 12, GOOD BALANCE OF PERFORMANCE AND SECURITY
 //BCRYPT.HASH(X.0), TAKES PASSWORD AS ONE ARGUMENT, COST FACTOR AS THE OTHER.
 async function hashPassword(password) {
@@ -62,11 +59,9 @@ async function comparePassword(password, hash) {
 }
 
 function generateAuthToken(user) {
-  return sign(
-    { name: user.username, role: user.role, sub: user.id },
-    process.env.SECRET_TOKEN,
-    { expiresIn: '43200s' }
-  )
+  return sign({ name: user.username, role: user.role, sub: user.id }, process.env.SECRET_TOKEN, {
+    expiresIn: '43200s',
+  })
 }
 
 export {

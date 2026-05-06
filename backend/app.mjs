@@ -34,6 +34,7 @@ import { send_slack_message } from './utils/slack.mjs'
 import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
 import db from './db/conn.mjs'
 import './loadEnvironment.mjs'
+import { gliders_sse } from './views/sse/gliders.mjs'
 
 const app = express()
 app.use(cors())
@@ -83,6 +84,9 @@ app.post('/events/:id/trigger', authenticateToken, requireAdmin, trigger_events)
 // logs
 app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, requireAdmin, post_logs)
+
+// sse
+app.get('/sse', authenticateToken, gliders_sse.listen)
 
 // Schedule
 const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
