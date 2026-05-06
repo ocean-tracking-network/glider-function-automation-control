@@ -25,10 +25,21 @@ const glider_next_waypoint = ref(null)
 
 const all_glider_markers = ref([])
 
+// Double-click tracking
+const lastClickedFenceKey = ref(null)
+const lastClickTime = ref(0)
+const clickTimeout = ref(null)
+const DOUBLE_CLICK_DELAY = 300 
+
+
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
 const { isAdmin } = storeToRefs(userStore)
+
+
+
+
 
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
@@ -85,7 +96,38 @@ const on_polygon_click = (e) => {
     e.originalEvent.preventDefault()
     e.originalEvent.stopPropagation()
   }
-  store.selectGeofence(polygon_to_geofence_map.value[e.target._leaflet_id])
+
+  const fenceKey = polygon_to_geofence_map.value[e.target._leaflet_id]
+  const currentTime = Date.now()
+
+  console.log("CLICK on polygon, fenceKey:", fenceKey, "currentTime:", currentTime, "lastClickTime:", lastClickTime.value)
+
+
+  if (lastClickedFenceKey.value === fenceKey && (currentTime - lastClickTime.value) < DOUBLE_CLICK_DELAY) {
+    console.log("DOUBLE CLICK DETECTED")
+    if (clickTimeout.value) {
+      clearTimeout(clickTimeout.value)
+      clickTimeout.value = null
+    }
+    lastClickedFenceKey.value = null
+    lastClickTime.value = 0
+    store.doubleClickGeofence(fenceKey)
+  } else {
+    lastClickedFenceKey.value = fenceKey
+    lastClickTime.value = currentTime
+
+    if (clickTimeout.value) {
+      clearTimeout(clickTimeout.value)
+    }
+
+    clickTimeout.value = setTimeout(() => {
+      lastClickedFenceKey.value = null
+      lastClickTime.value = 0
+      clickTimeout.value = null
+    }, DOUBLE_CLICK_DELAY)
+
+    store.selectGeofence(fenceKey)
+  }
 }
 
 

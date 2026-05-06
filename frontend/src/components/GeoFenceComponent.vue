@@ -238,6 +238,22 @@ function handle_geofence_selection(fenceKey) {
   store.select(fenceKey)
 }
 
+function handle_geofence_double_click(fenceKey) {
+  if (geofence_is_dirty.value) {
+    pending_fence_key.value = fenceKey
+    pending_from_map.value = true
+    show_close_confirm_modal.value = true
+    return
+  }
+  if (is_create_mode.value) {
+    store.remove(123)
+  }
+  is_create_mode.value = false
+  selected_fence_local.value = fenceKey
+  store.select(fenceKey)
+  geofence_editor.value = true
+}
+
 //RESTRICT REMOVE TO ADMIN
 function remove(element) {
   if (!isAdmin.value) {
@@ -313,12 +329,14 @@ watch([geofence_editor, drawerWidth], emitDrawerOffset, { immediate: true })
 onMounted(() => {
   document.addEventListener('click', handle_outside_click)
   store.setSelectGeofenceHandler(handle_geofence_selection)
+  store.setDoubleClickGeofenceHandler(handle_geofence_double_click)
 })
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handle_outside_click)
   stopResize()
   store.setSelectGeofenceHandler(null)
+  store.setDoubleClickGeofenceHandler(null)
   emit('drawer-offset-change', 0)
 })
 
