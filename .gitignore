@@ -33,5 +33,5 @@ local.json
 uploads/
 data/
 *.pyc
-
+*.tgz
 backend/.env
