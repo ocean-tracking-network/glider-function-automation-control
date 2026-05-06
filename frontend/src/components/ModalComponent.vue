@@ -1,21 +1,20 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, useTemplateRef } from 'vue';
 
 const modalRef = useTemplateRef('modalRef')
 
-const props = defineProps({
-  header: String,
-  alertText: String,
-  alertBtnText: String,
+const props = defineProps<{
+  header?: string
+  alertText?: string
+  alertBtnText?: string
+  blur?: boolean
+  wide?: boolean
+}>()
 
-  blur: Boolean,
-  wide: Boolean,
-})
-
-const emit = defineEmits({
-  close: Boolean,
-  confirm: Boolean
-})
+const emit = defineEmits<{
+  close: [boolean]
+  confirm: [boolean]
+}>()
 
 onMounted(() => {
   modalRef.value?.focus()

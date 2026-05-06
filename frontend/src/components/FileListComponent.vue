@@ -1,5 +1,5 @@
-<script setup>
-import { computed, onMounted, ref } from 'vue';
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
 import FileComponent from './FileComponent.vue';
 import draggable from 'vuedraggable'
 
@@ -50,11 +50,11 @@ onMounted(() => {
   }
 })
 
-function delete_element(index, element_id) {
-  if (!props.can_delete) {
-    return
-  }
+function delete_element(index: number, element_id: string) {
+  if (!props.can_delete) return
   emit("delete", element_id)
+
+  if (!props.list) return
   props.list.splice(index, 1)
 }
 </script>

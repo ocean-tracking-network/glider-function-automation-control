@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
@@ -9,7 +9,7 @@ const newUsername = ref("")
 const newPassword = ref("")
 const newRole = ref("viewer")
 const message = ref("")
-const messageType = ref("") // 'success' or 'error'
+const messageType = ref<'success' | 'error' | ''>('')
 
 async function createUser() {
   if (!newUsername.value || !newPassword.value) {

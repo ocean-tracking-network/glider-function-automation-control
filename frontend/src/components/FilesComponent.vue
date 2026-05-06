@@ -1,9 +1,8 @@
-<script setup>
-// import apiClient from '@/apiClientClient';
+<script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import FileComponent from './FileComponent.vue'
 
-const files = ref([]);
+const files = ref<{ filename: string}[]>([]);
 
 onMounted(() => {
   //apiClient.get()

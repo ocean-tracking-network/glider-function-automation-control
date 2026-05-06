@@ -1,22 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { useFilesStore } from '@/stores/files';
 import { computed } from 'vue';
 
-const props = defineProps({
-  element: Object,
-  canDelete: {
-    type: Boolean,
-    default: true,
-  },
-  canEdit: {
-    type: Boolean,
-    default: false,
-  },
-  selected: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<{
+  element: {
+    category?: string
+    name?: string
+    bold?: boolean
+  }
+  canDelete?: boolean
+  canEdit?: boolean
+  selected?: boolean
+}>(), {
+  canDelete: true,
+  canEdit: false,
+  selected: false,
 })
+
 const emit = defineEmits(["remove", "edit"])
 const filesStore = useFilesStore()
 

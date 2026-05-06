@@ -1,9 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import DropDownIcon from '@/assets/arrow_drop_down.svg'
 
-const emit = defineEmits(["select"])
-const props = defineProps(["options", "selected", "default", "disabled"])
+const emit = defineEmits<{
+  select: [option: string]
+}>()
+const props = defineProps<{
+  options: string[]
+  selected: string | null
+  default: string
+  disabled: boolean
+}>()
 
 const show_dropdown = ref(false)
 const filter_text = ref("")
@@ -15,11 +22,11 @@ const filtered_options = computed(() => {
   return props.options.filter(option => option.includes(filter_text.value))
 })
 
-function option_click(option) {
+function option_click(option: string) {
   if (props.disabled) {
     return
   }
-  emit("select", option)
+  emit('select', option)
   show_dropdown.value = false;
 }
 

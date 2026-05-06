@@ -1,15 +1,16 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import apiClient, { getEvenSource } from '@/apiClient'
+import type { GliderLog } from '@/lib/types';
 
 export const useLogsStore = defineStore('logs', () => {
-  const logs = ref([])
+  const logs = ref<GliderLog[]>([])
 
-  const sort_logs = (logs_to_sort) => {
-    return [...logs_to_sort].sort((a, b) => new Date(b.date) - new Date(a.date))
+  const sort_logs = (logs_to_sort: GliderLog[]) => {
+    return [...logs_to_sort].sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
   }
 
-  const add_log = (log) => {
+  const add_log = (log: GliderLog) => {
     logs.value = sort_logs([log, ...logs.value.filter((existing) => existing._id !== log._id)])
   }
 
@@ -35,7 +36,7 @@ export const useLogsStore = defineStore('logs', () => {
   }
 
   const logs_obj = computed(() => {
-    const ret = {}
+    const ret: {[_id: string]: GliderLog} = {}
     logs.value.forEach((log) => {
       ret[log._id] = { ...log }
     })

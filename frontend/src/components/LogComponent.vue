@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { useGlidersStore } from '@/stores/gliders';
 import { useLogsStore } from '@/stores/logs';
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import type { GliderLog } from '@/lib/types';
 
 const gliderStore = useGlidersStore()
 const logsStore = useLogsStore()
@@ -10,8 +11,8 @@ const { logs } = storeToRefs(logsStore)
 
 const filter_by_glider = ref(false)
 
-const filtered_logs = computed(() => {
-  let ret = []
+const filtered_logs = computed<GliderLog[]>(() => {
+  let ret: GliderLog[] = []
   logs.value.forEach((ele) => {
     if (ele.glider && gliderStore.selected_glider && ele.glider == gliderStore.selected_glider._id) {
       ret.push(ele)
@@ -22,7 +23,7 @@ const filtered_logs = computed(() => {
   return ret
 })
 
-function formatDate(date) {
+function formatDate(date: Date) {
   const year = String(date.getFullYear()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed because javascript
   const day = String(date.getDate()).padStart(2, '0');
@@ -32,14 +33,11 @@ function formatDate(date) {
   return `${year}-${month}-${day} ${hour}:${minute}`;
 }
 
-function get_glider_name(log) {
-  if (gliderStore.gliders_obj[log.glider]) {
-    return gliderStore.gliders_obj[log.glider].name
-  }
-  return ""
+function get_glider_name(log: GliderLog) {
+  return gliderStore.gliders_obj[log.glider]?.name ?? ''
 }
 
-function is_log_glider_selected(log) {
+function is_log_glider_selected(log: GliderLog) {
   if (log.glider && gliderStore.selected_glider && gliderStore.selected_glider._id == log.glider) {
     return true
   }

@@ -41,10 +41,12 @@ export type ScriptOptions = {
   script_type?: string
 }
 
+export type EventType = 'enter' | 'exit'
+
 export type Script = ScriptOptions & {
   geofence: string
   glider: string
-  event_type: 'enter' | 'exit'
+  event_type: EventType
 }
 
 export type GliderEvent = Script & {
@@ -58,8 +60,18 @@ export type GliderScripts = {
   }
 }
 
-export type DeletableUser = {
+export type UserRole = 'admin' | 'viewer'
+
+export type User = {
   username?: string
-  role?: string
+  role?: UserRole
   lastLogin?: string
+}
+
+export type GliderLog = {
+  _id: string
+  date: string
+  glider: string
+  level: string
+  message: string
 }

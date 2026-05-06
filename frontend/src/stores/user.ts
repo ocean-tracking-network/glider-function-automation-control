@@ -8,7 +8,7 @@ import { useFilesStore } from './files'
 import { useEventsStore } from './events'
 import { useLogsStore } from './logs'
 import { AxiosError } from 'axios'
-import type { DeletableUser } from '@/lib/types'
+import type { User } from '@/lib/types'
 
 export const useUserStore = defineStore('user', () => {
   const gliderStore = useGlidersStore()
@@ -138,12 +138,12 @@ export const useUserStore = defineStore('user', () => {
       const response = await apiClient.get('/users')
       const users = Array.isArray(response.data?.users) ? response.data.users : []
       const normalizedUsers = users
-        .map((user: DeletableUser) => ({
+        .map((user: User) => <User>({
           username: user?.username,
           role: user?.role === 'admin' ? 'admin' : 'viewer',
           lastLogin: user?.lastLogin,
         }))
-        .filter((user: DeletableUser) => !!user.username)
+        .filter((user: User) => !!user.username)
 
       return { success: true, users: normalizedUsers }
     } catch (err) {
