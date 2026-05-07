@@ -65,12 +65,13 @@ const classBold = computed(() => {
 .buttons button {
   background: transparent;
   border: none;
-  padding: 0;
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1;
   color: #111;
   cursor: pointer;
+    padding-left:6px;
+  padding-right:6px ;
 }
 
 .buttons .divider {
