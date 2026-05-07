@@ -15,10 +15,56 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const force_map_update = ref(false)
   const selected_kml_geo_json = ref(null)
   const onSelectGeofenceHandler = ref(null)
+  const onDoubleClickGeofenceHandler = ref(null)
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
   const show_alert_modal = ref('')
+
+  const toLatLonPairs = (coordinates = []) => {
+    return coordinates
+      .filter((lonlat) => Array.isArray(lonlat) && lonlat.length >= 2)
+      .map((lonlat) => [lonlat[1], lonlat[0]])
+  }
+
+  const parseCoordinateText = (coordinateText = '') => {
+    return coordinateText
+      .trim()
+      .split(/\s+/)
+      .map((coordinate) => coordinate.split(',').slice(0, 2).map((value) => Number(value)))
+      .filter(([lon, lat]) => Number.isFinite(lon) && Number.isFinite(lat))
+  }
+
+  const getDirectChildText = (element, tagName) => {
+    const child = Array.from(element?.children || []).find(
+      (candidate) => candidate.localName === tagName || candidate.tagName === tagName,
+    )
+    return child?.textContent?.trim() || ''
+  }
+
+  const getBareLinearRingPlacemarkFeatures = (kmlDom) => {
+    return Array.from(kmlDom.getElementsByTagName('Placemark'))
+      .map((placemark) => {
+        const linearRing = Array.from(placemark.children || []).find(
+          (candidate) => candidate.localName === 'LinearRing' || candidate.tagName === 'LinearRing',
+        )
+
+        if (!linearRing) {
+          return null
+        }
+
+        const coordinates = toLatLonPairs(parseCoordinateText(linearRing.textContent || ''))
+
+        return {
+          coordinates: coordinates,
+          placemark: getDirectChildText(placemark, 'name'),
+          type: 'LinearRing',
+          isValid: coordinates.length >= 3,
+          description: getDirectChildText(placemark, 'description'),
+        }
+      })
+      .filter(Boolean)
+  }
 
   watch(local_kml_file, async (new_kml_file) => {
     if (!new_kml_file) {
@@ -31,25 +77,42 @@ export const useGeoFencesStore = defineStore('geofences', () => {
         show_alert_modal.value = `Failed to parse ${new_kml_file.name} file! Please upload a valid KML file`
       } else {
         const geoJson = kml(kmlDom)
-        selected_kml_geo_json.value = geoJson.features.map((feature) => {
+        const geoJsonFeatures = (geoJson.features || []).map((feature) => {
           const coordinates = []
           let isValid = true
+          const geom = feature.geometry || {}
+          const type = geom.type
 
-          switch (feature.geometry.type) {
+          switch (type) {
             case 'Point':
-              coordinates.push([feature.geometry.coordinates[1], feature.geometry.coordinates[0]])
+              if (Array.isArray(geom.coordinates)) {
+                coordinates.push([geom.coordinates[1], geom.coordinates[0]])
+              }
               if (coordinates.length < 1) {
                 isValid = false
               }
               break
+
             case 'Polygon':
-              coordinates.push(
-                ...feature.geometry.coordinates[0].map((lonlats) => [lonlats[1], lonlats[0]]),
-              )
+              if (Array.isArray(geom.coordinates) && Array.isArray(geom.coordinates[0])) {
+                coordinates.push(
+                  ...geom.coordinates[0].map((lonlats) => [lonlats[1], lonlats[0]]),
+                )
+              }
               if (coordinates.length < 3) {
                 isValid = false
               }
               break
+
+            case 'LinearRing':
+              if (Array.isArray(geom.coordinates)) {
+                coordinates.push(...toLatLonPairs(geom.coordinates))
+              }
+              if (coordinates.length < 3) {
+                isValid = false
+              }
+              break
+
             default:
               isValid = false
               break
@@ -59,12 +122,17 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
           return {
             coordinates: coordinates,
-            placemark: feature.properties.name,
-            type: feature.geometry.type,
+            placemark: feature.properties && feature.properties.name,
+            type: type,
             isValid: isValid,
-            description: feature.properties.description,
+            description: feature.properties && feature.properties.description,
           }
         })
+
+        selected_kml_geo_json.value = [
+          ...geoJsonFeatures,
+          ...getBareLinearRingPlacemarkFeatures(kmlDom),
+        ]
       }
     }
   })
@@ -243,6 +311,16 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     onSelectGeofenceHandler.value = handler
   }
 
+  function setDoubleClickGeofenceHandler(handler) {
+    onDoubleClickGeofenceHandler.value = handler
+  }
+
+  function doubleClickGeofence(key) {
+    if (onDoubleClickGeofenceHandler.value) {
+      onDoubleClickGeofenceHandler.value(key)
+    }
+  }
+
   function deselect() {
     selected_fence.value = ''
     selected_fence_key.value = ''
@@ -277,6 +355,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     select,
     selectGeofence,
     setSelectGeofenceHandler,
+    setDoubleClickGeofenceHandler,
+    doubleClickGeofence,
     deselect,
     saveOrUpdateGeofence,
     deleteGeofence,
