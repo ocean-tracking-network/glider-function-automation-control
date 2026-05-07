@@ -15,6 +15,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const force_map_update = ref(false)
   const selected_kml_geo_json = ref(null)
   const onSelectGeofenceHandler = ref(null)
+  const onDoubleClickGeofenceHandler = ref(null)
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
@@ -243,6 +244,16 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     onSelectGeofenceHandler.value = handler
   }
 
+  function setDoubleClickGeofenceHandler(handler) {
+    onDoubleClickGeofenceHandler.value = handler
+  }
+
+  function doubleClickGeofence(key) {
+    if (onDoubleClickGeofenceHandler.value) {
+      onDoubleClickGeofenceHandler.value(key)
+    }
+  }
+
   function deselect() {
     selected_fence.value = ''
     selected_fence_key.value = ''
@@ -277,6 +288,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     select,
     selectGeofence,
     setSelectGeofenceHandler,
+    setDoubleClickGeofenceHandler,
+    doubleClickGeofence,
     deselect,
     saveOrUpdateGeofence,
     deleteGeofence,
