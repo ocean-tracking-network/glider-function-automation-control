@@ -21,6 +21,8 @@ const just_removed = ref(false)
 const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
+const show_delete_confirm_modal = ref(false)
+const delete_pending_element = ref(null)
 const geofence_is_dirty = ref(false)
 const pending_fence_key = ref(null)
 const pending_from_map = ref(false)
@@ -260,11 +262,23 @@ function remove(element) {
     return
   }
   just_removed.value = true
-  if (confirm("WARNING!\nAre you sure you want to remove this geofence?") == true) {
-    back(false).then(() => {
-      store.deleteGeofence(element.key)
-    })
-  }
+  delete_pending_element.value = element
+  show_delete_confirm_modal.value = true
+}
+
+function confirm_delete() {
+  if (!delete_pending_element.value) return
+  const element = delete_pending_element.value
+  back(false).then(() => {
+    store.deleteGeofence(element.key)
+    show_delete_confirm_modal.value = false
+    delete_pending_element.value = null
+  })
+}
+
+function cancel_delete() {
+  show_delete_confirm_modal.value = false
+  delete_pending_element.value = null
 }
 
 function startResize(e) {
@@ -362,6 +376,13 @@ onBeforeUnmount(() => {
         @edit="open_selected_geofence_editor"
       />
     </div>
+      <ModalComponent v-if="show_delete_confirm_modal" header="WARNING!" :blur="true" @close="cancel_delete" @confirm="confirm_delete">
+        <h3>Are you sure you want to remove this geofence?</h3>
+        <div class="close-confirm-actions">
+          <button type="button" @click="confirm_delete">Delete</button>
+          <button type="button" @click="cancel_delete">Cancel</button>
+        </div>
+      </ModalComponent>
     <!-- <div class="geofence-actions"> -->
       <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
         Edit Geofence

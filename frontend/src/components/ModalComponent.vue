@@ -101,8 +101,23 @@ onMounted(() => {
 }
 
 :slotted(h2), h2 {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   font-size: x-large;
+}
+
+:slotted(h3) {
+  margin-bottom: 1.25rem;
+}
+
+:slotted(.close-confirm-actions) {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+:slotted(.close-confirm-actions) button {
+  min-width: 40%;
 }
 
 :slotted(input) {
