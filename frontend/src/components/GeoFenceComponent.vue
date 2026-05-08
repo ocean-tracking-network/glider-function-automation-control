@@ -377,8 +377,8 @@ onBeforeUnmount(() => {
       />
     </div>
       <ModalComponent v-if="show_delete_confirm_modal" header="WARNING!" :blur="true" @close="cancel_delete" @confirm="confirm_delete">
-        <h3>Are you sure you want to remove this geofence?</h3>
-        <div class="close-confirm-actions">
+        <h3 class="delete-confirm-message">Are you sure you want to remove this geofence?</h3>
+        <div class="delete-confirm-actions">
           <button type="button" @click="confirm_delete">Delete</button>
           <button type="button" @click="cancel_delete">Cancel</button>
         </div>
@@ -519,6 +519,22 @@ onBeforeUnmount(() => {
 }
 
 .close-confirm-actions button {
+  margin: 0;
+}
+
+.delete-confirm-message {
+  margin-bottom: 1.25rem;
+}
+
+.delete-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
+
+.delete-confirm-actions button {
+  min-width: 40%;
   margin: 0;
 }
 </style>
