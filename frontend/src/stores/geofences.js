@@ -20,6 +20,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
   const show_alert_modal = ref('')
+  const supported_kml_geometry_types = new Set(['Point', 'Polygon', 'LinearRing'])
 
   const toLatLonPairs = (coordinates = []) => {
     return coordinates
@@ -127,7 +128,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
             isValid: isValid,
             description: feature.properties && feature.properties.description,
           }
-        })
+        }).filter((feature) => supported_kml_geometry_types.has(feature.type))
 
         selected_kml_geo_json.value = [
           ...geoJsonFeatures,
