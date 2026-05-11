@@ -22,10 +22,10 @@ const drawerWidth = ref(370)
 const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const show_delete_confirm_modal = ref(false)
-const delete_pending_element = ref(null)
 const geofence_is_dirty = ref(false)
 const pending_fence_key = ref(null)
 const pending_from_map = ref(false)
+const pending_delete_element = ref(null)
 const emit = defineEmits(['drawer-offset-change'])
 
 const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
@@ -262,23 +262,19 @@ function remove(element) {
     return
   }
   just_removed.value = true
-  delete_pending_element.value = element
+  pending_delete_element.value = element
   show_delete_confirm_modal.value = true
 }
 
 function confirm_delete() {
-  if (!delete_pending_element.value) return
-  const element = delete_pending_element.value
-  back(false).then(() => {
-    store.deleteGeofence(element.key)
-    show_delete_confirm_modal.value = false
-    delete_pending_element.value = null
-  })
-}
-
-function cancel_delete() {
+  const element = pending_delete_element.value
+  if (element) {
+    back(false).then(() => {
+      store.deleteGeofence(element.key)
+    })
+  }
   show_delete_confirm_modal.value = false
-  delete_pending_element.value = null
+  pending_delete_element.value = null
 }
 
 function startResize(e) {
@@ -376,13 +372,6 @@ onBeforeUnmount(() => {
         @edit="open_selected_geofence_editor"
       />
     </div>
-      <ModalComponent v-if="show_delete_confirm_modal" header="WARNING!" :blur="true" @close="cancel_delete" @confirm="confirm_delete">
-        <h3 class="delete-confirm-message">Are you sure you want to remove this geofence?</h3>
-        <div class="delete-confirm-actions">
-          <button type="button" @click="confirm_delete">Delete</button>
-          <button type="button" @click="cancel_delete">Cancel</button>
-        </div>
-      </ModalComponent>
     <!-- <div class="geofence-actions"> -->
       <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
         Edit Geofence
@@ -393,6 +382,16 @@ onBeforeUnmount(() => {
     <!-- </div> -->
 
 
+    <ModalComponent v-if="show_delete_confirm_modal" :blur="true" @close="show_delete_confirm_modal = false">
+      <div class="delete-modal-content">
+        <h2 class="delete-modal-title">Delete Geofence?</h2>
+        <p class="delete-modal-text">Are you sure you want to remove this geofence?</p>
+        <div class="delete-confirm-actions">
+          <button type="button" class="btn-cancel" @click="show_delete_confirm_modal = false">Cancel</button>
+          <button type="button" class="btn-delete" @click="confirm_delete()">Delete</button>
+        </div>
+      </div>
+    </ModalComponent>
     <transition name="slide-drawer">
       <div v-if="geofence_editor" class="drawer-overlay">
         <ModalComponent v-if="show_close_confirm_modal" :blur="true" @close="show_close_confirm_modal = false">
@@ -522,19 +521,60 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
-.delete-confirm-message {
-  margin-bottom: 1.25rem;
+.delete-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  text-align: center;
+}
+
+.delete-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.delete-modal-text {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
 }
 
 .delete-confirm-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   justify-content: center;
-  margin-top: 0.75rem;
 }
 
 .delete-confirm-actions button {
-  min-width: 40%;
-  margin: 0;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-cancel {
+  background-color: var(--color-border, #e0e0e0);
+  color: var(--color-text);
+}
+
+.btn-cancel:hover {
+  background-color: var(--color-border, #d0d0d0);
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
 }
 </style>
