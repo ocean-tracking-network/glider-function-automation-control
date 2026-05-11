@@ -101,7 +101,7 @@ onMounted(() => {
 }
 
 :slotted(h2), h2 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 2rem;
   font-size: x-large;
 }
 
