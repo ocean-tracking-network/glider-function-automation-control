@@ -139,8 +139,12 @@ const valid_kml_placemarks = computed(() => {
   return (selected_kml_geo_json.value ?? []).filter((placemark) => placemark?.isValid)
 })
 
+const valid_kml_placemarks_are_points = computed(() => {
+  return valid_kml_placemarks.value.length > 0 && valid_kml_placemarks.value.every((placemark) => placemark.type === 'Point')
+})
+
 const can_apply_all_kml = computed(() => {
-  return props.canEdit && !lock_fence.value && valid_kml_placemarks.value.length > 0
+  return props.canEdit && !lock_fence.value && valid_kml_placemarks_are_points.value
 })
 
 function apply_all_kml_coordinates() {
@@ -581,6 +585,19 @@ onBeforeMount(() => {
   width: 100%;
   margin: 0;
   margin-top: 12px;
+}
+
+.apply-all-kml-btn:disabled {
+  background-color: var(--color-background-soft, #f2f2f2);
+  border-color: var(--color-border, lightgray);
+  color: var(--color-text-muted, #777);
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.apply-all-kml-btn:disabled:hover {
+  border-color: var(--color-border, lightgray);
 }
 
 .kml-file-placemark-card {

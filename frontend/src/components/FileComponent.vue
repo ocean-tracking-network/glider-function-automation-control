@@ -28,16 +28,17 @@ const classBold = computed(() => {
   return (props.element.bold !== undefined ?  props.element.bold : false )
 })
 
+
 </script>
 <template>
   <div :class="{ border: true, selected: props.selected }">
     <p :style="{ color: styleColor }"
       :class="{ filename: true, bold: classBold}">{{
         element.name }}</p>
-    <div class="buttons" v-if="props.canDelete || (props.canEdit && props.selected)">
-      <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit geofence" title="Edit geofence">✎</button>
-      <!-- <button class="view">👁</button> -->
-      <button v-if="props.canDelete" @click.stop="emit('remove')" class="del">X</button>
+    <div class="buttons" v-if="(props.canEdit && props.selected) || (props.canDelete && props.selected)">
+      <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit geofence" title="Edit geofence"> ✎</button>
+      <span class="divider" v-if="props.canDelete && props.canEdit && props.selected">|</span>
+      <button v-if="props.canDelete && props.selected" @click.stop="emit('remove')" class="del" aria-label="Delete geofence" title="Delete geofence">🗑</button>
     </div>
   </div>
 </template>
@@ -56,9 +57,28 @@ const classBold = computed(() => {
   padding: 0;
 }
 
+.buttons button,
+.buttons .divider {
+  margin: 0;
+}
+
 .buttons button {
-  margin-left: .5rem;
-  /* font-size: larger; */
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #111;
+  cursor: pointer;
+    padding-left:6px;
+  padding-right:6px ;
+}
+
+.buttons .divider {
+  color: var(--color-text);
+  opacity: .6;
+  margin: 0 0.25rem;
+  user-select: none;
 }
 
 .border:hover {
@@ -72,19 +92,13 @@ const classBold = computed(() => {
   border-color: var(--color-text);
 }
 
-.del:hover {
-  color: red;
-}
-
+.del:hover,
 .edit:hover {
   color: limegreen;
 }
 
-.edit {
-  font-size: 0.95rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #111;
+.del:hover {
+  color: red;
 }
 
 .view:hover {
