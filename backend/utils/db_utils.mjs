@@ -14,17 +14,17 @@ const deleteMany = async (collection_name, ids) => {
   }
   return results
 }
-
 const updateOne = async (collection_name, id, update_dict) => {
-  let collection = await db.collection(collection_name)
-  const filter = { _id: ObjectId.createFromHexString(id) }
+  let collection = await db.collection(collection_name);
+  const filter_id = typeof id == String ? ObjectId.createFromHexString(id) : id;
+  const filter = { _id: filter_id };
   let updateDoc = {
     $set: {
       ...update_dict,
     },
-  }
-  let result = await collection.updateOne(filter, updateDoc)
-  return result
-}
+  };
+  let result = await collection.updateOne(filter, updateDoc);
+  return result;
+};
 
 export { deleteOne, updateOne, deleteMany }

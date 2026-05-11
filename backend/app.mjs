@@ -26,15 +26,20 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
-import { login, create_user, get_deletable_users, delete_user, user_exists } from './views/user.mjs'
+import { get_boats, get_boat_predict, check_gliders_safe } from './views/boats.mjs'
+import { login } from './views/user.mjs'
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
-import { delete_old_tracks, update_glider_positions } from './utils/glider_utils.mjs'
-import db from './db/conn.mjs'
+import {
+  delete_old_tracks,
+  update_glider_positions,
+  subscribe_sfmc_gliders,
+} from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 import { gliders_sse } from './views/sse/gliders.mjs'
+import { update_boats } from './utils/boat_utils.mjs'
 
 const app = express()
 app.use(cors())
@@ -88,30 +93,36 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 // sse
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
+// boats
+app.get('/boats/:end_offset', authenticateToken, get_boats)
+app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
+app.get('/boats/test', check_gliders_safe)
+
 // Schedule
-const backend_schedule = scheduleJob('*/45 * * * * *', async () => {
+const backend_schedule = scheduleJob(`*/${process.env.SCHEDULE_SECS} * * * * *`, async () => {
   await update_glider_positions()
   await update_geofences()
 
   await delete_old_tracks()
+  update_boats()
 })
 
 const ensureAdminUser = async () => {
   try {
     const autoCreateAdmin = process.env.AUTO_CREATE_ADMIN?.toLowerCase() === 'true'
-    
+
     if (!autoCreateAdmin) {
       console.log('Auto admin creation is disabled (AUTO_CREATE_ADMIN=false)')
       return
     }
-    
+
     const collection = await db.collection('users')
     const adminExists = await collection.findOne({ role: 'admin' })
-    
+
     if (!adminExists) {
       const username = process.env.AUTO_CREATE_ADMIN_USERNAME || 'testadmin'
       const password = process.env.AUTO_CREATE_ADMIN_PASSWORD || '123'
-      
+
       console.log('No admin user found. Creating default admin user...')
       const passwordHash = await hashPassword(password)
       await collection.insertOne({
@@ -134,7 +145,7 @@ const ensureAdminUser = async () => {
 // app start
 app.listen(port, async () => {
   await ensureAdminUser()
-  
+
   const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
   if (pause == 'false') {
     for (let i = 0; i < 20; i++) {
@@ -143,6 +154,9 @@ app.listen(port, async () => {
     console.log('pausing for 5 seconds to make sure you want to do this')
     await new Promise((r) => setTimeout(r, 5000))
   }
+
+  subscribe_sfmc_gliders()
+
   console.log(`example app listening on port ${port}`)
   send_slack_message('debug: Backend started and listening')
 })

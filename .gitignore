@@ -31,7 +31,9 @@ coverage
 
 local.json
 uploads/
-
+data/
+*.pyc
+*.tgz
 backend/.env
 *.tgz
 frontend/.env

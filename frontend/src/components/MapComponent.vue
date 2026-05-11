@@ -6,8 +6,10 @@ import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
 import slocum1 from "@/assets/slocum_marker.png";
+import boat from "@/assets/boat.png"
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
+import apiClient from "@/apiClient";
 
 const store = useGeoFencesStore();
 const gliderStore = useGlidersStore();
@@ -29,8 +31,24 @@ const all_glider_markers = ref([])
 const lastClickedFenceKey = ref(null)
 const lastClickTime = ref(0)
 const clickTimeout = ref(null)
-const DOUBLE_CLICK_DELAY = 300 
+const DOUBLE_CLICK_DELAY = 300
 
+
+// The box we have AIS data for
+const ais_border = [[49.725633, -65.114883],
+[48.487933, -61.889883],
+[48.416617, -61.892367],
+[49.332867, -65.130500],
+[49.725633, -65.114883]
+]
+
+const ais_offset_amount = 60
+const boat_slide_time_offset = ref(0)
+const boat_slider_min = ref(0)
+const boat_slider_max = ref(0)
+const boat_predict_lines = ref([])
+const boat_markers = ref([])
+const boats = ref([])
 
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
@@ -40,6 +58,97 @@ const { isAdmin } = storeToRefs(userStore)
 
 
 
+
+
+
+function get_boats() {
+  console.log("Getting boats")
+  apiClient.get(`/boats/${ais_offset_amount}`)
+    .then((res) => {
+      boats.value = res.data
+      if(boats.value.length > 0){
+        const offsets = res.data[0].prediction_range.intervals.map((element) => element.offset)
+
+        boat_slider_max.value = Math.max(...offsets)
+        boat_slider_min.value = Math.min(...offsets)
+      }
+      draw_boats()
+      draw_predict()
+    })
+}
+
+function clear_map_data(ref_arr) {
+  if (ref_arr.value.length) {
+    ref_arr.value.forEach((ele) => {
+      ele.removeFrom(initialMap.value)
+    })
+  }
+  ref_arr.value = []
+}
+
+async function draw_predict() {
+  let temp_array = boat_predict_lines.value
+  boat_predict_lines.value = []
+  for (const boat of boats.value) {
+    let predict_data = undefined
+    if (boat_slide_time_offset.value == 0) {
+      predict_data = boat.prediction
+    } else {
+      predict_data = {
+        cone: boat.prediction.cone,
+        ...boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
+      }
+    }
+    console.log(predict_data)
+    const ghost_line = L.polyline(predict_data.line, { color: "white" }).addTo(initialMap.value)
+    boat_predict_lines.value.push(ghost_line)
+    const predict_cone = L.polyline(predict_data.cone, { color: "green" }).addTo(initialMap.value)
+    boat_predict_lines.value.push(predict_cone)
+    const ghost = L.circle(predict_data.center, { radius: 3 }).addTo(initialMap.value)
+    boat_predict_lines.value.push(ghost)
+  }
+
+  if (temp_array.length) {
+    temp_array.forEach((ele) => {
+      ele.removeFrom(initialMap.value)
+    })
+  }
+
+}
+
+watch(boat_slide_time_offset, () => {
+  draw_predict()
+})
+
+function draw_boats() {
+  clear_map_data(boat_markers)
+  const boat_size = 30
+  let slocum_icon = L.icon({
+    iconUrl: boat,
+    iconSize: [boat_size, boat_size],
+    iconAnchor: [Math.floor(boat_size / 2), Math.floor(boat_size / 2)],
+  })
+  boats.value.forEach((ele) => {
+    const last_location = ele.locations[ele.locations.length - 1]
+    const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: slocum_icon })
+      .addTo(initialMap.value).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${last_location["NAME"]}</b>`)
+    boat_markers.value.push(new_marker)
+  })
+}
+
+// This border is where our old AIS data is within
+function draw_ais_border() {
+  const geo_json = generate_geojson(ais_border)
+  const ais_boder = L.geoJSON(geo_json, {
+    style: function (feature) {
+      return {
+        opacity: 1,
+        color: "blue"
+      }
+    }
+  }).addTo(initialMap.value)
+
+}
 
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
@@ -258,6 +367,9 @@ function update_map() {
   })
   polygons.value = []
   create_polygons()
+
+  get_boats()
+  draw_ais_border()
 }
 
 function glider_has_track(glider) {
@@ -372,13 +484,50 @@ watch(gliders, (new_val) => {
 
 </script>
 <template>
-  <div id="map"></div>
+  <div>
+    <div>
+      <div id="map"></div>
+    </div>
+    <div id="slider">
+      <div class="slider-flex" id="slider-header">
+      <div class="slider-flex" id="slider-lhs">
+          <p>Ship predictor minute offset:</p>
+          <p v-if="boat_slide_time_offset != 0">{{ boat_slide_time_offset }}m</p>
+          <p v-else>Current Time</p>
+      </div>
+      <div id="slider-rhs">
+        <button @click="boat_slide_time_offset = 0" id="current-time-btn" class="border">Set to current time</button>
+      </div>
+      </div>
+      <input style="width: 100%;" type="range" :min="boat_slider_min" :max="boat_slider_max" v-model="boat_slide_time_offset">
+    </div>
+  </div>
 </template>
 
 <style scoped>
 #map {
   width: 500px;
   height: 614px;
-  /* height: 300px; */
+}
+#current-time-btn {
+  padding: .1rem;
+}
+#current-time-btn:hover {
+ border-color: var(--color-border-hover);
+}
+#slider-lhs {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+#slider {
+margin-top: .2rem;
+}
+.slider-flex {
+  display: flex;
+  justify-content: space-between;
+
+}
+#slider-header p{
+  margin-right: .5rem;
 }
 </style>
