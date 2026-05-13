@@ -4,7 +4,6 @@ import { updateOne } from '../utils/db_utils.mjs'
 import { deleteGliderCascade } from '../utils/cascade_delete.mjs'
 import {
   get_active_deployment_details,
-  get_active_deployment_details,
   get_available_scripts,
   get_glider_details,
 } from '../utils/sfmc_api.mjs'
