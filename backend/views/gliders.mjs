@@ -3,10 +3,10 @@ import db from '../db/conn.mjs'
 import { updateOne } from '../utils/db_utils.mjs'
 import { deleteGliderCascade } from '../utils/cascade_delete.mjs'
 import {
-  get_active_deployment_details,
   get_available_scripts,
   get_glider_details,
 } from '../utils/sfmc_api.mjs'
+import { subscribe_sfmc_glider } from '../utils/glider_utils.mjs'
 
 const get_gliders = async (req, res) => {
   let collection = await db.collection('gliders')
@@ -24,6 +24,10 @@ const post_gliders = async (req, res) => {
   }
   const sfmc_json = await get_glider_details(glider_name)
   console.log(sfmc_json)
+  if (!sfmc_json || !sfmc_json.id) {
+    res.status(404).send({ error: `Glider not found in SFMC: ${glider_name}` })
+    return
+  }
   const new_doc = {
     name: glider_name,
     sfmc_id: sfmc_json.id,
@@ -31,6 +35,13 @@ const post_gliders = async (req, res) => {
     enabled: false,
   }
   let result = await collection.insertOne(new_doc)
+  // subscribe to SFMC events for this new glider so it receives connections/dialogs
+  try {
+    await subscribe_sfmc_glider(glider_name)
+  } catch (err) {
+    console.log('Failed to auto-subscribe new glider: ' + glider_name)
+    console.log(err)
+  }
   res.send(result).status(200)
 }
 

@@ -4,6 +4,7 @@ import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
+
 import {
   get_gliders,
   get_scripts,
@@ -31,6 +32,7 @@ import { login, create_user, get_deletable_users, delete_user, user_exists } fro
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
+import db from './db/conn.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 import {
   delete_old_tracks,
@@ -94,17 +96,18 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
 // boats
-app.get('/boats/:end_offset', authenticateToken, get_boats)
-app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
-app.get('/boats/test', check_gliders_safe)
+// app.get('/boats/:end_offset', authenticateToken, get_boats)
+// app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
+// app.get('/boats/test', check_gliders_safe)
 
 // Schedule
-const backend_schedule = scheduleJob(`*/${process.env.SCHEDULE_SECS} * * * * *`, async () => {
+const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
+const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
   await update_glider_positions()
   await update_geofences()
 
   await delete_old_tracks()
-  update_boats()
+  // update_boats()
 })
 
 const ensureAdminUser = async () => {

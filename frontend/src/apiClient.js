@@ -20,10 +20,12 @@ const apiClient = axios.create({
 let eventSource
 
 export const createEventSource = () => {
+  if (eventSource) return eventSource
   eventSource = new EventSource(`${generate_base_url()}/sse?token=${getToken()}`)
+  return eventSource
 }
 
-export const getEvenSource = () => eventSource
+export const getEvenSource = () => eventSource ?? createEventSource()
 
 export const getToken = () => localStorage.getItem('GFAC_token')
 

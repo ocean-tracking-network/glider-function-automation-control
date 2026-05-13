@@ -15,7 +15,7 @@ RUN --mount=type=bind,source=./backend/package.json,target=package.json \
     --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev
 
-run mkdir uploads && \
+RUN mkdir uploads && \
     chown node:node uploads
 
 USER node

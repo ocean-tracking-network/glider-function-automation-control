@@ -93,9 +93,11 @@ async function update_glider_position(glider, collection = undefined) {
 }
 
 async function update_glider_positions() {
-  // for (let glider of gliders) {
-  //   update_glider_position(glider)
-  // }
+  const collection = await db.collection('gliders')
+  const gliders = await collection.find({}).toArray()
+  for (let glider of gliders) {
+    update_glider_position(glider, collection)
+  }
 }
 
 function dialog_callback(dialog_event) {
@@ -120,14 +122,38 @@ async function connection_callback(connection_event) {
   }
 }
 
-function subscribe_sfmc_gliders() {
-  const gliders = ['otn200']
-  // const gliders = ["adam", "otn200"]
-  for (let glider of gliders) {
-    console.log('subbing glider: ' + glider)
-    subscribe_for_glider_connection(glider, connection_callback)
-    subscribe_for_glider_dialog(glider, dialog_callback)
+// keep track of subscriptions to avoid duplicates when called multiple times
+const _subscribed_gliders = new Set()
+
+async function subscribe_sfmc_glider(gliderName) {
+  if (!gliderName) return
+  if (_subscribed_gliders.has(gliderName)) {
+    console.log(`Already subscribed to glider: ${gliderName}`)
+    return
+  }
+  try {
+    console.log('subbing glider: ' + gliderName)
+    subscribe_for_glider_connection(gliderName, connection_callback)
+    subscribe_for_glider_dialog(gliderName, dialog_callback)
+    _subscribed_gliders.add(gliderName)
     console.log('done')
+  } catch (err) {
+    console.log('Failed to subscribe to glider: ' + gliderName)
+    console.log(err)
+  }
+}
+
+async function subscribe_sfmc_gliders() {
+  try {
+    const collection = await db.collection('gliders')
+    const docs = await collection.find({}).toArray()
+    const gliders = docs.map((g) => g.name).filter(Boolean)
+    for (let glider of gliders) {
+      await subscribe_sfmc_glider(glider)
+    }
+  } catch (err) {
+    console.log('Error fetching gliders for subscription')
+    console.log(err)
   }
 }
 
@@ -136,4 +162,5 @@ export {
   update_glider_waypoint,
   delete_old_tracks,
   subscribe_sfmc_gliders,
+  subscribe_sfmc_glider,
 }
