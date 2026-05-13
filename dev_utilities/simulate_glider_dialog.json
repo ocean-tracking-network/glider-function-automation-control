@@ -1,0 +1,4677 @@
+[
+    {
+        "_id": {
+            "$oid": "69b976a79f27aa9d8d852b77"
+        },
+        "date": {
+            "$date": "2026-03-17T15:43:35.817Z"
+        },
+        "message": "Glider Connection",
+        "level": "info",
+        "glider": {
+            "$oid": "69b861b28dbae62c82aec88f"
+        },
+        "glider_connection": {
+            "id": 83640,
+            "gliderId": 4,
+            "gliderDeploymentId": 300,
+            "active": false,
+            "endDateTime": "2026-03-17 15:48:57",
+            "startDateTime": "2026-03-17 15:43:35",
+            "logFilePath": "otn200_20260317T154335_network_net_0.log",
+            "type": "network",
+            "portId": 2,
+            "portName": "net/0"
+        },
+        "surface_dialog": [
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Connection Event: Carrier Detect found.432667    Iridium console active and ready...\r\nVehicle Name: otn200\r\nCurr Time: Tue Mar 17 15:43:24 2026 MT:  432662\r\nDR  Locati",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456994,
+                "time": {
+                    "$date": "2026-03-17T15:43:35.886Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "on:  4341.441 N -6237.055 E measured     47.858 secs ago\r\nGPS TooFar:   69696969.000 N 69696969.000 E measured     1e+308 secs a",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456995,
+                "time": {
+                    "$date": "2026-03-17T15:43:35.895Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "g",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456996,
+                "time": {
+                    "$date": "2026-03-17T15:43:35.918Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "o\r\nGPS Invalid :  4340.010 N -6235.744 E measured    142.198 secs ago\r\nGPS Location:  4341.441 N -6237.055 E measured     48.34",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456997,
+                "time": {
+                    "$date": "2026-03-17T15:43:35.941Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "3 secs ago\r\n   sensor:c_autoballast_state(enum)=2              1e+308 secs ago\r\n   sensor:c_climb_bpump(X)=195                  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456998,
+                "time": {
+                    "$date": "2026-03-17T15:43:35.963Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "   1e+308 secs ago\r\n   sensor:c_dive_bpump(X)=-405                     1e+308 secs ago\r\n   sensor:c_wpt_lat(lat)=4341.148       ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 456999,
+                "time": {
+                    "$date": "2026-03-17T15:43:36.692Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "          85483.8 secs ago\r\n   sensor:c_wpt_lon(lon)=-6241.34                 85483.9 secs ago\r\n   sensor:m_battery(volts)=14.72",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457000,
+                "time": {
+                    "$date": "2026-03-17T15:43:36.711Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "95932855132        17.609 secs ago\r\n   sensor:m_coulomb_amphr(amp-hrs)=202.209869384766       8.53 secs ago\r\n   sensor:m_coulomb",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457001,
+                "time": {
+                    "$date": "2026-03-17T15:43:36.732Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "_",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457002,
+                "time": {
+                    "$date": "2026-03-17T15:43:36.756Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "amphr_total(amp-hrs)=405.226425441853      8.552 secs ago\r\n   sensor:m_digifin_leakdetect_reading(nodim)=1023      0.794 secs a",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457003,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.501Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "g",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457004,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.523Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "o\r\n   sensor:m_final_water_vx(m/s)=0.0204541309750025    21386.2 secs ago\r\n   sensor:m_final_water_vy(m/s)=0.0676382785766896  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457005,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.543Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "  21386.2 secs ago\r\n   sensor:m_iridium_call_num(nodim)=1724            0.849 secs ago\r\n   sensor:m_iridium_signal_strength(nodi",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457006,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.567Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "m)=5       13.607 secs ago\r\n   sensor:m_leakdetect_voltage(volts)=2.5          54.914 secs ago\r\n   sensor:m_leakdetect_voltage_f",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457007,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.590Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "orward(volts)=2.49996947496947     54.933 secs ago\r\n   sensor:m_lithium_battery_relative_charge(%)=49.3466968197684      8.913 s",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457008,
+                "time": {
+                    "$date": "2026-03-17T15:43:37.609Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ecs ago\r\n   sensor:m_tot_num_inflections(nodim)=7929       186.009 secs ago\r\n   sensor:m_vacuum(inHg)=9.8862967032967           ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457009,
+                "time": {
+                    "$date": "2026-03-17T15:43:38.315Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "69.342 secs ago\r\n   sensor:m_water_vx(m/s)=0.133896335983714       114.229 secs ago\r\n   sensor:m_water_vy(m/s)=-0.02147727808129",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457010,
+                "time": {
+                    "$date": "2026-03-17T15:43:38.337Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "85      114.27 secs ago\r\n   sensor:u_alt_min_depth(m)=2                     1e+308 secs ago\r\n   sensor:u_alt_reduced_usage_mode(",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457011,
+                "time": {
+                    "$date": "2026-03-17T15:43:38.358Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "b",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457012,
+                "time": {
+                    "$date": "2026-03-17T15:43:38.385Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ool)=1         1e+308 secs ago\r\n   sensor:u_use_current_correction(nodim)=0        1e+308 secs ago\r\n   sensor:x_critical_abort_active(int)=0  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457013,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.130Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "         1e+308 secs ago\r\n   sensor:x_last_wpt_lat(lat)=4328.6833            107",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457014,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.153Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "989 secs ago\r\n   sensor:x_last_wp",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457015,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.177Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "t_lon(lon)=-6227.0572           107989 secs ago\r\nABORT HISTORY: ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457016,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.944Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "total since reset: 1\r\nABORT HIST",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457017,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.963Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ORY: last abort ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457018,
+                "time": {
+                    "$date": "2026-03-17T15:43:39.988Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "cause: MS_ABORT_",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457019,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.008Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "OVERDEPTH\r\nABORT",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457020,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.032Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " HISTORY: last a",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457021,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.052Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "bort details: \r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457022,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.075Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ABORT HISTORY: last abort time: ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457023,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.096Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "2026-03-04T04:57:",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457024,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.119Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "54\r\nABORT HISTORY: l",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457025,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.139Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ast abort segment",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457026,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.766Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ": otn200-2026-05",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457027,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.787Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "5-0-58 (0110.005",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457028,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.809Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "8)\r\nABORT HISTOR",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457029,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.831Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Y: last abort mission: 200HFX01.",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457030,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.853Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "MI\r\n432668    No",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457031,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.875Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " login script fou",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457032,
+                "time": {
+                    "$date": "2026-03-17T15:43:40.900Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "nd for processin",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457033,
+                "time": {
+                    "$date": "2026-03-17T15:43:41.567Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "g.\r\n432668    DRIVER_ODDITY:iridium:1826:xxx_ctr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457034,
+                "time": {
+                    "$date": "2026-03-17T15:43:41.586Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "l",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457035,
+                "time": {
+                    "$date": "2026-03-17T15:43:41.608Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "() ran too long\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457036,
+                "time": {
+                    "$date": "2026-03-17T15:43:41.631Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457037,
+                "time": {
+                    "$date": "2026-03-17T15:43:43.986Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\n\r\n\r\n\r\nGlider o",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457038,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.006Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "tn200 at surface.\r\nBecause:timeo",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457039,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.030Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ut expired [beha",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457040,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.050Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "vior surface_6 st",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457041,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.797Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "art_when = 9.0]",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457042,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.818Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\nMissionName:200HFX01.MI Mission",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457043,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.841Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Num:otn200-2026-070-0-38 (0116.0",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457044,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.863Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "038)\r\nVehicle Na",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457045,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.884Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "me: otn200\r\nCurr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457046,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.906Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " Time: Tue Mar 1",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457047,
+                "time": {
+                    "$date": "2026-03-17T15:43:44.929Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "7 15:43:42 2026 ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457048,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.615Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "M",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457049,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.637Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "T:  432684\r\nDR  Location:  4341",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457050,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.659Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".441 N -6237.055",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457051,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.680Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " E measured     ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457052,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.702Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " 66.13 secs ago\r\nGPS TooFar:   6",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457053,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.726Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "9696969.000 N 696",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457054,
+                "time": {
+                    "$date": "2026-03-17T15:43:45.747Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "96969.000 E meas",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457055,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.434Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ured     1e+308 secs ago\r\nGPS In",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457056,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.455Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "valid :  4340.01",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457057,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.478Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "0 N -6235.744 E ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457058,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.499Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "measured    160.471 secs ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457059,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.522Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ago\r\nGPS Location:  4341.441 N -",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457060,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.543Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "6237.055 E measu",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457061,
+                "time": {
+                    "$date": "2026-03-17T15:43:46.567Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "red     66.616 s",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457062,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.252Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ecs ago\r\n   sens",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457063,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.274Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "or:c_autoballast_state(enum)=2  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457064,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.294Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457065,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.317Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "           1e+3",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457066,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.339Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "08 secs ago\r\n   sensor:c_climb_b",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457067,
+                "time": {
+                    "$date": "2026-03-17T15:43:47.359Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "pump(X)=195     ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457068,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.068Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "                1e+",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457069,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.090Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "308 secs ago\r\n   sensor:c_dive_b",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457070,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.111Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "pump(X)=-405    ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457071,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.133Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "                ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457072,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.155Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " 1e+308 secs ago",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457073,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.177Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\n   sensor:c_wpt_lat(lat)=4341.",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457074,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.197Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "1",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457075,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.866Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "48                   85502 secs",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457076,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.887Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " ago\r\n   sensor:",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457077,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.909Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "c_wpt_lon(lon)=-",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457078,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.931Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "6241.34         ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457079,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.953Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "          85502 secs ago\r\n   sens",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457080,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.976Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "or:m_battery(vol",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457081,
+                "time": {
+                    "$date": "2026-03-17T15:43:48.998Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ts)=14.729593285",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457082,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.685Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "5132        35.725 secs ago\r\n   ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457083,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.706Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "sensor:m_coulomb",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457084,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.727Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "_amphr(amp-hrs)=",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457085,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.749Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "202.21223449707 ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457086,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.771Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "     4.288 secs ago",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457087,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.794Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\n   sen",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457088,
+                "time": {
+                    "$date": "2026-03-17T15:43:49.814Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "sor:m_cou",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457089,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.502Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "lomb_amphr_total(amp-hrs)=405.228",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457090,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.525Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "790554157       ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457091,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.546Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " 4.3 secs ago\r\n ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457092,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.568Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "  sensor:m_digif",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457093,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.588Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "in_leakdetect_reading(nodim)=102",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457094,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.611Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "2      9.066 sec",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457095,
+                "time": {
+                    "$date": "2026-03-17T15:43:50.630Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s ago\r\n   sensor",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457096,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.321Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ":m_final_water_vx(m/s)=0.0204541",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457097,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.341Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "309750025    214",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457098,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.363Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "04.3 secs ago\r\n ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457099,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.384Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "  sensor:m_final",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457100,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.408Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "_water_vy(m/s)=0.0676382785766896",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457101,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.429Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "    21404.3 secs ago\r\n   sensor:",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457102,
+                "time": {
+                    "$date": "2026-03-17T15:43:51.452Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "m_iridium_call_n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457103,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.137Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "um(nodim)=1724           18.912 ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457104,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.160Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "secs ago\r\n   sen",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457105,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.182Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457106,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.206Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "or:m_iridium_signal_strength(no",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457107,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.231Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "dim)=5       31.",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457108,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.249Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "661 secs ago\r\n  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457109,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.272Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " sensor:m_leakde",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457110,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.961Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "tect_voltage(volts)=2.5          ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457111,
+                "time": {
+                    "$date": "2026-03-17T15:43:52.983Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " 8.903 secs ago\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457112,
+                "time": {
+                    "$date": "2026-03-17T15:43:53.005Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\n   sensor:m_lea",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457113,
+                "time": {
+                    "$date": "2026-03-17T15:43:53.029Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "kdetect_voltage_",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457114,
+                "time": {
+                    "$date": "2026-03-17T15:43:53.049Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "forward(volts)=2.5      8.911 se",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457115,
+                "time": {
+                    "$date": "2026-03-17T15:43:53.071Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "cs ago\r\n   senso",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457116,
+                "time": {
+                    "$date": "2026-03-17T15:43:53.095Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457117,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.200Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ":m_lithium_batt",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457118,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.221Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457119,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.244Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ry_relative_charge(%)=49.3464011807303      4.581 secs ago\r\n   sensor:m_tot_num_inflections(nodim)=7929       204.014 secs ago\r\n   sensor:m_vacuum(inHg)=9.8862967032967    ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457120,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.266Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "        87.33 secs ago\r\n   sensor:m_water_vx(m/s)=0.133896335983714       132.207 secs ago\r\n   sensor:m_water_vy(m/s)=-0.0214772",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457121,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.289Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "780812985     132.239 secs ago\r\n   sensor:u_alt_min_depth(m)=2                     1e+308 secs ago\r\n   sensor:u_alt_reduced_usage_mode(bool)=1         1e+",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457122,
+                "time": {
+                    "$date": "2026-03-17T15:43:56.994Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "308 secs ago\r\n  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457123,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.017Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " sensor:u_use_current_correction(nodim)=0        1e+308 secs ago\r\n   sensor:x_cri",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457124,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.038Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "tical_abort_active(int)=0       ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457125,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.063Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "    1e+308 secs ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457126,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.085Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ago\r\n   sensor:x_",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457127,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.108Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "last_wpt_lat(la",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457128,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.133Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "t)=4328.6833            108007 s",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457129,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.817Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ecs ago\r\n   sens",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457130,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.839Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "or:x_last_wpt_lo",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457131,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.862Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "n(lon)=-6227.0572",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457132,
+                "time": {
+                    "$date": "2026-03-17T15:43:57.883Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "           108007 secs ago\r\ndevi",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457133,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.632Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ces:(t/m/s) errs",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457134,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.655Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ":   2/   0/   0 warn: 124/  14/   0 odd:1619/ 11",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457135,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.677Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "0",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457136,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.700Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "/   4\r\nABORT HI",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457137,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.721Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "STORY: total sin",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457138,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.744Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ce reset: 1\r\nABO",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457139,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.765Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "RT HISTORY: last abort cause: MS",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457140,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.786Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "_ABORT_OVERDEPTH",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457141,
+                "time": {
+                    "$date": "2026-03-17T15:43:58.808Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\nABORT HISTORY:",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457142,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.456Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " last abort details: \r\nABORT HISTORY: last abort time",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457143,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.479Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ": 2026-03-0",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457144,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.498Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4T04:57:54\r\nABOR",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457145,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.520Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "T HISTORY: last abort segment: otn200-2026-055-0",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457146,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.543Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "-",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457147,
+                "time": {
+                    "$date": "2026-03-17T15:43:59.566Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "58 (0110.0058)\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457148,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.273Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nABORT HISTORY: ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457149,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.296Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "last abort mission: 200HFX01.MI\r\n\r\n   Hit Contro",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457150,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.317Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "l-R to RESUME th",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457151,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.339Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e mission, i.e. ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457152,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.360Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "dive!\r\n   Hit Control-C to END    the mission, i.",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457153,
+                "time": {
+                    "$date": "2026-03-17T15:44:00.381Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e. GliderDos\r\n  ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457154,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.087Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " Hit Control-E t",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457155,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.111Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "o extend surface time by 5 minut",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457156,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.133Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "es.\r\n   Hit Cont",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457157,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.154Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "rol-W to get dev",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457158,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.176Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ice warning reports.\r\n   Hit Con",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457159,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.211Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "trol-F to re-read yo, goto_l, su",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457160,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.937Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "rface, sample, d",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457161,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.958Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "rift_ mafiles.\r\n   Hit H <n> <0:1",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457162,
+                "time": {
+                    "$date": "2026-03-17T15:44:01.982Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "> to Hangup and ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457163,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.002Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "call back in <n> minutes at 0-pr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457164,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.025Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "imary 1-alternat",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457165,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.753Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e number.\r\n   Hit S [-f={rf}|{ir",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457166,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.773Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "i",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457167,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.796Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "d] [-num=<n>] [-t=<s>] [filespe",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457168,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.818Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "c ...] to send log files\r\n   Hit",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457169,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.842Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " ! <GliderDos cm",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457170,
+                "time": {
+                    "$date": "2026-03-17T15:44:02.863Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "d>  to execute <GliderDos cmd>\r\n ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457171,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.576Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "  Hit Control-T to consci to sci",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457172,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.598Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ence computer wh",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457173,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.622Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "en comms ready:\r\n               ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457174,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.643Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "                ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457175,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.665Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "                ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457176,
+                "time": {
+                    "$date": "2026-03-17T15:44:03.687Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "... communications ready for con",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457177,
+                "time": {
+                    "$date": "2026-03-17T15:44:04.394Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "sci.\r\n\r\nWater Ve",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457178,
+                "time": {
+                    "$date": "2026-03-17T15:44:04.414Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "locity Calculati",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457179,
+                "time": {
+                    "$date": "2026-03-17T15:44:04.438Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ons waiting for ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457180,
+                "time": {
+                    "$date": "2026-03-17T15:44:04.458Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "final gps fix(ideally -62 secs)\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457181,
+                "time": {
+                    "$date": "2026-03-17T15:44:04.482Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Waypoint: (4341.1480,-6241.3400)",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457182,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.206Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " Range: 5781m, B",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457183,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.228Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "earing: 282deg, Age: 30:0h:m\r\nTi",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457184,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.250Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "m",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457185,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.273Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e until diving is: 230 secs\r\ns ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457186,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.296Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "*.sbd *",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457187,
+                "time": {
+                    "$date": "2026-03-17T15:44:05.317Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457188,
+                "time": {
+                    "$date": "2026-03-17T15:44:06.021Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "tbd\r\n\r\n--------------------------",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457189,
+                "time": {
+                    "$date": "2026-03-17T15:44:06.044Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "------\r\n432707 5",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457190,
+                "time": {
+                    "$date": "2026-03-17T15:44:06.067Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "1 01160038.mlg LOG FILE CLOSED\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457191,
+                "time": {
+                    "$date": "2026-03-17T15:44:06.088Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "S",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457192,
+                "time": {
+                    "$date": "2026-03-17T15:44:10.029Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "CIENCE DATA LOGGING: science IS",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457193,
+                "time": {
+                    "$date": "2026-03-17T15:44:10.050Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " running\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457194,
+                "time": {
+                    "$date": "2026-03-17T15:44:10.072Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "C",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457195,
+                "time": {
+                    "$date": "2026-03-17T15:44:14.033Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ONSCI REQUESTED (using IRIDIUM ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457196,
+                "time": {
+                    "$date": "2026-03-17T15:44:14.054Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "as console)\r\nASKING SCIENCE COMP",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457197,
+                "time": {
+                    "$date": "2026-03-17T15:44:14.075Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "UTER TO SWITCH T",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457198,
+                "time": {
+                    "$date": "2026-03-17T15:44:17.232Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "O COMMAND MODE v",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457199,
+                "time": {
+                    "$date": "2026-03-17T15:44:17.253Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "i",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457200,
+                "time": {
+                    "$date": "2026-03-17T15:44:19.650Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "a IRIDIUM\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457201,
+                "time": {
+                    "$date": "2026-03-17T15:44:19.672Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "SWITCHING TO SCIENCE COMMAND MODE over IRIDIUM\r\nNormal operation resumes when:\r\n    SciDos> QUIT              -or-\r\n    Lose CD (unplug freewave/hangup",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457202,
+                "time": {
+                    "$date": "2026-03-17T15:44:19.696Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " iridium) -or-\r\n    run longer than U_SCI_CMD_MAX_CONSCI_TIME(3600)s\r\n432716 55 Neutering the Freewave Console\r\nSCI: Implicitly ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457203,
+                "time": {
+                    "$date": "2026-03-17T15:44:20.463Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "l",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457204,
+                "time": {
+                    "$date": "2026-03-17T15:44:20.484Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "imiting total transfer to 1800 secs, representing 180 KB total size\r\n01160038.nlg LOG FILE CLOSED\r\nSCI: Enumerating and selecting files\r\nSCI: About to send 2 files\r\nPrechecking",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457205,
+                "time": {
+                    "$date": "2026-03-17T15:44:20.506Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " is not necessary for this invocation\r\nSTART\r\n**B00000000000000\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457206,
+                "time": {
+                    "$date": "2026-03-17T15:44:20.528Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nStarting zModem transfer of 01160038.tbd to/from otn200 size is 17832",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457207,
+                "time": {
+                    "$date": "2026-03-17T15:44:28.467Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 1024",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457208,
+                "time": {
+                    "$date": "2026-03-17T15:44:38.879Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 2048",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457209,
+                "time": {
+                    "$date": "2026-03-17T15:44:45.269Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 3072",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457210,
+                "time": {
+                    "$date": "2026-03-17T15:44:56.486Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 4096",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457211,
+                "time": {
+                    "$date": "2026-03-17T15:45:01.292Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 5120",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457212,
+                "time": {
+                    "$date": "2026-03-17T15:45:06.093Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 6144",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457213,
+                "time": {
+                    "$date": "2026-03-17T15:45:12.505Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 7168",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457214,
+                "time": {
+                    "$date": "2026-03-17T15:45:18.896Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 8192",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457215,
+                "time": {
+                    "$date": "2026-03-17T15:45:24.507Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 9216",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457216,
+                "time": {
+                    "$date": "2026-03-17T15:45:33.311Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 10240",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457217,
+                "time": {
+                    "$date": "2026-03-17T15:45:38.919Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 11264",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457218,
+                "time": {
+                    "$date": "2026-03-17T15:45:44.527Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 12288",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457219,
+                "time": {
+                    "$date": "2026-03-17T15:45:53.333Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 13312",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457220,
+                "time": {
+                    "$date": "2026-03-17T15:45:57.332Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 13395",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457221,
+                "time": {
+                    "$date": "2026-03-17T15:46:27.733Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 14336",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457222,
+                "time": {
+                    "$date": "2026-03-17T15:46:35.732Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 15360",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457223,
+                "time": {
+                    "$date": "2026-03-17T15:46:44.535Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 16384",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457224,
+                "time": {
+                    "$date": "2026-03-17T15:46:50.947Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 17408",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457225,
+                "time": {
+                    "$date": "2026-03-17T15:46:57.359Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 17832",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457226,
+                "time": {
+                    "$date": "2026-03-17T15:46:59.753Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nzModem transfer DONE for file 01160038.tbd\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457227,
+                "time": {
+                    "$date": "2026-03-17T15:46:59.774Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nStarting zModem transfer of 01160037.tbd to/from otn200 size is 5116",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457228,
+                "time": {
+                    "$date": "2026-03-17T15:47:02.950Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 1024",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457229,
+                "time": {
+                    "$date": "2026-03-17T15:47:11.757Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 2048",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457230,
+                "time": {
+                    "$date": "2026-03-17T15:47:17.366Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 3072",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457231,
+                "time": {
+                    "$date": "2026-03-17T15:47:23.776Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 4096",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457232,
+                "time": {
+                    "$date": "2026-03-17T15:47:30.168Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 5116",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457233,
+                "time": {
+                    "$date": "2026-03-17T15:47:36.580Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nzModem transfer DONE for file 01160037.tbd\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457234,
+                "time": {
+                    "$date": "2026-03-17T15:47:36.600Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\nSHUFFLING FILES.",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457235,
+                "time": {
+                    "$date": "2026-03-17T15:47:42.191Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".\r\nSCI: Sent 2 f",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457236,
+                "time": {
+                    "$date": "2026-03-17T15:47:42.999Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ile(s):\r\nc:\\logs\\01160038.TBD  c:",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457237,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.020Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\\logs\\01160037.TBD\r\nSCI: SUCCESS",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457238,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.042Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\nreport_heap_si",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457239,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.063Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "z",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457240,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.086Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "e(): SCI_M_FREE_HEAP=555.0K,  S",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457241,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.106Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "CI_M_SPARE_HEAP=555.0K\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457242,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.812Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "M",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457243,
+                "time": {
+                    "$date": "2026-03-17T15:47:43.836Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "egabytes used      on CF file s",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457244,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.622Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ystem = 261.937500\r\nMegabytes av",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457245,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.642Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ailable on CF file system = 1738",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457246,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.665Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".500000\r\nRunning",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457247,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.689Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " algorithm to fr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457248,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.710Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ee disk space if",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457249,
+                "time": {
+                    "$date": "2026-03-17T15:47:44.733Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " required\r\nNot necessary to dele",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457250,
+                "time": {
+                    "$date": "2026-03-17T15:47:45.439Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "te any files at this time\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457251,
+                "time": {
+                    "$date": "2026-03-17T15:47:45.459Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "initiate_open_he",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457252,
+                "time": {
+                    "$date": "2026-03-17T15:47:50.248Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "lper(): ERROR on 01160038.tbd fr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457253,
+                "time": {
+                    "$date": "2026-03-17T15:47:50.269Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "om fopen(): Unkn",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457254,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.034Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "own Error (17)\r\nr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457255,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.061Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "eport_heap_size(): SCI_M_FREE_H",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457256,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.078Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "EAP=555.0K,  SCI_M_SPARE_HEAP=55",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457257,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.100Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "5",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457258,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.122Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".0K\r\nSCI: SCI ERROR resuming",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457259,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.850Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " logging on science\r\n432932  6 F",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457260,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.870Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "reewave console restored\r\nREVERT",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457261,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.895Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ING FROM SCIENCE",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457262,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.917Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " COMMAND MODE\r\nS",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457263,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.937Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "CIENCE COMMAND M",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457264,
+                "time": {
+                    "$date": "2026-03-17T15:47:51.960Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ODE TERMINATED because:\r\n   Scie",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457265,
+                "time": {
+                    "$date": "2026-03-17T15:47:52.666Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "nce Program QUIT (cts lowered)\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457266,
+                "time": {
+                    "$date": "2026-03-17T15:47:52.686Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "G",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457267,
+                "time": {
+                    "$date": "2026-03-17T15:47:54.277Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "LD: Enumerating and selecting f",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457268,
+                "time": {
+                    "$date": "2026-03-17T15:47:54.298Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "iles\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457269,
+                "time": {
+                    "$date": "2026-03-17T15:47:54.321Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "G",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457270,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.086Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "LD: About to send 2 files\r\nPrec",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457271,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.109Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "hecking is not necessary for thi",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457272,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.903Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s invocation\r\n432",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457273,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.923Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "936    save_and_change_sensors(",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457274,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.945Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ")....\r\n          Changed u_use_c",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457275,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.967Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "td_depth_for_fly",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457276,
+                "time": {
+                    "$date": "2026-03-17T15:47:55.989Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ing from 0 to 0\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457277,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.697Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\n          Changed c_sci",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457278,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.717Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ence_on from 1 to 0\r\n432936 ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457279,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.740Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "   save_and_chan",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457280,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.763Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ge_sensors()....",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457281,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.783Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\n          Changed c_science_pr",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457282,
+                "time": {
+                    "$date": "2026-03-17T15:47:56.806Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "intout from 0 to 0\r\nWaiting for ",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457283,
+                "time": {
+                    "$date": "2026-03-17T15:47:57.513Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "motors idle\r\n",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457284,
+                "time": {
+                    "$date": "2026-03-17T15:47:57.531Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "S",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457285,
+                "time": {
+                    "$date": "2026-03-17T15:47:59.123Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "TART\r\n**B00000000000000\r",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457286,
+                "time": {
+                    "$date": "2026-03-17T15:47:59.928Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nStarting zModem transfer of 01160038.sbd to/from otn200 size is 25866",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457287,
+                "time": {
+                    "$date": "2026-03-17T15:48:01.539Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 1024",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457288,
+                "time": {
+                    "$date": "2026-03-17T15:48:09.539Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 2048",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457289,
+                "time": {
+                    "$date": "2026-03-17T15:48:15.932Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 3072",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457290,
+                "time": {
+                    "$date": "2026-03-17T15:48:22.345Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 4096",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457291,
+                "time": {
+                    "$date": "2026-03-17T15:48:28.755Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 5120",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457292,
+                "time": {
+                    "$date": "2026-03-17T15:48:35.148Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 6144",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457293,
+                "time": {
+                    "$date": "2026-03-17T15:48:41.559Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\nTotal Bytes sent/received: 6504",
+                "logFileName": "otn200_20260317T154335_network_net_0.log",
+                "sequenceNumber": 457294,
+                "time": {
+                    "$date": "2026-03-17T15:48:58.360Z"
+                }
+            }
+        ]
+    },
+    {
+        "_id": {
+            "$oid": "69b976a79f27aa9d8d852b78"
+        },
+        "date": {
+            "$date": "2026-03-17T15:43:35.871Z"
+        },
+        "message": "otn200 as a new GPS position",
+        "level": "info",
+        "glider": {
+            "$oid": "69b861b28dbae62c82aec88f"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "69b978609f27aa9d8d852b79"
+        },
+        "date": {
+            "$date": "2026-03-17T15:50:56.892Z"
+        },
+        "message": "Glider Connection",
+        "level": "info",
+        "glider": {
+            "$oid": "69b861b28dbae62c82aec88f"
+        },
+        "glider_connection": {
+            "id": 83641,
+            "gliderId": 4,
+            "gliderDeploymentId": 300,
+            "active": false,
+            "endDateTime": "2026-03-17 15:52:26",
+            "startDateTime": "2026-03-17 15:50:56",
+            "logFilePath": "otn200_20260317T155056_network_net_0.log",
+            "type": "network",
+            "portId": 2,
+            "portName": "net/0"
+        },
+        "surface_dialog": [
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "3 secs ago\r\n   sensor:c_autoballast_state(enum)=2              1e+308 secs ago\r\n   sensor:c_climb_bpump(X)=195                  ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457298,
+                "time": {
+                    "$date": "2026-03-17T15:50:57.595Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "   1e+308 secs ago\r\n   sensor:c_dive_bpump(X)=-405                     1e+308 secs ago\r\n   sensor:c_wpt_lat(lat)=4341.148       ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457299,
+                "time": {
+                    "$date": "2026-03-17T15:50:57.616Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "          85922.2 secs ago\r\n   sensor:c_wpt_lon(lon)=-6241.34                 85922.2 secs ago\r\n   sensor:m_battery(volts)=14.72",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457300,
+                "time": {
+                    "$date": "2026-03-17T15:50:57.640Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "95932855132        455.95 secs ago\r\n   sensor:m_coulomb_amphr(amp-hrs)=202.255981445312      4.409 secs ago\r\n   sensor:m_coulomb",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457301,
+                "time": {
+                    "$date": "2026-03-17T15:50:57.662Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "_amphr_total(amp-hrs)=405.2725375024      4.423 secs ago\r\n   sensor:m_digifin_leakdetect_reading(nodim)=1023       4.53 secs ago",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457302,
+                "time": {
+                    "$date": "2026-03-17T15:50:58.389Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457303,
+                "time": {
+                    "$date": "2026-03-17T15:50:58.411Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\n   sensor:m_final_water_vx(m/s)=0.0204541309750025    21824.5 secs ago\r\n   sensor:m_final_water_vy(m/s)=0.0676382785766896    ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457304,
+                "time": {
+                    "$date": "2026-03-17T15:50:58.432Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "21824.5 secs ago\r\n   sensor:m_iridium_call_num(nodim)=1725            0.629 secs ago\r\n   sensor:m_iridium_signal_strength(nodim)",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457305,
+                "time": {
+                    "$date": "2026-03-17T15:50:58.454Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "=",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457306,
+                "time": {
+                    "$date": "2026-03-17T15:50:58.476Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4       11.956 secs ago\r\n   sensor:m_leakdetect_voltage(volts)=2.5         429.126 secs ago\r\n   sensor:m_leakdetect_voltage_for",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457307,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.201Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ward(volts)=2.5    429.135 secs ago\r\n   sensor:m_lithium_battery_relative_charge(%)=49.3409328122001        4.7 secs ago\r\n   sen",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457308,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.222Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457309,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.247Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "or:m_tot_num_inflections(nodim)=7929       624.237 secs ago\r\n   sensor:m_vacuum(inHg)=9.8862967032967          507.554 secs ago",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457310,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.268Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457311,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.291Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\n   sensor:m_water_vx(m/s)=0.133896335983714        552.43 secs ago\r\n   sensor:m_water_vy(m/s)=-0.0214772780812985     552.462 ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457312,
+                "time": {
+                    "$date": "2026-03-17T15:50:59.313Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457313,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.022Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ecs ago\r\n   sensor:u_alt_min_depth(m)=2                     1e+308 secs ago\r\n   sensor:u_alt_reduced_usage_mode(bool)=1        ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457314,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.046Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457315,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.069Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "1e+308 secs ago\r\n   sensor:u_use_current_correction(nodim)=0        1e+308 secs ago\r\n   sensor:x_critical_abort_active(int)=0  ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457316,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.091Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "         1e+308 secs ago\r\n   sensor:x_last_wpt_lat(lat)=4328.6833            108427 secs ago\r\n   sensor:x_last_wpt_lon(lon)=-622",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457317,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.115Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "7",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457318,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.135Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".0572           108427 secs ago\r\nABORT HISTORY: total since reset: 1\r\nABORT HISTORY: last abort cause: MS_ABORT_OVERDEPTH\r\nABOR",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457319,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.841Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "T HISTORY: last abort details: \r\nABORT HISTORY: last abort time: 2026-03-04T04:57:54\r\nABORT HISTORY: last abort segment: otn200-",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457320,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.863Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "2",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457321,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.886Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "026-055-0-58 (0110.0058)\r\nABORT HISTORY: last abort mission: 200HFX01.MI\r\n433106    No login script found for processing.\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457322,
+                "time": {
+                    "$date": "2026-03-17T15:51:00.916Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457323,
+                "time": {
+                    "$date": "2026-03-17T15:51:44.056Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "33165",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457324,
+                "time": {
+                    "$date": "2026-03-17T15:51:44.078Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457325,
+                "time": {
+                    "$date": "2026-03-17T15:51:44.865Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "   01160040.mlg",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457326,
+                "time": {
+                    "$date": "2026-03-17T15:51:44.886Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " LOG FILE OPENED\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457327,
+                "time": {
+                    "$date": "2026-03-17T15:51:44.908Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Megabytes used  ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457328,
+                "time": {
+                    "$date": "2026-03-17T15:51:46.477Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "    on CF file s",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457329,
+                "time": {
+                    "$date": "2026-03-17T15:51:46.500Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ystem = 359.406250\r\nMegabytes av",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457330,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.268Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ailable on CF fi",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457331,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.291Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "le system = 1641.",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457332,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.312Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "531250\r\n433168 ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457333,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.334Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "   init_gps_input()\r\n433168    b",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457334,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.356Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ehavior surface_",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457335,
+                "time": {
+                    "$date": "2026-03-17T15:51:47.379Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "6: SUBSTATE 7 ->9 : Turning on t",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457336,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.084Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "hruster burst\r\n4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457337,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.105Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "3",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457338,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.130Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "3168    behavior surface_6: TIM",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457339,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.151Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ED OUT WAITING F",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457340,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.173Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "OR A CHARACTER\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457341,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.196Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "\r\nsurface_6: Tur",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457342,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.216Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ning thruster on: 6.0 V.\r\n^E4331",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457343,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.904Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "68    sensor: c_",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457344,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.922Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "thruster_on = 40",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457345,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.946Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ".5202155800806 %\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457346,
+                "time": {
+                    "$date": "2026-03-17T15:51:48.967Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457347,
+                "time": {
+                    "$date": "2026-03-17T15:51:52.123Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "33173 18 sensor: c_thruster_on ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457348,
+                "time": {
+                    "$date": "2026-03-17T15:51:52.145Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "= 40.37548378276",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457349,
+                "time": {
+                    "$date": "2026-03-17T15:51:52.166Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "05 %\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457350,
+                "time": {
+                    "$date": "2026-03-17T15:51:52.188Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "433178 18 sensor",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457351,
+                "time": {
+                    "$date": "2026-03-17T15:51:56.932Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ": c_thruster_on ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457352,
+                "time": {
+                    "$date": "2026-03-17T15:51:56.954Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "= 40.37548378276",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457353,
+                "time": {
+                    "$date": "2026-03-17T15:51:56.976Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "0",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457354,
+                "time": {
+                    "$date": "2026-03-17T15:51:57.745Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "5 %\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457355,
+                "time": {
+                    "$date": "2026-03-17T15:51:58.526Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457356,
+                "time": {
+                    "$date": "2026-03-17T15:52:01.752Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "33183 19 sensor: c_thruster_on ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457357,
+                "time": {
+                    "$date": "2026-03-17T15:52:01.774Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "= 40.37548378276",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457358,
+                "time": {
+                    "$date": "2026-03-17T15:52:01.795Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "0",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457359,
+                "time": {
+                    "$date": "2026-03-17T15:52:02.543Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "5 %\r\n433184    sensor: m_thruster_cur",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457360,
+                "time": {
+                    "$date": "2026-03-17T15:52:02.566Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "rent = 0 amp\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457361,
+                "time": {
+                    "$date": "2026-03-17T15:52:02.585Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "433188 20 sensor",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457362,
+                "time": {
+                    "$date": "2026-03-17T15:52:06.566Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": ": c_thruster_on ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457363,
+                "time": {
+                    "$date": "2026-03-17T15:52:06.587Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "= 40.3754837827605 %\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457364,
+                "time": {
+                    "$date": "2026-03-17T15:52:07.374Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457365,
+                "time": {
+                    "$date": "2026-03-17T15:52:07.395Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "33189    sensor: m_thruster_cur",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457366,
+                "time": {
+                    "$date": "2026-03-17T15:52:08.163Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "rent = 0 amp\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457367,
+                "time": {
+                    "$date": "2026-03-17T15:52:08.184Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457368,
+                "time": {
+                    "$date": "2026-03-17T15:52:11.384Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "urface_6: Turning thruster off ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457369,
+                "time": {
+                    "$date": "2026-03-17T15:52:11.406Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "(secs thr on).\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457370,
+                "time": {
+                    "$date": "2026-03-17T15:52:12.193Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "433193 22 behavior surface_6: SU",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457371,
+                "time": {
+                    "$date": "2026-03-17T15:52:12.215Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "B",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457372,
+                "time": {
+                    "$date": "2026-03-17T15:52:12.237Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "STATE 9 ->10 : ",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457373,
+                "time": {
+                    "$date": "2026-03-17T15:52:12.259Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "Waiting for final gps fix\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457374,
+                "time": {
+                    "$date": "2026-03-17T15:52:12.281Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "s",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457375,
+                "time": {
+                    "$date": "2026-03-17T15:52:16.202Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "urface_6: Waiting for final GPS",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457376,
+                "time": {
+                    "$date": "2026-03-17T15:52:16.222Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": " fix.\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457377,
+                "time": {
+                    "$date": "2026-03-17T15:52:16.246Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "4",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457378,
+                "time": {
+                    "$date": "2026-03-17T15:52:17.011Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "33198 23 disabl",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457379,
+                "time": {
+                    "$date": "2026-03-17T15:52:17.032Z"
+                }
+            },
+            {
+                "gliderName": "otn200",
+                "portId": 2,
+                "portName": "net/0",
+                "deviceType": "network",
+                "data": "ing Iridium console...\r\n",
+                "logFileName": "otn200_20260317T155056_network_net_0.log",
+                "sequenceNumber": 457380,
+                "time": {
+                    "$date": "2026-03-17T15:52:17.055Z"
+                }
+            }
+        ]
+    }
+]

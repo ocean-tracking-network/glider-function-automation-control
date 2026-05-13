@@ -14,6 +14,49 @@ async function get_active_deployment_details(glider_name) {
   return result
 }
 
+async function get_glider_details(glider_name, token="") {
+  let result = {}
+  if (!token) {
+    token = await sfmc.accessToken.getAccessToken()
+    token = token.token
+  }
+  try {
+    result = await sfmc.glider.getGliderDetails(token, glider_name)
+  } catch (sfmc_error){
+    console.log(sfmc_error)
+    console.log('Could not get glider details for: ' + glider_name)
+  }
+  return result.data
+}
+
+async function subscribe_for_glider_dialog(glider_name, callback) {
+  let token = await sfmc.accessToken.getAccessToken()
+  token = token.token
+  let glider_details = await get_glider_details(glider_name, token)
+  let glider_id = glider_details.id
+  console.log(glider_id)
+  sfmc.stompConnect.connect(token).then((stomp_client) => {
+    sfmc.glider.subscribeForGliderOutputEvents(stomp_client, glider_id, callback)
+  }).catch((err) => {
+    console.log("Can't subscribe to dialog because: ")
+    console.log(err)
+  })
+}
+
+async function subscribe_for_glider_connection(glider_name, callback) {
+  let token = await sfmc.accessToken.getAccessToken()
+  token = token.token
+  let glider_details = await get_glider_details(glider_name, token)
+  let glider_id = glider_details.id
+  console.log(glider_id)
+  sfmc.stompConnect.connect(token).then((stomp_client) => {
+    sfmc.glider.subscribeForConnectionEvents(stomp_client, glider_id, callback)
+  }).catch((err) => {
+    console.log("Can't subscribe to connection because: ")
+    console.log(err)
+  })
+}
+
 async function upload_file(glider_name, glider_folder, file_path, category) {
   // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
   //   glider_name = 'adam'
@@ -88,4 +131,7 @@ export {
   get_available_scripts,
   set_script,
   clear_script,
+  subscribe_for_glider_connection,
+  subscribe_for_glider_dialog,
+  get_glider_details
 }

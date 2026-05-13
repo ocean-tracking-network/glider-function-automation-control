@@ -159,7 +159,7 @@ function onGeofenceDrawerOffsetChange(offset) {
           <!-- <div id="map"> -->
           <!-- </div> -->
           <div>
-            <MapComponent id="map" />
+            <MapComponent id="map-big" />
           </div>
           <div id="side">
             <GliderTabComponent />
