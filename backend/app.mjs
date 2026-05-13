@@ -32,6 +32,9 @@ import { login, create_user, get_deletable_users, delete_user, user_exists } fro
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import { send_slack_message } from './utils/slack.mjs'
+
+import db from './db/conn.mjs'
+
 import {
   delete_old_tracks,
   update_glider_positions,
