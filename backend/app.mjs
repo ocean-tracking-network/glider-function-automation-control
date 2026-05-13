@@ -34,6 +34,9 @@ import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
 import db from './db/conn.mjs'
 import { send_slack_message } from './utils/slack.mjs'
+
+import db from './db/conn.mjs'
+
 import {
   delete_old_tracks,
   update_glider_positions,
