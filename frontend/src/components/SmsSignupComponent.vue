@@ -24,13 +24,39 @@ const formData = ref({
 
 const gliders = computed(() => glidersStore.gliders);
 
-const selectedGliderEvents = computed(() => {
-  if (!formData.value.glider) return [];
-  const glider = gliders.value.find((g) => g._id === formData.value.glider);
-  if (!glider) return [];
-  
-  return eventsStore.events.filter((e) => e.glider_id === glider._id);
-});
+const smsEventTypes = [
+  'Glider Connect',
+  'Glider Mission Abort',
+  'Surface Sensor Value Out of Range',
+  'Glider Started Last Gasp Mission',
+  'Glider Missed Last Call-In',
+  'Segment Errors',
+  'Glider Started Initial Mission',
+  'Glider Outside Geofence'
+];
+
+// Drag detection for overlay
+const overlayMouseDownPos = ref({ x: 0, y: 0 });
+const isDraggingOnOverlay = ref(false);
+
+function handleOverlayMouseDown(event) {
+  overlayMouseDownPos.value = { x: event.clientX, y: event.clientY };
+  isDraggingOnOverlay.value = false;
+}
+
+function handleOverlayMouseMove(event) {
+  const dx = Math.abs(event.clientX - overlayMouseDownPos.value.x);
+  const dy = Math.abs(event.clientY - overlayMouseDownPos.value.y);
+  if (dx > 5 || dy > 5) {
+    isDraggingOnOverlay.value = true;
+  }
+}
+
+function handleOverlayClick(event) {
+  if (!isDraggingOnOverlay.value && event.target === event.currentTarget) {
+    close();
+  }
+}
 
 onMounted(async () => {
   await loadSignups();
@@ -40,7 +66,7 @@ async function loadSignups() {
   loading.value = true;
   error.value = '';
   try {
-    const res = await apiClient.get('/notify/contacts');
+    const res = await apiClient.get('/notify');
     signups.value = res.data.contacts || [];
   } catch (err) {
     error.value = 'Failed to load signups: ' + (err.response?.data?.error || err.message);
@@ -74,7 +100,7 @@ async function submitSignup() {
       glider: gliderName,
     };
 
-    await apiClient.post('/notify/contacts', payload);
+    await apiClient.post('/notify', payload);
     successMessage.value = 'SMS signup created successfully!';
     
     // Reset form
@@ -101,7 +127,7 @@ async function deleteSignup(id) {
 
   try {
     error.value = '';
-    await apiClient.delete(`/notify/contacts/${id}`);
+    await apiClient.delete(`/notify/${id}`);
     successMessage.value = 'Signup deleted successfully!';
     await loadSignups();
     
@@ -118,9 +144,8 @@ function getGliderName(gliderId) {
   return glider ? glider.name : 'Unknown Glider';
 }
 
-function getEventName(eventId) {
-  const event = eventsStore.events.find((e) => e._id === eventId);
-  return event ? event.name : 'Unknown Event';
+function getEventName(eventValue) {
+  return eventValue || 'Not specified';
 }
 
 const groupedSignups = computed(() => {
@@ -137,7 +162,12 @@ const groupedSignups = computed(() => {
 
 <template>
   <transition name="slide-drawer">
-    <div class="drawer-overlay" @click.self="close">
+    <div
+      class="drawer-overlay"
+      @mousedown="handleOverlayMouseDown"
+      @mousemove="handleOverlayMouseMove"
+      @click="handleOverlayClick"
+    >
       <div class="drawer-panel" :style="{ width: '500px' }" @click.stop>
         <div class="drawer-header">
           <h2 class="drawer-title">SMS Notification Signup</h2>
@@ -193,12 +223,8 @@ const groupedSignups = computed(() => {
                   <label for="event">Event</label>
                   <select v-model="formData.event" id="event" :disabled="!formData.glider">
                     <option value="">Select an event</option>
-                    <option
-                      v-for="event in selectedGliderEvents"
-                      :key="event._id"
-                      :value="event._id"
-                    >
-                      {{ event.event_type }} - {{ event.geofence_name }}
+                    <option v-for="eventType in smsEventTypes" :key="eventType" :value="eventType">
+                      {{ eventType }}
                     </option>
                   </select>
                 </div>
