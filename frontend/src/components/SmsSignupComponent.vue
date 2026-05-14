@@ -13,10 +13,11 @@ const signups = ref([]);
 const loading = ref(true);
 const error = ref('');
 const successMessage = ref('');
+const users = ref([]);
 
 // Form state
 const formData = ref({
-  name: '',
+  user: '',
   phone: '',
   glider: '',
   event: '',
@@ -59,8 +60,18 @@ function handleOverlayClick(event) {
 }
 
 onMounted(async () => {
+  await loadUsers();
   await loadSignups();
 });
+
+async function loadUsers() {
+  try {
+    const res = await apiClient.get('/users/list');
+    users.value = res.data.users || [];
+  } catch (err) {
+    console.error('Failed to load users:', err);
+  }
+}
 
 async function loadSignups() {
   loading.value = true;
@@ -80,7 +91,7 @@ function close() {
 }
 
 async function submitSignup() {
-  if (!formData.value.name || !formData.value.phone || !formData.value.glider) {
+  if (!formData.value.user || !formData.value.phone || !formData.value.glider || !formData.value.event) {
     error.value = 'Please fill in all fields';
     return;
   }
@@ -94,7 +105,7 @@ async function submitSignup() {
     const gliderName = selectedGlider?.name || '';
 
     const payload = {
-      name: formData.value.name,
+      name: formData.value.user,
       phone: formData.value.phone,
       notification_type: 'sms',
       glider: gliderName,
@@ -106,7 +117,7 @@ async function submitSignup() {
     
     // Reset form
     formData.value = {
-      name: '',
+      user: '',
       phone: '',
       glider: '',
       event: '',
@@ -189,14 +200,13 @@ const groupedSignups = computed(() => {
               <h3 class="section-title">Add SMS Signup</h3>
               <form @submit.prevent="submitSignup" class="signup-form">
                 <div class="form-group">
-                  <label for="name">Name *</label>
-                  <input
-                    id="name"
-                    v-model="formData.name"
-                    type="text"
-                    placeholder="Enter name"
-                    required
-                  />
+                  <label for="user">User *</label>
+                  <select v-model="formData.user" id="user" required>
+                    <option value="">Select a user</option>
+                    <option v-for="user in users" :key="user.username" :value="user.username">
+                      {{ user.username }}
+                    </option>
+                  </select>
                 </div>
 
                 <div class="form-group">
@@ -221,8 +231,8 @@ const groupedSignups = computed(() => {
                 </div>
 
                 <div class="form-group">
-                  <label for="event">Event</label>
-                  <select v-model="formData.event" id="event" :disabled="!formData.glider">
+                  <label for="event">Event *</label>
+                  <select v-model="formData.event" id="event" required>
                     <option value="">Select an event</option>
                     <option v-for="eventType in smsEventTypes" :key="eventType" :value="eventType">
                       {{ eventType }}
@@ -245,7 +255,7 @@ const groupedSignups = computed(() => {
                   <table class="signups-table">
                     <thead>
                       <tr>
-                        <th>Name</th>
+                        <th>User</th>
                         <th>Phone</th>
                         <th>Event</th>
                         <th>Action</th>
