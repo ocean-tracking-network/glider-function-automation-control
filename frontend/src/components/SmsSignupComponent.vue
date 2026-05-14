@@ -98,6 +98,7 @@ async function submitSignup() {
       phone: formData.value.phone,
       notification_type: 'sms',
       glider: gliderName,
+      event: formData.value.event,
     };
 
     await apiClient.post('/notify', payload);
