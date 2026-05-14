@@ -28,7 +28,7 @@ import {
   trigger_events,
 } from './views/events.mjs'
 import { get_boats, get_boat_predict, check_gliders_safe } from './views/boats.mjs'
-import { login, create_user, get_deletable_users, delete_user, user_exists } from './views/user.mjs'
+import { login, create_user, get_deletable_users, delete_user, user_exists, get_all_users } from './views/user.mjs'
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
@@ -57,6 +57,7 @@ const port = 3000
 
 // user
 app.post('/login', login)
+app.get('/users/list', authenticateToken, get_all_users)
 app.post('/users', authenticateToken, requireAdmin, create_user)
 app.get('/users', authenticateToken, requireAdmin, get_deletable_users)
 app.get('/users/:username/exists', authenticateToken, requireAdmin, user_exists)
