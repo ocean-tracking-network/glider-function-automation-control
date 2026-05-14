@@ -35,8 +35,6 @@ import { get_logs, post_logs } from './views/logs.mjs'
 import db from './db/conn.mjs'
 import { send_slack_message } from './utils/slack.mjs'
 
-import db from './db/conn.mjs'
-
 import {
   delete_old_tracks,
   update_glider_positions,
@@ -45,6 +43,7 @@ import {
 import './loadEnvironment.mjs'
 import { gliders_sse } from './views/sse/gliders.mjs'
 import { update_boats } from './utils/boat_utils.mjs'
+import { delete_contacts, get_contacts, create_contact, edit_contact } from './views/notify.mjs'
 
 const app = express()
 app.use(cors())
@@ -98,6 +97,14 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 // sse
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
+//sms
+app.get('/notify', authenticateToken, get_contacts)
+app.post('/notify', authenticateToken, create_contact)
+app.patch('/notify/:id', authenticateToken, edit_contact)
+app.delete('/notify/:id', authenticateToken, delete_contacts)
+
+
+
 // boats
 // app.get('/boats/:end_offset', authenticateToken, get_boats)
 // app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
@@ -108,7 +115,6 @@ const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
 const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
   await update_glider_positions()
   await update_geofences()
-
   await delete_old_tracks()
   // update_boats()
 })

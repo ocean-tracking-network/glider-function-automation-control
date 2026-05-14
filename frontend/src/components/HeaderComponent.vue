@@ -2,6 +2,7 @@
 import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
+import SmsSignupComponent from './SmsSignupComponent.vue';
 
 const version_number = "0.2.1"
 const userStore = useUserStore();
@@ -18,6 +19,7 @@ const loadingDeletableUsers = ref(false);
 const deleteMessage = ref('');
 const deleteMessageType = ref('');
 const deleting = ref(false);
+const showSmsSignupDrawer = ref(false);
 
 const sortedDeletableUsers = computed(() => {
   return [...deletableUsers.value].sort((a, b) => {
@@ -178,6 +180,11 @@ function toggleMenu() {
   menuOpen.value = !menuOpen.value;
 }
 
+function openSmsSignup() {
+  showSmsSignupDrawer.value = true;
+  menuOpen.value = false;
+}
+
 function handleClickOutside(event) {
   if (menuContainer.value && !menuContainer.value.contains(event.target)) {
     menuOpen.value = false;
@@ -214,6 +221,9 @@ onBeforeUnmount(() => {
           <div class="dropdown-menu" v-if="menuOpen">
             <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
               Create User
+            </button>
+            <button v-if="userStore.isAdmin" class="menu-item" @click="openSmsSignup">
+              SMS Signup
             </button>
             <button v-if="userStore.isAdmin" class="menu-item delete-item" @click="deleteUser">
               Delete User
@@ -319,6 +329,8 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </ModalComponent>
+
+  <SmsSignupComponent v-if="showSmsSignupDrawer" @close="showSmsSignupDrawer = false" />
 
   <ModalComponent
     v-if="showDeleteConfirmModal"
