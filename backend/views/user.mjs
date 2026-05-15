@@ -125,7 +125,7 @@ const delete_user = async (req, res) => {
 const get_all_users = async (req, res) => {
   const collection = await db.collection('users')
   const users = await collection
-    .find({}, { projection: { _id: 0, username: 1 } })
+    .find({}, { projection: { _id: 0, username: 1, role: 1 } })
     .sort({ username: 1 })
     .toArray()
 

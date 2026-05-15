@@ -24,6 +24,28 @@ const formData = ref({
 });
 
 const gliders = computed(() => glidersStore.gliders);
+const normalizedUsers = computed(() => {
+  return users.value
+    .map((user) => ({
+      username: user?.username,
+      role: user?.role === 'admin' ? 'admin' : 'viewer',
+    }))
+    .filter((user) => !!user.username)
+    .sort((a, b) => {
+      if (a.role !== b.role) {
+        return a.role === 'admin' ? -1 : 1;
+      }
+
+      return a.username.localeCompare(b.username);
+    });
+});
+
+const adminUsers = computed(() => normalizedUsers.value.filter((user) => user.role === 'admin'));
+const viewerUsers = computed(() => normalizedUsers.value.filter((user) => user.role === 'viewer'));
+const openUserRole = ref('');
+const selectedUser = computed(() => {
+  return normalizedUsers.value.find((user) => user.username === formData.value.user) || null;
+});
 
 const smsEventTypes = [
   'Glider Connect',
@@ -67,7 +89,7 @@ onMounted(async () => {
 async function loadUsers() {
   try {
     const res = await apiClient.get('/users/list');
-    users.value = res.data.users || [];
+    users.value = Array.isArray(res.data.users) ? res.data.users : [];
   } catch (err) {
     console.error('Failed to load users:', err);
   }
@@ -88,6 +110,15 @@ async function loadSignups() {
 
 function close() {
   emit('close');
+}
+
+function toggleUserRole(role) {
+  openUserRole.value = openUserRole.value === role ? '' : role;
+}
+
+function selectUser(username) {
+  formData.value.user = username;
+  openUserRole.value = '';
 }
 
 async function submitSignup() {
@@ -201,12 +232,67 @@ const groupedSignups = computed(() => {
               <form @submit.prevent="submitSignup" class="signup-form">
                 <div class="form-group">
                   <label for="user">User *</label>
-                  <select v-model="formData.user" id="user" required>
-                    <option value="">Select a user</option>
-                    <option v-for="user in users" :key="user.username" :value="user.username">
-                      {{ user.username }}
-                    </option>
-                  </select>
+                  <div class="user-role-dropdowns">
+                    <div class="user-role-dropdown">
+                      <button
+                        type="button"
+                        class="user-role-toggle"
+                        :aria-expanded="openUserRole === 'admin'"
+                        @click="toggleUserRole('admin')"
+                      >
+                        <span class="user-role-toggle-label">
+                          Admins
+                          <span class="user-role-count">{{ adminUsers.length }}</span>
+                        </span>
+                        <span class="dropdown-arrow" :class="{ open: openUserRole === 'admin' }">▾</span>
+                      </button>
+                      <div v-if="openUserRole === 'admin'" class="user-role-listbox" role="listbox" aria-label="Admins">
+                        <button
+                          v-for="user in adminUsers"
+                          :key="`admin-${user.username}`"
+                          type="button"
+                          class="user-role-option"
+                          :class="{ selected: formData.user === user.username }"
+                          @click="selectUser(user.username)"
+                        >
+                          <span>{{ user.username }}</span>
+                        </button>
+                        <div v-if="adminUsers.length === 0" class="user-role-empty">No admins available</div>
+                      </div>
+                    </div>
+
+                    <div class="user-role-dropdown">
+                      <button
+                        type="button"
+                        class="user-role-toggle"
+                        :aria-expanded="openUserRole === 'viewer'"
+                        @click="toggleUserRole('viewer')"
+                      >
+                        <span class="user-role-toggle-label">
+                          Viewers
+                          <span class="user-role-count">{{ viewerUsers.length }}</span>
+                        </span>
+                        <span class="dropdown-arrow" :class="{ open: openUserRole === 'viewer' }">▾</span>
+                      </button>
+                      <div v-if="openUserRole === 'viewer'" class="user-role-listbox" role="listbox" aria-label="Users">
+                        <button
+                          v-for="user in viewerUsers"
+                          :key="`viewer-${user.username}`"
+                          type="button"
+                          class="user-role-option"
+                          :class="{ selected: formData.user === user.username }"
+                          @click="selectUser(user.username)"
+                        >
+                          <span>{{ user.username }}</span>
+                        </button>
+                        <div v-if="viewerUsers.length === 0" class="user-role-empty">No users available</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-if="selectedUser" class="user-selected-summary">
+                    <span class="selected-summary-label">Selected User:</span>
+                    <span class="selected-summary-name">{{ selectedUser.username }}</span>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -436,6 +522,156 @@ const groupedSignups = computed(() => {
 .form-group select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.sms-signup-body {
+  --user-picker-surface: rgba(0, 0, 0, 0.02);
+  --user-picker-surface-hover: rgba(0, 0, 0, 0.04);
+  --user-picker-border: rgba(0, 0, 0, 0.14);
+  --user-picker-border-soft: rgba(0, 0, 0, 0.08);
+  --user-picker-muted: rgba(0, 0, 0, 0.58);
+  --user-picker-muted-strong: rgba(0, 0, 0, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  .sms-signup-body {
+    --user-picker-surface: rgba(255, 255, 255, 0.03);
+    --user-picker-surface-hover: rgba(255, 255, 255, 0.06);
+    --user-picker-border: rgba(255, 255, 255, 0.14);
+    --user-picker-border-soft: rgba(255, 255, 255, 0.08);
+    --user-picker-muted: rgba(235, 235, 235, 0.68);
+    --user-picker-muted-strong: rgba(235, 235, 235, 0.8);
+  }
+}
+
+.user-role-dropdowns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.user-role-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.user-role-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: 12px;
+  font-size: 0.95rem;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.user-role-toggle:hover {
+  border-color: var(--color-border-hover, var(--color-text));
+}
+
+.user-role-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.dropdown-arrow {
+  display: inline-flex;
+  transition: transform 0.2s ease;
+  color: var(--user-picker-muted-strong);
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.user-role-count {
+  min-width: 1.75rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: var(--user-picker-surface);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.user-role-listbox {
+  border: 1px solid var(--user-picker-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: var(--color-background);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.user-role-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--user-picker-border-soft);
+  background: var(--color-background);
+  color: var(--color-text);
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.user-role-option:last-child {
+  border-bottom: 0;
+}
+
+.user-role-option:hover,
+.user-role-option.selected {
+  background: var(--user-picker-surface-hover);
+}
+
+.user-role-option.selected {
+  font-weight: 600;
+}
+
+.user-role-empty {
+  padding: 10px 14px;
+  color: var(--color-text);
+  font-style: italic;
+  background: var(--user-picker-surface);
+}
+
+.user-selected-summary {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.selected-summary-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--user-picker-muted-strong);
+}
+
+.selected-summary-name {
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 .submit-btn {
