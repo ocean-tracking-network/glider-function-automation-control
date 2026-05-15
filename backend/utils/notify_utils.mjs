@@ -21,13 +21,13 @@ async function glider_exists(gliderName) {
   return Boolean(glider)
 }
 
-async function create_contact({ name, phone, notification_type, glider, event }) {
-  if (!name || !phone || !notification_type || !glider) {
-    return { error: 'Need to provide name, phone, notification_type, and glider' }
+async function create_contact({ name, email, phone, notification_type, glider, event }) {
+  if (!name || !email || !phone || !notification_type || !glider) {
+    return { error: 'Need to provide name, email, phone, notification_type, and glider' }
   }
 
   const contactCollection = await db.collection('contacts')
-  const existing = await contactCollection.findOne({ name, phone, notification_type, glider })
+  const existing = await contactCollection.findOne({ name, email, phone, notification_type, glider })
   if (existing) {
     return { error: 'Contact already exists' }
   }
@@ -37,11 +37,11 @@ async function create_contact({ name, phone, notification_type, glider, event })
     return { error: 'Glider does not exist' }
   }
 
-  const result = await contactCollection.insertOne({ name, phone, notification_type, glider, event })
+  const result = await contactCollection.insertOne({ name, email, phone, notification_type, glider, event })
   return { contact: result }
 }
 
-async function update_contact(id, { name, phone, notification_type, glider, event }) {
+async function update_contact(id, { name, email, phone, notification_type, glider, event }) {
   const contactCollection = await db.collection('contacts')
   const existing = await contactCollection.findOne({ _id: new ObjectId(id) })
   if (!existing) {
@@ -54,7 +54,7 @@ async function update_contact(id, { name, phone, notification_type, glider, even
 
   await contactCollection.updateOne(
     { _id: new ObjectId(id) },
-    { $set: { name, phone, notification_type, glider, event } },
+    { $set: { name, email, phone, notification_type, glider, event } },
   )
   return { message: 'Contact updated' }
 }

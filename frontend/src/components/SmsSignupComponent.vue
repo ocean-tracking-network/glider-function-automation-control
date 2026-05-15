@@ -18,6 +18,7 @@ const users = ref([]);
 // Form state
 const formData = ref({
   user: '',
+  email: '',
   phone: '',
   glider: '',
   event: '',
@@ -58,7 +59,6 @@ const smsEventTypes = [
   'Glider Outside Geofence'
 ];
 
-// Drag detection for overlay
 const overlayMouseDownPos = ref({ x: 0, y: 0 });
 const isDraggingOnOverlay = ref(false);
 
@@ -122,7 +122,7 @@ function selectUser(username) {
 }
 
 async function submitSignup() {
-  if (!formData.value.user || !formData.value.phone || !formData.value.glider || !formData.value.event) {
+  if (!formData.value.user || !formData.value.email || !formData.value.phone || !formData.value.glider || !formData.value.event) {
     error.value = 'Please fill in all fields';
     return;
   }
@@ -131,12 +131,12 @@ async function submitSignup() {
     error.value = '';
     successMessage.value = '';
 
-    // Get glider name from selected ID
     const selectedGlider = gliders.value.find((g) => g._id === formData.value.glider);
     const gliderName = selectedGlider?.name || '';
 
     const payload = {
       name: formData.value.user,
+      email: formData.value.email,
       phone: formData.value.phone,
       notification_type: 'sms',
       glider: gliderName,
@@ -146,15 +146,14 @@ async function submitSignup() {
     await apiClient.post('/notify', payload);
     successMessage.value = 'SMS signup created successfully!';
     
-    // Reset form
     formData.value = {
       user: '',
+      email: '',
       phone: '',
       glider: '',
       event: '',
     };
 
-    // Reload signups
     await loadSignups();
 
     setTimeout(() => {
@@ -220,13 +219,9 @@ const groupedSignups = computed(() => {
         </div>
         <div class="drawer-content">
           <div class="sms-signup-body">
-            <!-- Error Message -->
             <div v-if="error" class="message message-error">{{ error }}</div>
 
-            <!-- Success Message -->
             <div v-if="successMessage" class="message message-success">{{ successMessage }}</div>
-
-            <!-- Form Section -->
             <div class="form-section">
               <h3 class="section-title">Add SMS Signup</h3>
               <form @submit.prevent="submitSignup" class="signup-form">
@@ -296,6 +291,17 @@ const groupedSignups = computed(() => {
                 </div>
 
                 <div class="form-group">
+                  <label for="email">Email *</label>
+                  <input
+                    id="email"
+                    v-model="formData.email"
+                    type="email"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
                   <label for="phone">Phone *</label>
                   <input
                     id="phone"
@@ -330,7 +336,6 @@ const groupedSignups = computed(() => {
               </form>
             </div>
 
-            <!-- Signups List Section -->
             <div class="signups-section">
               <h3 class="section-title">Registered Signups</h3>
               <div v-if="loading" class="loading">Loading signups...</div>
@@ -342,6 +347,7 @@ const groupedSignups = computed(() => {
                     <thead>
                       <tr>
                         <th>User</th>
+                        <th>Email</th>
                         <th>Phone</th>
                         <th>Event</th>
                         <th>Action</th>
@@ -350,6 +356,7 @@ const groupedSignups = computed(() => {
                     <tbody>
                       <tr v-for="signup in gliderSignups" :key="signup._id" class="signup-row">
                         <td>{{ signup.name }}</td>
+                        <td>{{ signup.email || 'Not specified' }}</td>
                         <td>{{ signup.phone }}</td>
                         <td>{{ getEventName(signup.event) }}</td>
                         <td>
@@ -502,14 +509,19 @@ const groupedSignups = computed(() => {
 }
 
 .form-group input,
+.form-group select,
+.user-role-toggle {
+  font-family: inherit;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border, #ccc);
+  font-size: 0.95rem;
+}
+
+.form-group input,
 .form-group select {
   padding: 8px 12px;
-  border: 1px solid var(--color-border, #ccc);
   border-radius: 4px;
-  font-size: 0.95rem;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: inherit;
 }
 
 .form-group input:focus,
@@ -522,15 +534,6 @@ const groupedSignups = computed(() => {
 .form-group select:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.sms-signup-body {
-  --user-picker-surface: rgba(0, 0, 0, 0.02);
-  --user-picker-surface-hover: rgba(0, 0, 0, 0.04);
-  --user-picker-border: rgba(0, 0, 0, 0.14);
-  --user-picker-border-soft: rgba(0, 0, 0, 0.08);
-  --user-picker-muted: rgba(0, 0, 0, 0.58);
-  --user-picker-muted-strong: rgba(0, 0, 0, 0.55);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -563,12 +566,7 @@ const groupedSignups = computed(() => {
   justify-content: space-between;
   width: 100%;
   padding: 10px 14px;
-  border: 1px solid var(--color-border, #ccc);
   border-radius: 12px;
-  font-size: 0.95rem;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: inherit;
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
@@ -625,8 +623,6 @@ const groupedSignups = computed(() => {
   background: var(--color-background);
   color: var(--color-text);
   text-align: left;
-  font-family: inherit;
-  cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
@@ -695,24 +691,17 @@ const groupedSignups = computed(() => {
   background-color: #3d8b40;
 }
 
-.signups-section {
-  border: 1px solid var(--color-border, lightgray);
-  border-radius: 4px;
-  padding: 16px;
-  background-color: rgba(0, 0, 0, 0.02);
+.no-signups {
+  text-align: center;
+  color: var(--color-text);
+  padding: 20px;
+  font-style: italic;
 }
 
 .loading {
   text-align: center;
   color: var(--color-text);
   padding: 20px;
-}
-
-.no-signups {
-  text-align: center;
-  color: var(--color-text);
-  padding: 20px;
-  font-style: italic;
 }
 
 .signups-list {
@@ -749,17 +738,19 @@ const groupedSignups = computed(() => {
 }
 
 .signups-table th {
-  padding: 10px 12px;
   text-align: left;
   font-weight: 600;
-  color: var(--color-text);
   border-bottom: 1px solid var(--color-border, #ddd);
 }
 
-.signups-table td {
+.signups-table td,
+.signups-table th {
   padding: 10px 12px;
-  border-bottom: 1px solid var(--color-border, #eee);
   color: var(--color-text);
+}
+
+.signups-table td {
+  border-bottom: 1px solid var(--color-border, #eee);
 }
 
 .signups-table tbody tr:hover {
@@ -780,6 +771,14 @@ const groupedSignups = computed(() => {
 
 .delete-btn:hover {
   background-color: #da190b;
+}
+
+.submit-btn,
+.delete-btn,
+.sms-signup-close,
+.user-role-option {
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .sms-signup-close {
