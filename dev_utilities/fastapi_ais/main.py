@@ -8,12 +8,18 @@ from .db import myclient, mydb, mycol, \
                 get_group_by, \
                 get_by_index, \
                 get_all_unique, \
-                get_mimic
+                get_mimic, \
+                ensure_data_loaded
 
 DATA_LOCATION = "./data"
 
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+def startup():
+    ensure_data_loaded()
 
 
 

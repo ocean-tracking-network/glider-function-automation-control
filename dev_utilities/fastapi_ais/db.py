@@ -7,10 +7,12 @@ from zoneinfo import ZoneInfo
 
 DATA_DIR = "./data"
 
+# Read Mongo connection from environment so the service can run in Docker
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+MONGO_USER = os.getenv("MONGO_USER", "ceotr")
+MONGO_PASS = os.getenv("MONGO_PASS", "ceotr")
 
-myclient = pymongo.MongoClient("mongodb://localhost:27017",
-                               username="ceotr",
-                               password="ceotr")
+myclient = pymongo.MongoClient(MONGO_URL, username=MONGO_USER, password=MONGO_PASS)
 mydb = myclient["ais"]
 mycol = mydb["ais"]
 config_col = mydb['ais_config']
@@ -163,8 +165,16 @@ def insert_data():
         group+=1
 
 
-if __name__ == '__main__':
+def ensure_data_loaded():
+    if mycol.estimated_document_count() > 0:
+        return
+
+    print("AIS collection is empty; loading AIS fixture data")
     insert_data()
+
+
+if __name__ == '__main__':
+    ensure_data_loaded()
     # fun()
     # get_all_unique()
     # get_grouped()
