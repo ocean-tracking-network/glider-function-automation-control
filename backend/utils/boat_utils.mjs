@@ -33,22 +33,22 @@ async function _ais_exists(ais_data) {
 
 async function insert_ais_historic_data(ais_data_list) {
   const historic_col = await db.collection("historic_ais");
-  ais_data_list.forEach(async (ais) => {
+  for (const ais of ais_data_list) {
     const exists = await _ais_exists(ais);
     if (!exists) {
-      historic_col.insertOne({
+      await historic_col.insertOne({
         AIS: ais.AIS,
         api_time: new Date(),
       });
     }
-  });
+  }
 }
 
 async function _clean_boats() {
   const time_cutoff = 3; //hours (this could be configurable, open to either)
   const col = await db.collection("boats");
-  const boats = await col.find({}); //No way this couldn't be a mongo filter, right?
-  boats.forEach((boat) => {
+  const boats = col.find({}); //No way this couldn't be a mongo filter, right?
+  for await (const boat of boats) {
     const time_offset =
       (new Date().getTime() -
         boat.locations[boat.locations.length - 1].TIMESTAMP.getTime()) /
@@ -56,11 +56,11 @@ async function _clean_boats() {
     console.log(time_offset);
     if (time_offset >= time_cutoff) {
       console.log(`Deleting, over ${time_cutoff} hours`);
-      col.deleteOne({ _id: boat._id });
+      await col.deleteOne({ _id: boat._id });
     } else {
       console.log("Still got time");
     }
-  });
+  }
 }
 
 function _TIMESTAMP_to_date(TIMESTAMP) {
@@ -82,7 +82,7 @@ function _get_new_location_obj(ais_data) {
 
 async function _insert_or_update_current_boats(ais_data_list) {
   const col = await db.collection("boats");
-  ais_data_list.forEach(async (ele) => {
+  for (const ele of ais_data_list) {
     const ais_data = ele.AIS;
     const boat = await col.findOne({ MMSI: ais_data.MMSI });
     if (boat == null) {
@@ -106,14 +106,14 @@ async function _insert_or_update_current_boats(ais_data_list) {
         if (new_locations.length > 10) {
           new_locations = new_locations.slice(-9);
         }
-        updateOne("boats", boat._id, {
+        await updateOne("boats", boat._id, {
           locations: new_locations,
         });
       } else {
         console.log("No New Timestamp");
       }
     }
-  });
+  }
 }
 
 function _predict_ship_movement(AIS, key, angle_offset = 0, distance = 50) {
@@ -220,7 +220,7 @@ async function predict_boat_movement_range(boat_id, minutes_diff_start, minutes_
 
 async function update_boats() {
   const new_ais = await _fetch_ais();
-  insert_ais_historic_data(new_ais);
+  await insert_ais_historic_data(new_ais);
   await _insert_or_update_current_boats(new_ais);
   await _clean_boats();
 

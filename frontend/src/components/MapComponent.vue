@@ -6,7 +6,6 @@ import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
 import slocum1 from "@/assets/slocum_marker.png";
-import boat from "@/assets/boat.png"
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
@@ -120,18 +119,36 @@ watch(boat_slide_time_offset, () => {
   draw_predict()
 })
 
+function get_boat_rotation(last_location) {
+  const heading = Number(last_location["HEADING"])
+  if (Number.isFinite(heading) && heading >= 0 && heading <= 360) {
+    return heading
+  }
+
+  const course = Number(last_location["COURSE"])
+  if (Number.isFinite(course) && course >= 0 && course <= 360) {
+    return course
+  }
+
+  return 0
+}
+
+function create_boat_icon(rotation) {
+  return L.divIcon({
+    className: 'boat-arrow-marker',
+    iconSize: [30, 30],
+    iconAnchor: [15, 15],
+    html: `<span class="boat-arrow" style="transform: rotate(${rotation}deg);"></span>`,
+  })
+}
+
 function draw_boats() {
   clear_map_data(boat_markers)
-  const boat_size = 30
-  let slocum_icon = L.icon({
-    iconUrl: boat,
-    iconSize: [boat_size, boat_size],
-    iconAnchor: [Math.floor(boat_size / 2), Math.floor(boat_size / 2)],
-  })
   boats.value.forEach((ele) => {
     const last_location = ele.locations[ele.locations.length - 1]
-    const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: slocum_icon })
-      .addTo(initialMap.value).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${last_location["NAME"]}</b>`)
+    const rotation = get_boat_rotation(last_location)
+    const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: create_boat_icon(rotation) })
+      .addTo(initialMap.value).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${ele["NAME"]}</b>`)
     boat_markers.value.push(new_marker)
   })
 }
@@ -358,6 +375,8 @@ onMounted(() => {
   }).addTo(initialMap.value);
   initialMap.value.on('click', map_click)
   create_polygons()
+  draw_ais_border()
+  get_boats()
 })
 
 function update_map() {
@@ -529,5 +548,44 @@ margin-top: .2rem;
 }
 #slider-header p{
   margin-right: .5rem;
+}
+
+:deep(.boat-arrow-marker) {
+  background: transparent;
+  border: 0;
+}
+
+:deep(.boat-arrow) {
+  display: block;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  transform-origin: center;
+}
+
+:deep(.boat-arrow::before) {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 22px solid #1fb655;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .45));
+  transform: translateX(-50%);
+}
+
+:deep(.boat-arrow::after) {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 6px;
+  height: 12px;
+  background: #137a39;
+  border-radius: 999px;
+  transform: translateX(-50%);
 }
 </style>
