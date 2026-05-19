@@ -837,6 +837,8 @@ function toggleGliderDropdown(gliderName) {
 .signup-list {
   padding: 0;
   background-color: var(--color-background);
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .signup-item {
