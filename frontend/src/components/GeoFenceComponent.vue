@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import FilesBoxComponent from './FilesBoxComponent.vue';
@@ -9,6 +9,7 @@ import { useEventsStore } from '@/stores/events';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from '@/stores/gliders';
 import { useUserStore } from '@/stores/user';
+import type { FileBoxType, Geofence } from '@/lib/types';
 
 const store = useGeoFencesStore()
 const eventsStore = useEventsStore()
@@ -23,10 +24,13 @@ const isResizing = ref(false)
 const show_close_confirm_modal = ref(false)
 const show_delete_confirm_modal = ref(false)
 const geofence_is_dirty = ref(false)
-const pending_fence_key = ref(null)
+const pending_fence_key = ref<string | null>(null)
 const pending_from_map = ref(false)
-const pending_delete_element = ref(null)
-const emit = defineEmits(['drawer-offset-change'])
+const pending_delete_element = ref<FileBoxType<Geofence> | null>(null)
+
+const emit = defineEmits<{
+  'drawer-offset-change': [number]
+}>()
 
 const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
@@ -50,7 +54,7 @@ function add_geo() {
   }
   is_create_mode.value = true
   geofence_is_dirty.value = false
-  const hasSelectedGeofence = selected_fence_local.value !== "" || selected_fence.value !== ""
+  const hasSelectedGeofence = selected_fence_local.value !== "" || selected_fence.value !== null
   selected_fence_local.value = ""
   store.deselect()
 
@@ -66,17 +70,17 @@ function add_geo() {
 }
 
 //SAVE RESTRICTED TO ADMIN
-function back(save) {
+function back(save: boolean) {
   if (!isAdmin.value) {
     save = false
   }
-  let savePromise = Promise.resolve()
+  let savePromise: Promise<boolean | void> = Promise.resolve()
   if (save) {
     savePromise = store.saveOrUpdateGeofence() || Promise.resolve()
   }
   else {
     if (is_create_mode.value) {
-      store.remove(123)
+      store.remove('123')
     }
     savePromise = store.getGeofences() || Promise.resolve()
   }
@@ -105,8 +109,8 @@ function confirm_close_save() {
     savePromise.then(() => {
       is_create_mode.value = false
       geofence_is_dirty.value = false
-      selected_fence_local.value = pending_fence_key.value
-      store.select(pending_fence_key.value)
+      selected_fence_local.value = pending_fence_key.value as string
+      store.select(pending_fence_key.value as string)
       pending_fence_key.value = null
       pending_from_map.value = false
       show_close_confirm_modal.value = false
@@ -131,14 +135,14 @@ function confirm_close_save() {
 function confirm_close_discard() {
   if (pending_from_map.value) {
     if (is_create_mode.value) {
-      store.remove(123)
+      store.remove('123')
     }
     const reloadPromise = store.getGeofences() || Promise.resolve()
     reloadPromise.then(() => {
       is_create_mode.value = false
       geofence_is_dirty.value = false
-      selected_fence_local.value = pending_fence_key.value
-      store.select(pending_fence_key.value)
+      selected_fence_local.value = pending_fence_key.value as string
+      store.select(pending_fence_key.value as string)
       pending_fence_key.value = null
       pending_from_map.value = false
       show_close_confirm_modal.value = false
@@ -160,23 +164,23 @@ function confirm_close_discard() {
   }
 }
 
-function on_click(e) {
+function on_click(e: FileBoxType<Geofence>) {
   //console.log("ONCLICK")
   if (just_removed.value) {
     just_removed.value = false;
     return
   }
   if (geofence_is_dirty.value) {
-    pending_fence_key.value = e.key
+    pending_fence_key.value = e.key ?? ''
     show_close_confirm_modal.value = true
     return
   }
   if (is_create_mode.value) {
-    store.remove(123)
+    store.remove('123')
   }
   is_create_mode.value = false
-  selected_fence_local.value = e.key
-  store.select(e.key)
+  selected_fence_local.value = e.key ?? ''
+  store.select(e.key ?? '')
 }
 
 function open_selected_geofence_editor() {
@@ -196,7 +200,7 @@ function deselect_selected_geofence_editor() {
   store.deselect()
 }
 
-function handle_outside_click(event) {
+function handle_outside_click(event: PointerEvent) {
   if (!selected_fence_local.value && !selected_fence.value) {
     return
   }
@@ -225,7 +229,7 @@ function handle_outside_click(event) {
   deselect_selected_geofence_editor()
 }
 
-function handle_geofence_selection(fenceKey) {
+function handle_geofence_selection(fenceKey: string) {
   if (geofence_is_dirty.value) {
     pending_fence_key.value = fenceKey
     pending_from_map.value = true
@@ -233,14 +237,14 @@ function handle_geofence_selection(fenceKey) {
     return
   }
   if (is_create_mode.value) {
-    store.remove(123)
+    store.remove('123')
   }
   is_create_mode.value = false
   selected_fence_local.value = fenceKey
   store.select(fenceKey)
 }
 
-function handle_geofence_double_click(fenceKey) {
+function handle_geofence_double_click(fenceKey: string) {
   if (geofence_is_dirty.value) {
     pending_fence_key.value = fenceKey
     pending_from_map.value = true
@@ -248,7 +252,7 @@ function handle_geofence_double_click(fenceKey) {
     return
   }
   if (is_create_mode.value) {
-    store.remove(123)
+    store.remove('123')
   }
   is_create_mode.value = false
   selected_fence_local.value = fenceKey
@@ -257,7 +261,7 @@ function handle_geofence_double_click(fenceKey) {
 }
 
 //RESTRICT REMOVE TO ADMIN
-function remove(element) {
+function remove(element: FileBoxType<Geofence>) {
   if (!isAdmin.value) {
     return
   }
@@ -270,14 +274,14 @@ function confirm_delete() {
   const element = pending_delete_element.value
   if (element) {
     back(false).then(() => {
-      store.deleteGeofence(element.key)
+      store.deleteGeofence(element.key as string)
     })
   }
   show_delete_confirm_modal.value = false
   pending_delete_element.value = null
 }
 
-function startResize(e) {
+function startResize(e: MouseEvent) {
   isResizing.value = true
   document.body.style.cursor = 'ew-resize'
   document.body.style.userSelect = 'none'
@@ -286,7 +290,7 @@ function startResize(e) {
   e.preventDefault()
 }
 
-function handleResize(e) {
+function handleResize(e: MouseEvent) {
   if (!isResizing.value) return
   const newWidth = window.innerWidth - e.clientX
   if (newWidth >= 200 && newWidth <= 800) {
@@ -308,20 +312,26 @@ function emitDrawerOffset() {
 }
 
 const latlons = computed(() => {
-  let ret = []
-  Object.keys(geofences.value).forEach((key, index) => {
-    let new_obj = {
+  const ret: FileBoxType<Geofence>[] = []
+  Object.keys(geofences.value).forEach((key) => {
+    if (geofences.value[key] === undefined) return
+
+    let has_geofence_event = false
+    let name = geofences.value[key].name
+    const new_obj = {
       ...geofences.value[key]
     }
-    let name = geofences.value[key].name
+
     if (selected_glider.value && eventsStore.glider_has_geofence_event(selected_glider.value._id, key)) {
       name = "* " + name
+      has_geofence_event = true
     }
     ret.push({
       ...new_obj,
-      key: key,
+      name: name,
       selected: selected_fence_local.value === key,
-      bold: (selected_glider.value && eventsStore.glider_has_geofence_event(selected_glider.value._id, key))
+      key: key,
+      bold: has_geofence_event
     })
   })
   return ret;

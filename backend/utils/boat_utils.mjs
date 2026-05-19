@@ -242,7 +242,7 @@ async function gliders_in_boath_path(boat) {
   for (const glider of gliders) {
     if (glider.track) {
       let glider_pos = glider.track[glider.track.length - 1];
-      glider_pos = [convert_gps(glider_pos.lat), convert_gps(glider_pos.lon)];
+      glider_pos = [convert_gps(glider_pos.lat), convert_gps(glider_pos.lng)];
       const last_location = boat.locations[boat.locations.length - 1];
       const boat_poly = get_boat_polygon(last_location);
       // console.log(glider_pos);

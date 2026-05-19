@@ -1,13 +1,10 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
+import type { FileBoxType } from '@/lib/types';
 import { useFilesStore } from '@/stores/files';
 import { computed } from 'vue';
 
 const props = withDefaults(defineProps<{
-  element: {
-    category?: string
-    name?: string
-    bold?: boolean
-  }
+  element: FileBoxType<T>
   canDelete?: boolean
   canEdit?: boolean
   selected?: boolean
@@ -21,11 +18,13 @@ const emit = defineEmits(["remove", "edit"])
 const filesStore = useFilesStore()
 
 const styleColor = computed(() => {
-  return (props.element.category !== undefined ? filesStore.colour_by_category[props.element.category] : '')
+  return ('category' in props.element ? filesStore.colour_by_category[props.element.category as string] : '')
 })
 
-const classBold = computed(() => {
-  return (props.element.bold !== undefined ?  props.element.bold : false )
+const elementName = computed(() => {
+  if ('name' in props.element) return props.element.name
+  if ('filename' in props.element) return props.element.filename
+  return ''
 })
 
 
@@ -33,8 +32,9 @@ const classBold = computed(() => {
 <template>
   <div :class="{ border: true, selected: props.selected }">
     <p :style="{ color: styleColor }"
-      :class="{ filename: true, bold: classBold}">{{
-        element.name }}</p>
+      :class="{ filename: true, bold: element.bold}">
+      {{ elementName }}
+    </p>
     <div class="buttons" v-if="(props.canEdit && props.selected) || (props.canDelete && props.selected)">
       <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit geofence" title="Edit geofence"> ✎</button>
       <span class="divider" v-if="props.canDelete && props.canEdit && props.selected">|</span>

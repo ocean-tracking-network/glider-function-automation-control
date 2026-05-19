@@ -12,7 +12,7 @@ const { logs } = storeToRefs(logsStore)
 const filter_by_glider = ref(false)
 
 const filtered_logs = computed<GliderLog[]>(() => {
-  let ret: GliderLog[] = []
+  const ret: GliderLog[] = []
   logs.value.forEach((ele) => {
     if (ele.glider && gliderStore.selected_glider && ele.glider == gliderStore.selected_glider._id) {
       ret.push(ele)

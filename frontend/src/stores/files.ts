@@ -90,13 +90,13 @@ export const useFilesStore = defineStore('files', () => {
   }
 
   // ((payload: Event) => void)
-  const upload_kml_file = (file: Event | File) => {
+  const upload_kml_file = (file: Event | File[]) => {
     if (file instanceof Event) {
       if (file.target instanceof HTMLInputElement) {
         local_kml_file.value = file.target!.files?.item(0) ?? null
       }
     }
-    else local_kml_file.value = file
+    else local_kml_file.value = file[0] ?? null
   }
 
   const clear_kml_file = () => {
@@ -124,7 +124,7 @@ export const useFilesStore = defineStore('files', () => {
       })
   }
 
-  const update_files_category = (files: {_id: string, category: string}) => {
+  const update_files_category = (files: {_id: string, category: string}[]) => {
     apiClient
       .patch('/files', files)
       .then(() => {
@@ -146,12 +146,9 @@ export const useFilesStore = defineStore('files', () => {
   })
 
   const files_arr = computed(() => {
-    const ret: (UploadedFile & {name: string})[] = []
+    const ret: UploadedFile[] = []
     files_raw.value.forEach((ele) => {
-      ret.push({
-        ...ele,
-        name: ele.filename,
-      })
+      ret.push({...ele})
     })
     return ret
   })

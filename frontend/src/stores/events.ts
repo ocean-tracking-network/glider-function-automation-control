@@ -4,7 +4,7 @@ import { computed, ref, watch } from 'vue'
 import { useGlidersStore } from './gliders'
 import { useFilesStore } from './files'
 import { useGeoFencesStore } from './geofences'
-import type { GliderEvent, Script, ScriptOptions, UploadedFile } from '@/lib/types'
+import type { EventGliderFile, GliderEvent, Script, ScriptOptions, UploadedFile } from '@/lib/types'
 
 export const useEventsStore = defineStore('events', () => {
   const gliderStore = useGlidersStore()
@@ -12,10 +12,9 @@ export const useEventsStore = defineStore('events', () => {
   const geofenceStore = useGeoFencesStore()
   const events = ref<GliderEvent[]>([])
 
-  const enter_files_ref = ref<(UploadedFile & GliderEvent)[]>([])
-  const exit_files_ref = ref<(UploadedFile & GliderEvent)[]>([])
+  const enter_files_ref = ref<EventGliderFile[]>([])
+  const exit_files_ref = ref<EventGliderFile[]>([])
 
-  // options {} file_id if file, script and script_type if a script
   const add_event = (event_type: 'enter' | 'exit', options: ScriptOptions) => {
     const selected_glider = gliderStore.selected_glider
     const selected_fence_key = geofenceStore.selected_fence_key
@@ -24,28 +23,6 @@ export const useEventsStore = defineStore('events', () => {
       console.warn('Cannot add event: missing selected glider or geofence')
       return
     }
-
-    // const file_id = options.file_id
-    // const script = options.script
-    // const script_type = options.script_type
-
-    // const data = {
-    //   geofence: selected_fence_key,
-    //   glider: selected_glider._id,
-    //   event_type: event_type,
-    // }
-    // if (options.file_id) {
-    //   data.file = file_id
-    // } else if (script) {
-    //   data.script = script
-    //   data.script_type = script_type
-    // };
-
-    // Need to test typed scripts when the dummy api is back on,
-    // or when we can get some fabricated data
-    // const data_options: ScriptOptions = options.file
-    // ? {file: options.file}
-    // : {script: options.script, script_type: options.script_type}
 
     const data: Script = {
       file_id: options.file_id,
@@ -61,12 +38,11 @@ export const useEventsStore = defineStore('events', () => {
     console.log('data')
     console.log(data)
 
-    // Test outgoing data is formated the same typed as it is in JS
-    // apiClient.post('/events', data).then((res) => {
-    //   console.log('Added event')
-    //   console.log(data)
-    //   get_events()
-    // })
+    apiClient.post('/events', data).then((res) => {
+      console.log('Added event')
+      console.log(data)
+      get_events()
+    })
   }
 
   const remove_event = (id: string) => {
@@ -109,7 +85,9 @@ export const useEventsStore = defineStore('events', () => {
     const found = events.value.find(
       (event) => event.geofence == geofence_id && event.glider == glider_id,
     )
-    console.log(found)
+    if (found) {
+      console.log(`Found glider geofence event ${found}`)
+    }
     return found
   }
 

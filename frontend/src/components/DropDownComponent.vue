@@ -42,9 +42,9 @@ function option_click(option: string) {
       <DropDownIcon class="dropdown-icon" />
     </button>
     <div v-if="show_dropdown" class="dropdown-content" @click.stop>
-      <input :disabled="props.disabled" @focusin="" @click.stop type="text" placeholder="Search.." class="dropdown-search"
+      <input :disabled="props.disabled" @focusin.stop @click.stop type="text" placeholder="Search.." class="dropdown-search"
         v-model="filter_text">
-      <button :disabled="props.disabled" @click.stop="option_click(option)" v-for="option in filtered_options">
+      <button :disabled="props.disabled" @click.stop="option_click(option)" :key="`${option}-${index}`" v-for="(option, index) in filtered_options">
         {{ option }}
       </button>
     </div>

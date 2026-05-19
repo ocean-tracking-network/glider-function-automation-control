@@ -9,19 +9,18 @@ const get_geofences = async (req, res) => {
 }
 
 function filter_latlons(latlon) {
-  if (latlon.length != 2) {
-    return false
-  }
-  if (!latlon[0] || !latlon[1]) {
+  if (!latlon.lat || !latlon.lng) {
     return false
   }
   return true
 }
 
 const post_geofences = async (req, res, next) => {
+  console.log(req.body)
   const latlons = req.body.latlons.filter(filter_latlons).map((latlon) => {
-    return [parseFloat(latlon[0]), parseFloat(latlon[1])]
+    return {lat: parseFloat(latlon.lat), lng: parseFloat(latlon.lng)}
   })
+  console.log(latlons)
   const name = req.body.name
   const notify = req.body.notify
 
@@ -57,7 +56,7 @@ const patch_geofences = async (req, res) => {
   let data = req.body
   if (data.latlons) {
     data.latlons = data.latlons.filter(filter_latlons).map((latlon) => {
-      return [parseFloat(latlon[0]), parseFloat(latlon[1])]
+      return {lat: parseFloat(latlon.lat), lng: parseFloat(latlon.lng)}
     })
   }
 

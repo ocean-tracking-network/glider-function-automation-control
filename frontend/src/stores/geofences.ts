@@ -5,6 +5,7 @@ import apiClient from '@/apiClient'
 import { useEventsStore } from './events'
 import { useFilesStore } from './files'
 import type { Geofence, kmlGeoJson, Latlon } from '@/lib/types'
+import type { GeoJsonGeometryTypes, Geometry } from 'geojson'
 
 export const useGeoFencesStore = defineStore('geofences', () => {
   const geofences = ref<Record<string, Geofence>>({})
@@ -17,55 +18,16 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const selected_kml_geo_json = ref<kmlGeoJson[] | null>(null)
   const show_alert_modal = ref<string>('')
   const onSelectGeofenceHandler = ref<((fencekey: string) => void) | null>(null)
-  const onDoubleClickGeofenceHandler = ref(null)
+  const onDoubleClickGeofenceHandler = ref<((fencekey: string) => void) | null>(null)
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
-  const supported_kml_geometry_types = new Set(['Point', 'Polygon', 'LinearRing'])
+  const supported_kml_geometry_types = new Set<GeoJsonGeometryTypes>(['Point', 'Polygon', 'LineString'])
 
-  const toLatLonPairs = (coordinates = []) => {
+  const toLatLonPairs = (coordinates: number[][] = []): Latlon[] => {
     return coordinates
       .filter((lonlat) => Array.isArray(lonlat) && lonlat.length >= 2)
-      .map((lonlat) => [lonlat[1], lonlat[0]])
-  }
-
-  const parseCoordinateText = (coordinateText = '') => {
-    return coordinateText
-      .trim()
-      .split(/\s+/)
-      .map((coordinate) => coordinate.split(',').slice(0, 2).map((value) => Number(value)))
-      .filter(([lon, lat]) => Number.isFinite(lon) && Number.isFinite(lat))
-  }
-
-  const getDirectChildText = (element, tagName) => {
-    const child = Array.from(element?.children || []).find(
-      (candidate) => candidate.localName === tagName || candidate.tagName === tagName,
-    )
-    return child?.textContent?.trim() || ''
-  }
-
-  const getBareLinearRingPlacemarkFeatures = (kmlDom) => {
-    return Array.from(kmlDom.getElementsByTagName('Placemark'))
-      .map((placemark) => {
-        const linearRing = Array.from(placemark.children || []).find(
-          (candidate) => candidate.localName === 'LinearRing' || candidate.tagName === 'LinearRing',
-        )
-
-        if (!linearRing) {
-          return null
-        }
-
-        const coordinates = toLatLonPairs(parseCoordinateText(linearRing.textContent || ''))
-
-        return {
-          coordinates: coordinates,
-          placemark: getDirectChildText(placemark, 'name'),
-          type: 'LinearRing',
-          isValid: coordinates.length >= 3,
-          description: getDirectChildText(placemark, 'description'),
-        }
-      })
-      .filter(Boolean)
+      .map((lonlat) => { return { lat: lonlat[1]!, lng: lonlat[0]! }})
   }
 
   watch(local_kml_file, async (new_kml_file) => {
@@ -79,10 +41,12 @@ export const useGeoFencesStore = defineStore('geofences', () => {
         show_alert_modal.value = `Failed to parse ${new_kml_file.name} file! Please upload a valid KML file`
       } else {
         const geoJson = kml(kmlDom)
-        const geoJsonFeatures = (geoJson.features || []).map((feature) => {
+        const geoJsonFeatures = (geoJson.features || []).filter(
+          (feature) => feature.geometry && supported_kml_geometry_types.has(feature.geometry.type)
+        ).map((feature) => {
           const coordinates: Latlon[] = []
           let isValid: boolean = true
-          const geom = feature.geometry || {}
+          const geom = feature.geometry as Geometry
           const type = geom.type
 
           switch (type) {
@@ -91,9 +55,9 @@ export const useGeoFencesStore = defineStore('geofences', () => {
                 coordinates.push(
                   {
                     lat: geom.coordinates[1] ?? 0,
-                    lon: geom.coordinates[0] ?? 0,
+                    lng: geom.coordinates[0] ?? 0,
                   }
-              )
+                )
               }
               if (coordinates.length < 1) {
                 isValid = false
@@ -105,8 +69,8 @@ export const useGeoFencesStore = defineStore('geofences', () => {
                 coordinates.push(
                   ...geom.coordinates[0]?.map((lonlats) => ({
                   lat: lonlats[1] ?? 0,
-                  lon: lonlats[0] ?? 0,
-                  })
+                  lng: lonlats[0] ?? 0,
+                })
               ) ?? [])
 
               }
@@ -115,7 +79,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
               }
               break
 
-            case 'LinearRing':
+            case 'LineString':
               if (Array.isArray(geom.coordinates)) {
                 coordinates.push(...toLatLonPairs(geom.coordinates))
               }
@@ -138,12 +102,9 @@ export const useGeoFencesStore = defineStore('geofences', () => {
             isValid: isValid,
             description: feature.properties?.description,
           }
-        }).filter((feature) => supported_kml_geometry_types.has(feature.type))
+        })
 
-        selected_kml_geo_json.value = [
-          ...geoJsonFeatures,
-          ...getBareLinearRingPlacemarkFeatures(kmlDom),
-        ]
+        selected_kml_geo_json.value = [...geoJsonFeatures]
       }
     }
   })
@@ -288,7 +249,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     geofences.value[temp_fence_key] = {
       name: name,
       selected: false,
-      latlons: [],
+      latlons: [] as Latlon[],
       notify: false,
     }
     return temp_fence_key
@@ -306,7 +267,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       selected_fence_key.value = ''
       return
     }
-    console.log(key)
+    // console.log(key)
     selected_fence.value = fence
     selected_fence_key.value = key
     set_force_map_update(true)
@@ -320,15 +281,15 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     }
   }
 
-  function setSelectGeofenceHandler(handler: (fencekey: string) => void) {
+  function setSelectGeofenceHandler(handler: ((fencekey: string) => void) | null) {
     onSelectGeofenceHandler.value = handler
   }
 
-  function setDoubleClickGeofenceHandler(handler) {
+  function setDoubleClickGeofenceHandler(handler: ((fencekey: string) => void) | null) {
     onDoubleClickGeofenceHandler.value = handler
   }
 
-  function doubleClickGeofence(key) {
+  function doubleClickGeofence(key: string) {
     if (onDoubleClickGeofenceHandler.value) {
       onDoubleClickGeofenceHandler.value(key)
     }

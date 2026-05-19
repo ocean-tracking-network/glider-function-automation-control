@@ -166,10 +166,10 @@ const update_geofences = async () => {
       if (last_glider_point.lat > 100) {
         //Hack because SFMC uses large numbers
         last_glider_point.lat = convert_gps(last_glider_point.lat)
-        last_glider_point.lon = convert_gps(last_glider_point.lon)
+        last_glider_point.lng = convert_gps(last_glider_point.lng)
       }
       const in_geofence = is_in_polygon(
-        [last_glider_point.lat, last_glider_point.lon],
+        [last_glider_point.lat, last_glider_point.lng],
         [...geofence.latlons, [null]] //Yeah, no idea why it needs [null] right now, temp fix
       )
       let last_in_geofence = false

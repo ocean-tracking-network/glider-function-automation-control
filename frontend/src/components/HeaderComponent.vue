@@ -6,7 +6,11 @@ import type { User, UserRole } from '@/lib/types';
 
 const version_number = "0.2.1"
 const userStore = useUserStore();
-const emit = defineEmits(['toggle-user-management']);
+
+const emit = defineEmits<{
+  'toggle-user-management': []
+}>();
+
 const menuOpen = ref(false);
 const menuContainer = useTemplateRef('menuContainer');
 const showDeleteModal = ref(false);
