@@ -22,8 +22,12 @@ async function glider_exists(gliderName) {
 }
 
 async function create_contact({ name, email, phone, notification_type, glider, event }) {
-  if (!name || !email || !phone || !notification_type || !glider) {
-    return { error: 'Need to provide name, email, phone, notification_type, and glider' }
+  if (!name || !notification_type || !glider) {
+    return { error: 'Need to provide name, notification_type, and glider' }
+  }
+
+  if (!email && !phone) {
+    return { error: 'Need to provide either an email address or phone number' }
   }
 
   const contactCollection = await db.collection('contacts')
