@@ -55,7 +55,6 @@ onBeforeMount(() => {
 
 function on_input() {
   if (!props.canEdit || lock_fence.value || !selected_fence.value) {
-    console.log(`Returning on_input`)
     return
   }
   const latlons = selected_fence.value.latlons
@@ -248,10 +247,9 @@ const back_display = computed(() => {
   return has_unsaved_changes.value ? "Save/Back" : "Back"
 })
 
-// Causing recursion
 watch(() => geofences.value, async () => {
   on_input()
-}, { deep: false })
+}, { deep: true })
 
 watch(
   [selected_fence],
@@ -260,10 +258,6 @@ watch(
   },
   { deep: true },
 )
-
-watch(fence_key, () => {
-  console.log(fence_key.value)
-})
 
 const { isOverDropZone } = useDropZone(dropZoneRef, {
   onDrop,

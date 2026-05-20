@@ -17,7 +17,7 @@ const apiClient = axios.create({
 })
 
 /** @type {EventSource} */
-let eventSource: EventSource
+let eventSource: EventSource | undefined
 
 export const createEventSource = () => {
   if (eventSource) return eventSource

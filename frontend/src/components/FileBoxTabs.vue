@@ -38,7 +38,6 @@ function select(tab: string) {
       }
     }
 
-    console.log("1")
     emit("select", tab)
   }
 }
@@ -61,10 +60,8 @@ function stop_edit() {
   else {
     emit("rename", { old: props.selected, new: temp_rename_text.value })
     // nextTick(() => {
-    console.log("2")
     // emit("select", temp_rename_text.value)
     // })
-
   }
 }
 
@@ -72,7 +69,6 @@ function add() {
   if (props.disabled) {
     return
   }
-  console.log("3")
   // emit("select", "")
   adding_new.value = true
   // rename.value = true
@@ -90,7 +86,7 @@ const all_tabs = computed(() => {
 </script>
 <template>
   <div class="tab-container">
-    <button :class="{ first: index == 0 }" :key="`${tab}-${index}`" v-for="(tab, index) in all_tabs" @click="select(tab)"
+    <button :class="{ first: index == 0 }" :key="index" v-for="(tab, index) in all_tabs" @click="select(tab)"
       :disabled="props.disabled">
       <p :class="{ tabtext: true, selected: (selected == tab && !static), last: static }"
         :style="{ color: filesStore.colour_by_category[tab] }"

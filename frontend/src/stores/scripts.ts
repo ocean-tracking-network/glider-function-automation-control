@@ -2,7 +2,7 @@ import { defineStore, storeToRefs } from 'pinia'
 import { onMounted, ref, watch } from 'vue'
 import { useGlidersStore } from './gliders'
 import apiClient from '@/apiClient'
-import type { Glider, GliderScripts } from '@/lib/types'
+import type { Glider, GliderScripts, ScriptData } from '@/lib/types'
 
 export const useScriptsStore = defineStore('scripts', () => {
   const gliderStore = useGlidersStore()
@@ -11,7 +11,7 @@ export const useScriptsStore = defineStore('scripts', () => {
   const scripts = ref<GliderScripts>({})
 
   async function get_scripts(glider_id: string) {
-    let ret_scripts = {}
+    let ret_scripts: ScriptData = {}
     await apiClient
       .get(`/glider/${glider_id}/scripts`)
       .then((res) => {
@@ -28,8 +28,6 @@ export const useScriptsStore = defineStore('scripts', () => {
     if (!scripts.value[glider_name] && glider_name) {
       const glider_scripts = await get_scripts(glider_obj._id)
       scripts.value[glider_name] = glider_scripts
-    } else {
-      console.log('CANNOT ADD GLIDER: ' + glider_name)
     }
   }
 

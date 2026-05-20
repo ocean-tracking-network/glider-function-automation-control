@@ -57,11 +57,13 @@ export type GliderEvent = Script & {
 
 export type EventGliderFile = UploadedFile & GliderEvent
 
+export type ScriptData = {
+  factory?: string[]
+  user?: string[]
+}
+
 export type GliderScripts = {
-  [glider_name: string]: {
-    factoryScripts?: string[]
-    userScripts?: string[]
-  }
+  [glider_name: string]: ScriptData
 }
 
 export type GliderLog = {
