@@ -66,12 +66,12 @@ async function update_glider_position(glider, collection = undefined) {
     return
   }
   let tracks = glider.track
-  let last_track = { lat: 0, lon: 0 }
+  let last_track = { lat: 0, lng: 0 }
   if (tracks.length > 0) {
     last_track = tracks[tracks.length - 1]
   }
 
-  if (last_track.lat != sfmc_json.gpsValidLat || last_track.lon != sfmc_json.gpsValidLon) {
+  if (last_track.lat != sfmc_json.gpsValidLat || last_track.lng != sfmc_json.gpsValidLon) {
     const track = {
       lat: sfmc_json.gpsValidLat,
       lng: sfmc_json.gpsValidLon,
