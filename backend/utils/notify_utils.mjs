@@ -21,17 +21,17 @@ async function glider_exists(gliderName) {
   return Boolean(glider)
 }
 
-async function create_contact({ name, email, phone, notification_type, glider, event }) {
+async function create_contact({ name, slack_id, phone, notification_type, glider, event }) {
   if (!name || !notification_type || !glider) {
     return { error: 'Need to provide name, notification_type, and glider' }
   }
 
-  if (!email && !phone) {
-    return { error: 'Need to provide either an email address or phone number' }
+  if (!slack_id && !phone) {
+    return { error: 'Need to provide either a Slack ID or phone number' }
   }
 
   const contactCollection = await db.collection('contacts')
-  const existing = await contactCollection.findOne({ name, email, phone, notification_type, glider })
+  const existing = await contactCollection.findOne({ name, slack_id, phone, notification_type, glider })
   if (existing) {
     return { error: 'Contact already exists' }
   }
@@ -41,11 +41,11 @@ async function create_contact({ name, email, phone, notification_type, glider, e
     return { error: 'Glider does not exist' }
   }
 
-  const result = await contactCollection.insertOne({ name, email, phone, notification_type, glider, event })
+  const result = await contactCollection.insertOne({ name, slack_id, phone, notification_type, glider, event })
   return { contact: result }
 }
 
-async function update_contact(id, { name, email, phone, notification_type, glider, event }) {
+async function update_contact(id, { name, slack_id, phone, notification_type, glider, event }) {
   const contactCollection = await db.collection('contacts')
   const existing = await contactCollection.findOne({ _id: new ObjectId(id) })
   if (!existing) {
@@ -58,7 +58,7 @@ async function update_contact(id, { name, email, phone, notification_type, glide
 
   await contactCollection.updateOne(
     { _id: new ObjectId(id) },
-    { $set: { name, email, phone, notification_type, glider, event } },
+    { $set: { name, slack_id, phone, notification_type, glider, event } },
   )
   return { message: 'Contact updated' }
 }

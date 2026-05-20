@@ -14,34 +14,12 @@ const successMessage = ref('');
 const users = ref([]);
 const formData = ref({
   user: '',
-  email: '',
+  slackId: '',
   phone: '',
   glider: '',
   event: '',
 });
 const gliders = computed(() => glidersStore.gliders);
-const normalizedUsers = computed(() => {
-  return users.value
-    .map((user) => ({
-      username: user?.username,
-      role: user?.role === 'admin' ? 'admin' : 'viewer',
-    }))
-    .filter((user) => !!user.username)
-    .sort((a, b) => {
-      if (a.role !== b.role) {
-        return a.role === 'admin' ? -1 : 1;
-      }
-
-      return a.username.localeCompare(b.username);
-    });
-});
-
-const adminUsers = computed(() => normalizedUsers.value.filter((user) => user.role === 'admin'));
-const viewerUsers = computed(() => normalizedUsers.value.filter((user) => user.role === 'viewer'));
-const openUserRole = ref('');
-const selectedUser = computed(() => {
-  return normalizedUsers.value.find((user) => user.username === formData.value.user) || null;
-});
 
 const openGliderDropdown = ref('');
 
@@ -57,27 +35,21 @@ const smsEventTypes = [
 ];
 
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/;
 
 const overlayMouseDownPos = ref({ x: 0, y: 0 });
 const isDraggingOnOverlay = ref(false);
-function isValidEmail(email) {
-  return email.trim() !== '' && emailRegex.test(email);
-}
-
 function isValidPhone(phone) {
   if (phone.trim() === '') return false;
   return phoneRegex.test(phone);
 }
 
 function validateContactFields() {
-  const hasValidEmail = isValidEmail(formData.value.email);
   const hasValidPhone = isValidPhone(formData.value.phone);
-  if (!hasValidEmail && !hasValidPhone) {
+  if (!hasValidPhone) {
     return {
       valid: false,
-      message: 'Please provide a valid email address and/or phone number.'
+      message: 'Please provide a valid phone number.'
     };
   }
 
@@ -134,14 +106,7 @@ function close() {
   emit('close');
 }
 
-function toggleUserRole(role) {
-  openUserRole.value = openUserRole.value === role ? '' : role;
-}
 
-function selectUser(username) {
-  formData.value.user = username;
-  openUserRole.value = '';
-}
 
 async function submitSignup() {
   if (!formData.value.user || !formData.value.glider || !formData.value.event) {
@@ -160,20 +125,12 @@ async function submitSignup() {
     successMessage.value = '';
     const selectedGlider = gliders.value.find((g) => g._id === formData.value.glider);
     const gliderName = selectedGlider?.name || '';
-    const hasValidEmail = isValidEmail(formData.value.email);
-    const hasValidPhone = isValidPhone(formData.value.phone);
-    let notificationType = 'sms'; // default
-    if (hasValidEmail && hasValidPhone) {
-      notificationType = 'email_sms';
-    } else if (hasValidEmail) {
-      notificationType = 'email';
-    }
 
     const payload = {
       name: formData.value.user,
-      email: formData.value.email,
+      slack_id: formData.value.slackId,
       phone: formData.value.phone,
-      notification_type: notificationType,
+      notification_type: 'sms',
       glider: gliderName,
       event: formData.value.event,
     };
@@ -183,7 +140,7 @@ async function submitSignup() {
     
     formData.value = {
       user: '',
-      email: '',
+      slackId: '',
       phone: '',
       glider: '',
       event: '',
@@ -265,82 +222,28 @@ function toggleGliderDropdown(gliderName) {
               <h3 class="section-title">Add SMS Signup</h3>
               <form @submit.prevent="submitSignup" class="signup-form">
                 <div class="form-group">
-                  <label for="user">User *</label>
-                  <div class="user-role-dropdowns">
-                    <div class="user-role-dropdown">
-                      <button
-                        type="button"
-                        class="user-role-toggle"
-                        :aria-expanded="openUserRole === 'admin'"
-                        @click="toggleUserRole('admin')"
-                      >
-                        <span class="user-role-toggle-label">
-                          Admins
-                          <span class="user-role-count">{{ adminUsers.length }}</span>
-                        </span>
-                        <span class="dropdown-arrow" :class="{ open: openUserRole === 'admin' }">▾</span>
-                      </button>
-                      <div v-if="openUserRole === 'admin'" class="user-role-listbox" role="listbox" aria-label="Admins">
-                        <button
-                          v-for="user in adminUsers"
-                          :key="`admin-${user.username}`"
-                          type="button"
-                          class="user-role-option"
-                          :class="{ selected: formData.user === user.username }"
-                          @click="selectUser(user.username)"
-                        >
-                          <span>{{ user.username }}</span>
-                        </button>
-                        <div v-if="adminUsers.length === 0" class="user-role-empty">No admins available</div>
-                      </div>
-                    </div>
-
-                    <div class="user-role-dropdown">
-                      <button
-                        type="button"
-                        class="user-role-toggle"
-                        :aria-expanded="openUserRole === 'viewer'"
-                        @click="toggleUserRole('viewer')"
-                      >
-                        <span class="user-role-toggle-label">
-                          Viewers
-                          <span class="user-role-count">{{ viewerUsers.length }}</span>
-                        </span>
-                        <span class="dropdown-arrow" :class="{ open: openUserRole === 'viewer' }">▾</span>
-                      </button>
-                      <div v-if="openUserRole === 'viewer'" class="user-role-listbox" role="listbox" aria-label="Users">
-                        <button
-                          v-for="user in viewerUsers"
-                          :key="`viewer-${user.username}`"
-                          type="button"
-                          class="user-role-option"
-                          :class="{ selected: formData.user === user.username }"
-                          @click="selectUser(user.username)"
-                        >
-                          <span>{{ user.username }}</span>
-                        </button>
-                        <div v-if="viewerUsers.length === 0" class="user-role-empty">No users available</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div v-if="selectedUser" class="user-selected-summary">
-                    <span class="selected-summary-label">Selected User:</span>
-                    <span class="selected-summary-name">{{ selectedUser.username }}</span>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="email">Email</label>
+                  <label for="user">Name *</label>
                   <input
-                    id="email"
-                    v-model="formData.email"
-                    type="email"
-                    placeholder="Enter email address"
+                    id="user"
+                    v-model="formData.user"
+                    type="text"
+                    placeholder="Enter name"
+                    required
                   />
                 </div>
 
                 <div class="form-group">
-                  <label for="phone">Phone</label>
+                  <label for="slackId">Slack ID</label>
+                  <input
+                    id="slackId"
+                    v-model="formData.slackId"
+                    type="text"
+                    placeholder="Enter Slack ID"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="phone">Phone *</label>
                   <input
                     id="phone"
                     v-model="formData.phone"
@@ -395,7 +298,7 @@ function toggleGliderDropdown(gliderName) {
                       <div>
                         <div><strong>{{ signup.name }}</strong> - {{ getEventName(signup.event) }}</div>
                         <div class="signup-details">
-                          Email: {{ signup.email || 'Not specified' }}<br>
+                          Slack ID: {{ signup.slack_id || 'Not specified' }}<br>
                           Phone: {{ signup.phone || 'Not specified' }}
                         </div>
                       </div>
@@ -572,143 +475,7 @@ function toggleGliderDropdown(gliderName) {
   color: var(--color-text-muted, #666);
 }
 
-@media (prefers-color-scheme: dark) {
-  .sms-signup-body {
-    --user-picker-surface: rgba(255, 255, 255, 0.03);
-    --user-picker-surface-hover: rgba(255, 255, 255, 0.06);
-    --user-picker-border: rgba(255, 255, 255, 0.14);
-    --user-picker-border-soft: rgba(255, 255, 255, 0.08);
-    --user-picker-muted-strong: rgba(235, 235, 235, 0.8);
-  }
-}
 
-.user-role-dropdowns {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 2px;
-}
-
-.user-role-dropdown {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.user-role-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--color-border, #ccc);
-  border-radius: 12px;
-  background: var(--color-background);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.user-role-toggle:hover {
-  border-color: var(--color-border-hover, var(--color-text));
-}
-
-.user-role-toggle-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-}
-
-.dropdown-arrow {
-  display: inline-flex;
-  transition: transform 0.2s;
-  color: var(--user-picker-muted-strong);
-}
-
-.dropdown-arrow.open {
-  transform: rotate(180deg);
-}
-
-.user-role-count {
-  min-width: 1.75rem;
-  padding: 0.05rem 0.35rem;
-  border-radius: 4px;
-  background: var(--user-picker-surface);
-  font-size: 0.78rem;
-  font-weight: 600;
-  text-align: center;
-}
-
-.user-role-listbox {
-  border: 1px solid var(--user-picker-border);
-  border-radius: 6px;
-  overflow: hidden;
-  background-color: var(--color-background);
-  max-height: 220px;
-  overflow-y: auto;
-}
-
-.user-role-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  padding: 10px 14px;
-  border: none;
-  border-bottom: 1px solid var(--user-picker-border-soft);
-  background: var(--color-background);
-  color: var(--color-text);
-  font-family: inherit;
-  font-size: 0.95rem;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.user-role-option:last-child {
-  border-bottom: none;
-}
-
-.user-role-option:hover,
-.user-role-option.selected {
-  background: var(--user-picker-surface-hover);
-}
-
-.user-role-option.selected {
-  font-weight: 600;
-}
-
-.user-role-empty {
-  padding: 10px 14px;
-  color: var(--color-text);
-  font-style: italic;
-  background: var(--user-picker-surface);
-}
-
-.user-selected-summary {
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-.selected-summary-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--user-picker-muted-strong);
-}
-
-.selected-summary-name {
-  font-size: 0.8rem;
-  font-weight: 700;
-}
 
 .submit-btn {
   padding: 10px 16px;
