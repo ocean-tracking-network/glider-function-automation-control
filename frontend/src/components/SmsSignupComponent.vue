@@ -44,7 +44,7 @@ function isValidPhone(phone) {
   return phoneRegex.test(phone);
 }
 
-function validateContactFields() {
+function validateNotificationFields() {
   const hasValidPhone = isValidPhone(formData.value.phone);
   if (!hasValidPhone) {
     return {
@@ -94,7 +94,7 @@ async function loadSignups() {
   error.value = '';
   try {
     const res = await apiClient.get('/notify');
-    signups.value = res.data.contacts || [];
+    signups.value = res.data.notifications || [];
   } catch (err) {
     error.value = 'Failed to load signups: ' + (err.response?.data?.error || err.message);
   } finally {
@@ -114,7 +114,7 @@ async function submitSignup() {
     return;
   }
 
-  const validation = validateContactFields();
+  const validation = validateNotificationFields();
   if (!validation.valid) {
     error.value = validation.message;
     return;
