@@ -1,6 +1,7 @@
 import db from '../db/conn.mjs'
 import { gliders_sse } from '../views/sse/gliders.mjs'
 import { add_dialog_to_log, close_connection_on_log, create_log } from './log_utils.mjs'
+import { processNotificationsForConnectionLog } from './notifications.mjs'
 import {
   get_active_deployment_details,
   subscribe_for_glider_connection,
@@ -100,9 +101,22 @@ async function update_glider_positions() {
   }
 }
 
-function dialog_callback(dialog_event) {
+async function dialog_callback(dialog_event) {
   console.log('New dialog!')
-  add_dialog_to_log(dialog_event)
+  try {
+    const active_connection_log = await add_dialog_to_log(dialog_event)
+    if (!active_connection_log) {
+      return
+    }
+    await processNotificationsForConnectionLog(active_connection_log)
+  } catch (error) {
+    console.log('Notification processing failed')
+    console.log(error)
+    await create_log(
+      `Notification processing failed for ${dialog_event.gliderName}: ${error.message}`,
+      'error',
+    )
+  }
 }
 
 async function connection_callback(connection_event) {
@@ -122,38 +136,60 @@ async function connection_callback(connection_event) {
   }
 }
 
-// keep track of subscriptions to avoid duplicates when called multiple times
-const _subscribed_gliders = new Set()
+function get_glider_name(glider) {
+  if (typeof glider == 'string') {
+    return glider
+  }
+  return glider?.name
+}
 
-async function subscribe_sfmc_glider(gliderName) {
-  if (!gliderName) return
-  if (_subscribed_gliders.has(gliderName)) {
-    console.log(`Already subscribed to glider: ${gliderName}`)
+async function get_gliders_to_subscribe(gliders = undefined) {
+  if (gliders) {
+    return Array.isArray(gliders) ? gliders : [gliders]
+  }
+
+  const glider_collection = db.collection('gliders')
+  return glider_collection.find({}).toArray()
+}
+
+async function subscribe_sfmc_gliders(gliders = undefined) {
+  const gliders_to_subscribe = await get_gliders_to_subscribe(gliders)
+
+  if (gliders_to_subscribe.length == 0) {
+    console.log('No gliders found in database; no SFMC subscriptions created')
     return
   }
-  try {
-    console.log('subbing glider: ' + gliderName)
-    subscribe_for_glider_connection(gliderName, connection_callback)
-    subscribe_for_glider_dialog(gliderName, dialog_callback)
-    _subscribed_gliders.add(gliderName)
-    console.log('done')
-  } catch (err) {
-    console.log('Failed to subscribe to glider: ' + gliderName)
-    console.log(err)
+
+  for (let glider of gliders_to_subscribe) {
+    const glider_name = get_glider_name(glider)
+    if (!glider_name) {
+      console.log('Skipping SFMC subscription for glider document without a name')
+      continue
+    }
+
+    console.log('subbing glider: ' + glider_name)
+    try {
+      await Promise.all([
+        subscribe_for_glider_connection(glider_name, connection_callback),
+        subscribe_for_glider_dialog(glider_name, dialog_callback),
+      ])
+      console.log('done')
+    } catch (error) {
+      console.log(`Could not subscribe glider ${glider_name}`)
+      console.log(error)
+    }
   }
 }
 
-async function subscribe_sfmc_gliders() {
-  try {
-    const collection = await db.collection('gliders')
-    const docs = await collection.find({}).toArray()
-    const gliders = docs.map((g) => g.name).filter(Boolean)
-    for (let glider of gliders) {
-      await subscribe_sfmc_glider(glider)
+async function unsubscribe_sfmc_gliders(gliders = undefined) {
+  const gliders_to_unsubscribe = Array.isArray(gliders) ? gliders : [gliders]
+  for (let glider of gliders_to_unsubscribe) {
+    const glider_name = get_glider_name(glider)
+    if (!glider_name) {
+      console.log('Skipping SFMC unsubscribe for glider document without a name')
+      continue
     }
-  } catch (err) {
-    console.log('Error fetching gliders for subscription')
-    console.log(err)
+    console.log(`unsubscribe_sfmc_gliders stub called for ${glider_name}`)
   }
 }
 
@@ -162,5 +198,5 @@ export {
   update_glider_waypoint,
   delete_old_tracks,
   subscribe_sfmc_gliders,
-  subscribe_sfmc_glider,
+  unsubscribe_sfmc_gliders,
 }

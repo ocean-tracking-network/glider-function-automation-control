@@ -4,7 +4,6 @@ import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
 import { update_geofences } from './utils/geofence_utils.mjs'
 
-
 import {
   get_gliders,
   get_scripts,
@@ -28,7 +27,14 @@ import {
   trigger_events,
 } from './views/events.mjs'
 import { get_boats, get_boat_predict, check_gliders_safe } from './views/boats.mjs'
-import { login, create_user, get_deletable_users, delete_user, user_exists, get_all_users } from './views/user.mjs'
+import {
+  login,
+  create_user,
+  get_deletable_users,
+  delete_user,
+  user_exists,
+  get_all_users,
+} from './views/user.mjs'
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
@@ -104,8 +110,6 @@ app.post('/notify', authenticateToken, create_notification)
 app.patch('/notify/:id', authenticateToken, edit_notification)
 app.delete('/notify/:id', authenticateToken, delete_notifications)
 
-
-
 // boats
 // app.get('/boats/:end_offset', authenticateToken, get_boats)
 // app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
@@ -168,7 +172,10 @@ app.listen(port, async () => {
     await new Promise((r) => setTimeout(r, 5000))
   }
 
-  subscribe_sfmc_gliders()
+  // const gliders = ['otn200']
+  // const gliders = ["adam", "otn200"]
+  // await subscribe_sfmc_gliders(gliders)
+  await subscribe_sfmc_gliders()
 
   console.log(`example app listening on port ${port}`)
   send_slack_message('debug: Backend started and listening')

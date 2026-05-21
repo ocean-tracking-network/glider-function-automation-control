@@ -2,12 +2,11 @@ import db from '../db/conn.mjs'
 import { gliders_sse } from '../views/sse/gliders.mjs'
 
 async function purge_old_logs() {
-  const collection = await db.collection('logs')
+  const collection = db.collection('logs')
   const past_date = new Date()
   past_date.setDate(past_date.getDate() - process.env.HISTORY_DAYS)
   const results = await collection.deleteMany({ date: { $lt: past_date } })
 }
-
 
 // Let us change logs a bit
 // let log = {
@@ -28,34 +27,42 @@ async function purge_old_logs() {
 
 const close_connection_on_log = async (glider_connection) => {
   const collection = await db.collection('logs')
-  let result = collection.updateOne({"glider_connection.id": glider_connection.id},
+  let result = collection.updateOne(
+    { 'glider_connection.id': glider_connection.id },
     {
-      $set: {"glider_connection": glider_connection}
-    })
+      $set: { glider_connection: glider_connection },
+    },
+  )
   return result
 }
 
 const add_dialog_to_log = async (dialog) => {
-  const log_collection = await db.collection('logs')
-  const glider_collection = await db.collection('gliders')
-  const glider = await glider_collection.findOne({name: dialog.gliderName})
+  const log_collection = db.collection('logs')
+  const glider_collection = db.collection('gliders')
+  const glider = await glider_collection.findOne({ name: dialog.gliderName })
   console.log(dialog)
-  console.log(glider)
-  const filter = {glider: glider._id, 'glider_connection.active': true}
-  let result = await log_collection.updateOne(filter,
-    {
-      $push: {"surface_dialog": {
-        ...dialog,
-        time: new Date()
-      }}
-    })
-  console.log(result)
-  if(result.matchedCount == 0){
-    console.log("PROBLEM ADDING TO LOG!")
+  // console.log(glider)
+  if (!glider) {
+    console.log('PROBLEM ADDING TO LOG! Glider not found')
+    return null
   }
+  const filter = { glider: glider._id, 'glider_connection.active': true }
+  const dialog_doc = {
+    ...dialog,
+    time: new Date(),
+  }
+  let result = await log_collection.updateOne(filter, {
+    $push: { surface_dialog: dialog_doc },
+  })
+  // console.log(result)
+  if (result.matchedCount == 0) {
+    console.log('PROBLEM ADDING TO LOG!')
+    return null
+  }
+  return log_collection.findOne(filter)
 }
 
-const create_log = async (message, level, glider = '', glider_connection=undefined) => {
+const create_log = async (message, level, glider = '', glider_connection = undefined) => {
   // level: str -> info, warning, error
   // glider: str _id (optional)
   // glider_connection: object from sfmc api (optional, don't need glider if this is populated)
@@ -71,18 +78,18 @@ const create_log = async (message, level, glider = '', glider_connection=undefin
   }
   if (glider) {
     new_doc.glider = glider
-  } else if(glider_connection){
-    const glider_collection = await db.collection('gliders')
-    const glider_obj = await glider_collection.findOne({sfmc_id: glider_connection.gliderId})
+  } else if (glider_connection) {
+    const glider_collection = db.collection('gliders')
+    const glider_obj = await glider_collection.findOne({ sfmc_id: glider_connection.gliderId })
     // check if there's already an active log
-    const filter = {glider: glider_obj._id, 'glider_connection.active': true}
-    const update_result = await collection.updateMany(filter,
-      {
-        $set: {"glider_connection.active": false}
-      }
-    )
-    if (update_result.modifiedCount > 0){
-      console.log(`Closed ${update_result.modifiedCount} active connections for glider: ${glider_obj.name}`)
+    const filter = { glider: glider_obj._id, 'glider_connection.active': true }
+    const update_result = await collection.updateMany(filter, {
+      $set: { 'glider_connection.active': false },
+    })
+    if (update_result.modifiedCount > 0) {
+      console.log(
+        `Closed ${update_result.modifiedCount} active connections for glider: ${glider_obj.name}`,
+      )
     }
     new_doc.glider = glider_obj._id
     new_doc.glider_connection = glider_connection
@@ -93,6 +100,5 @@ const create_log = async (message, level, glider = '', glider_connection=undefin
   purge_old_logs()
   return result
 }
-
 
 export { create_log, close_connection_on_log, add_dialog_to_log }
