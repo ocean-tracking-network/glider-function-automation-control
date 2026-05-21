@@ -69,6 +69,9 @@ function get_boats() {
       draw_boats()
       draw_predict()
     })
+    .catch((error) => {
+      console.error("Error fetching boats:", error)
+    })
 }
 
 function clear_map_data(map_element_arr: Ref<L.Marker[]>) {
@@ -84,26 +87,36 @@ async function draw_predict() {
   const temp_array = boat_predict_lines.value
   boat_predict_lines.value = []
   for (const boat of boats.value) {
+    if (!boat || !boat.prediction) continue
     let predict_data = undefined
     if (boat_slide_time_offset.value == 0) {
       predict_data = boat.prediction
-    } else {
+    } else if (boat.prediction_range && boat.prediction_range.intervals) {
       predict_data = {
         cone: boat.prediction.cone,
         ...boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
       }
     }
+    
+    if (!predict_data) continue
+    
     console.log(predict_data)
     // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
     // @ts-expect-error predict data unknown
-    const ghost_line = L.polyline(predict_data.line!, { color: "white" }).addTo(initialMap.value as L.Map)
-    boat_predict_lines.value.push(ghost_line)
+    if (predict_data.line) {
+        const ghost_line = L.polyline(predict_data.line, { color: "white" }).addTo(initialMap.value as L.Map)
+        boat_predict_lines.value.push(ghost_line)
+    }
     // @ts-expect-error predict data unknown
-    const predict_cone = L.polyline(predict_data.cone!, { color: "green" }).addTo(initialMap.value as L.Map)
-    boat_predict_lines.value.push(predict_cone)
+    if (predict_data.cone) {
+        const predict_cone = L.polyline(predict_data.cone, { color: "green" }).addTo(initialMap.value as L.Map)
+        boat_predict_lines.value.push(predict_cone)
+    }
     // @ts-expect-error predict data unknown
-    const ghost = L.circle(predict_data.center!, { radius: 3 }).addTo(initialMap.value as L.Map)
-    boat_predict_lines.value.push(ghost)
+    if (predict_data.center) {
+        const ghost = L.circle(predict_data.center, { radius: 3 }).addTo(initialMap.value as L.Map)
+        boat_predict_lines.value.push(ghost)
+    }
   }
 
   if (temp_array.length) {
@@ -144,13 +157,11 @@ function create_boat_icon(rotation) {
 function draw_boats() {
   clear_map_data(boat_markers as Ref<L.Marker[]>)
   const boat_size = 30
-  const slocum_icon = L.icon({
-    iconUrl: boat,
-    iconSize: [boat_size, boat_size],
-    iconAnchor: [Math.floor(boat_size / 2), Math.floor(boat_size / 2)],
-  })
   boats.value.forEach((ele) => {
+    if (!ele.locations || ele.locations.length === 0) return
     const last_location = ele.locations[ele.locations.length - 1]
+    if (!last_location || !last_location["LATITUDE"] || !last_location["LONGITUDE"]) return
+
     const rotation = get_boat_rotation(last_location)
     const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: create_boat_icon(rotation) })
       .addTo(initialMap.value as L.Map).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${ele["NAME"]}</b>`)
