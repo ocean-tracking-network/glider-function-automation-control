@@ -60,6 +60,7 @@ function hide_add_modal() {
 <template>
   <ModalComponent v-if="show_add_modal"
     header="Add a New Glider"
+    :blur="true"
     @close="hide_add_modal()"
     @confirm="add_glider()"
   >
