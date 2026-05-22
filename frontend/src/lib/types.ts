@@ -82,6 +82,16 @@ export type User = {
   lastLogin?: string
 }
 
+export type SmsSignup = {
+  _id: string
+  name: string
+  slack_id: string
+  phone: string
+  notification_type: string
+  glider: string
+  event: string
+}
+
 export type FileBoxType<T> = T & {
   key?: string
   bold?: boolean

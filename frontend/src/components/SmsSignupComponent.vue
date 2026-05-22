@@ -1,13 +1,13 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useGlidersStore } from '@/stores/gliders';
-import { useEventsStore } from '@/stores/events';
 import apiClient from '@/apiClient';
+import { isAxiosError } from 'axios';
+import type { SmsSignup } from '@/lib/types';
 
 const emit = defineEmits(['close']);
 const glidersStore = useGlidersStore();
-const eventsStore = useEventsStore();
-const signups = ref([]);
+const signups = ref<SmsSignup[]>([]);
 const loading = ref(true);
 const error = ref('');
 const successMessage = ref('');
@@ -39,7 +39,7 @@ const phoneRegex = /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]
 
 const overlayMouseDownPos = ref({ x: 0, y: 0 });
 const isDraggingOnOverlay = ref(false);
-function isValidPhone(phone) {
+function isValidPhone(phone: string) {
   if (phone.trim() === '') return false;
   return phoneRegex.test(phone);
 }
@@ -56,12 +56,12 @@ function validateNotificationFields() {
   return { valid: true, message: '' };
 }
 
-function handleOverlayMouseDown(event) {
+function handleOverlayMouseDown(event: MouseEvent) {
   overlayMouseDownPos.value = { x: event.clientX, y: event.clientY };
   isDraggingOnOverlay.value = false;
 }
 
-function handleOverlayMouseMove(event) {
+function handleOverlayMouseMove(event: MouseEvent) {
   const dx = Math.abs(event.clientX - overlayMouseDownPos.value.x);
   const dy = Math.abs(event.clientY - overlayMouseDownPos.value.y);
   if (dx > 5 || dy > 5) {
@@ -69,7 +69,7 @@ function handleOverlayMouseMove(event) {
   }
 }
 
-function handleOverlayClick(event) {
+function handleOverlayClick(event: MouseEvent) {
   if (!isDraggingOnOverlay.value && event.target === event.currentTarget) {
     close();
   }
@@ -96,7 +96,9 @@ async function loadSignups() {
     const res = await apiClient.get('/notify');
     signups.value = res.data.notifications || [];
   } catch (err) {
-    error.value = 'Failed to load signups: ' + (err.response?.data?.error || err.message);
+    if (isAxiosError(err)) {
+      error.value = 'Failed to load signups: ' + (err.response?.data?.error || err.message);
+    }
   } finally {
     loading.value = false;
   }
@@ -105,8 +107,6 @@ async function loadSignups() {
 function close() {
   emit('close');
 }
-
-
 
 async function submitSignup() {
   if (!formData.value.user || !formData.value.glider || !formData.value.event) {
@@ -137,7 +137,7 @@ async function submitSignup() {
 
     await apiClient.post('/notify', payload);
     successMessage.value = 'SMS signup created successfully!';
-    
+
     formData.value = {
       user: '',
       slackId: '',
@@ -152,11 +152,13 @@ async function submitSignup() {
       successMessage.value = '';
     }, 3000);
   } catch (err) {
-    error.value = err.response?.data?.error || 'Failed to create signup';
+    if (isAxiosError(err)) {
+      error.value = err.response?.data?.error || 'Failed to create signup';
+    }
   }
 }
 
-async function deleteSignup(id) {
+async function deleteSignup(id: string) {
   if (!confirm('Are you sure you want to delete this signup?')) return;
 
   try {
@@ -164,36 +166,38 @@ async function deleteSignup(id) {
     await apiClient.delete(`/notify/${id}`);
     successMessage.value = 'Signup deleted successfully!';
     await loadSignups();
-    
+
     setTimeout(() => {
       successMessage.value = '';
     }, 3000);
   } catch (err) {
-    error.value = 'Failed to delete signup: ' + (err.response?.data?.error || err.message);
+    if (isAxiosError(err)) {
+      error.value = 'Failed to delete signup: ' + (err.response?.data?.error || err.message);
+    }
   }
 }
 
-function getGliderName(gliderId) {
-  const glider = gliders.value.find((g) => g._id === gliderId);
-  return glider ? glider.name : 'Unknown Glider';
-}
+// function getGliderName(gliderId: string) {
+//   const glider = gliders.value.find((g) => g._id === gliderId);
+//   return glider ? glider.name : 'Unknown Glider';
+// }
 
-function getEventName(eventValue) {
+function getEventName(eventValue: string) {
   return eventValue || 'Not specified';
 }
 
 const groupedSignups = computed(() => {
-  const grouped = {};
+  const grouped: {[glider: string]: SmsSignup[]} = {};
   signups.value.forEach((signup) => {
     if (!grouped[signup.glider]) {
       grouped[signup.glider] = [];
     }
-    grouped[signup.glider].push(signup);
+    grouped[signup.glider]!.push(signup);
   });
   return grouped;
 });
 
-function toggleGliderDropdown(gliderName) {
+function toggleGliderDropdown(gliderName: string) {
   openGliderDropdown.value = openGliderDropdown.value === gliderName ? '' : gliderName;
 }
 </script>
