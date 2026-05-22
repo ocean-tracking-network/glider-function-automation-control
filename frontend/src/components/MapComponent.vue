@@ -97,9 +97,9 @@ async function draw_predict() {
         ...boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
       }
     }
-    
+
     if (!predict_data) continue
-    
+
     console.log(predict_data)
     // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
     // @ts-expect-error predict data unknown
