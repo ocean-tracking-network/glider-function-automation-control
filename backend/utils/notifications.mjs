@@ -24,8 +24,8 @@ function formatNotificationDate(value) {
 }
 
 function formatGps(gpsLocation) {
-  if (!gpsLocation || gpsLocation.lat == null || gpsLocation.lon == null) return null
-  return `${gpsLocation.lat.toFixed(4)}, ${gpsLocation.lon.toFixed(4)}`
+  if (!gpsLocation || gpsLocation.lat == null || gpsLocation.lng == null) return null
+  return `${gpsLocation.lat.toFixed(4)}, ${gpsLocation.lng.toFixed(4)}`
 }
 
 function formatBattery(parsed) {
@@ -55,11 +55,7 @@ function buildNotificationMessage(parsed) {
   const eventLabel = EVENT_LABELS[parsed.eventType] || 'Unknown Glider Event'
   const gliderName = parsed.gliderName || 'unknown'
   const abortHistory = parsed.abortHistory
-  const lines = [
-    'GFAC Notification',
-    `Event: ${eventLabel}`,
-    `Glider: ${gliderName}`,
-  ]
+  const lines = ['GFAC Notification', `Event: ${eventLabel}`, `Glider: ${gliderName}`]
 
   if (parsed.eventType == 'abort') {
     addMessageLine(lines, 'Status', 'The glider reported a mission abort')
@@ -234,7 +230,16 @@ async function getSubscribers(parsed, event, connectionLog) {
   }
 }
 
-async function claimDelivery(logs, connectionLog, field, kind, parsed, event, message, parsedSummary) {
+async function claimDelivery(
+  logs,
+  connectionLog,
+  field,
+  kind,
+  parsed,
+  event,
+  message,
+  parsedSummary,
+) {
   const startedAt = new Date()
   const result = await logs.updateOne(
     { _id: connectionLog._id, [field]: { $exists: false } },
@@ -457,14 +462,7 @@ async function processNotificationsForConnectionLog(connectionLog) {
 
   // SMS and Slack have separate log fields so repeated dialog chunks cannot duplicate either send.
   const results = {
-    sms: await sendSmsMessages(
-      connectionLog,
-      parsed,
-      event,
-      message,
-      parsedSummary,
-      recipients,
-    ),
+    sms: await sendSmsMessages(connectionLog, parsed, event, message, parsedSummary, recipients),
     slack: await sendSlackMessages(
       connectionLog,
       parsed,

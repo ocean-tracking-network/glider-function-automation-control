@@ -4,7 +4,7 @@ import { kml } from '@tmcw/togeojson'
 import apiClient from '@/apiClient'
 import { useEventsStore } from './events'
 import { useFilesStore } from './files'
-import type { Geofence, kmlGeoJson, Latlon } from '@/lib/types'
+import type { Geofence, kmlGeoJson, Latlng } from '@/lib/types'
 import type { GeoJsonGeometryTypes, Geometry } from 'geojson'
 
 export const useGeoFencesStore = defineStore('geofences', () => {
@@ -22,12 +22,18 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const eventsStore = useEventsStore()
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
-  const supported_kml_geometry_types = new Set<GeoJsonGeometryTypes>(['Point', 'Polygon', 'LineString'])
+  const supported_kml_geometry_types = new Set<GeoJsonGeometryTypes>([
+    'Point',
+    'Polygon',
+    'LineString',
+  ])
 
-  const toLatLonPairs = (coordinates: number[][] = []): Latlon[] => {
+  const toLatLonPairs = (coordinates: number[][] = []): Latlng[] => {
     return coordinates
-      .filter((lonlat) => Array.isArray(lonlat) && lonlat.length >= 2)
-      .map((lonlat) => { return { lat: lonlat[1]!, lng: lonlat[0]! }})
+      .filter((lnglat) => Array.isArray(lnglat) && lnglat.length >= 2)
+      .map((lnglat) => {
+        return { lat: lnglat[1]!, lng: lnglat[0]! }
+      })
   }
 
   watch(local_kml_file, async (new_kml_file) => {
@@ -41,68 +47,68 @@ export const useGeoFencesStore = defineStore('geofences', () => {
         show_alert_modal.value = `Failed to parse ${new_kml_file.name} file! Please upload a valid KML file`
       } else {
         const geoJson = kml(kmlDom)
-        const geoJsonFeatures = (geoJson.features || []).filter(
-          (feature) => feature.geometry && supported_kml_geometry_types.has(feature.geometry.type)
-        ).map((feature) => {
-          const coordinates: Latlon[] = []
-          let isValid: boolean = true
-          const geom = feature.geometry as Geometry
-          const type = geom.type
+        const geoJsonFeatures = (geoJson.features || [])
+          .filter(
+            (feature) =>
+              feature.geometry && supported_kml_geometry_types.has(feature.geometry.type),
+          )
+          .map((feature) => {
+            const coordinates: Latlng[] = []
+            let isValid: boolean = true
+            const geom = feature.geometry as Geometry
+            const type = geom.type
 
-          switch (type) {
-            case 'Point':
-              if (Array.isArray(geom.coordinates)) {
-                coordinates.push(
-                  {
+            switch (type) {
+              case 'Point':
+                if (Array.isArray(geom.coordinates)) {
+                  coordinates.push({
                     lat: geom.coordinates[1] ?? 0,
                     lng: geom.coordinates[0] ?? 0,
-                  }
-                )
-              }
-              if (coordinates.length < 1) {
+                  })
+                }
+                if (coordinates.length < 1) {
+                  isValid = false
+                }
+                break
+
+              case 'Polygon':
+                if (Array.isArray(geom.coordinates) && Array.isArray(geom.coordinates[0])) {
+                  coordinates.push(
+                    ...(geom.coordinates[0]?.map((lnglats) => ({
+                      lat: lnglats[1] ?? 0,
+                      lng: lnglats[0] ?? 0,
+                    })) ?? []),
+                  )
+                }
+                if (coordinates.length < 3) {
+                  isValid = false
+                }
+                break
+
+              case 'LineString':
+                if (Array.isArray(geom.coordinates)) {
+                  coordinates.push(...toLatLonPairs(geom.coordinates))
+                }
+                if (coordinates.length < 3) {
+                  isValid = false
+                }
+                break
+
+              default:
                 isValid = false
-              }
-              break
+                break
+            }
 
-            case 'Polygon':
-              if (Array.isArray(geom.coordinates) && Array.isArray(geom.coordinates[0])) {
-                coordinates.push(
-                  ...geom.coordinates[0]?.map((lonlats) => ({
-                  lat: lonlats[1] ?? 0,
-                  lng: lonlats[0] ?? 0,
-                })
-              ) ?? [])
+            console.log('coordinates: ', coordinates)
 
-              }
-              if (coordinates.length < 3) {
-                isValid = false
-              }
-              break
-
-            case 'LineString':
-              if (Array.isArray(geom.coordinates)) {
-                coordinates.push(...toLatLonPairs(geom.coordinates))
-              }
-              if (coordinates.length < 3) {
-                isValid = false
-              }
-              break
-
-            default:
-              isValid = false
-              break
-          }
-
-          console.log('coordinates: ', coordinates)
-
-          return {
-            coordinates: coordinates,
-            placemark: feature.properties?.name,
-            type: type,
-            isValid: isValid,
-            description: feature.properties?.description,
-          }
-        })
+            return {
+              coordinates: coordinates,
+              placemark: feature.properties?.name,
+              type: type,
+              isValid: isValid,
+              description: feature.properties?.description,
+            }
+          })
 
         selected_kml_geo_json.value = [...geoJsonFeatures]
       }
@@ -110,11 +116,11 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   })
 
   watch(selected_kml_geo_json, () => {
-    // Auto Fill geofence latlons inputs if inputs are empty
+    // Auto Fill geofence latlngs inputs if inputs are empty
     // and kml file contains only 1 placemark
     if (
       selected_fence.value &&
-      selected_fence.value.latlons.length <= 1 &&
+      selected_fence.value.latlngs.length <= 1 &&
       selected_kml_geo_json.value &&
       selected_kml_geo_json.value.length === 1
     ) {
@@ -123,12 +129,12 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     }
   })
 
-  const apply_coordinates_from_kml_file = (latlons: Latlon[]) => {
+  const apply_coordinates_from_kml_file = (latlngs: Latlng[]) => {
     if (!selected_fence.value) return
-    if (selected_fence.value.latlons.length <= 1) {
-      selected_fence.value.latlons = [...latlons]
+    if (selected_fence.value.latlngs.length <= 1) {
+      selected_fence.value.latlngs = [...latlngs]
     } else {
-      selected_fence.value.latlons.splice(-1, 1, ...latlons)
+      selected_fence.value.latlngs.splice(-1, 1, ...latlngs)
     }
   }
 
@@ -140,9 +146,9 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     geofences.value = {}
     const url = '/geofence'
     return apiClient.get(url).then((res) => {
-      res.data.forEach((ele: {_id: string} & Geofence) => {
+      res.data.forEach((ele: { _id: string } & Geofence) => {
         geofences.value[ele._id] = {
-          latlons: ele.latlons,
+          latlngs: ele.latlngs,
           name: ele.name,
           selected: false,
           notify: ele.notify,
@@ -159,12 +165,12 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
     const geofence = geofences.value[temp_fence_key]
     const url = '/geofence'
-    if (!geofence || !geofence.name && geofence.latlons.length == 1) {
+    if (!geofence || (!geofence.name && geofence.latlngs.length == 1)) {
       return Promise.resolve(false)
     }
     const data = {
       name: geofence.name ? geofence.name : 'Untitled',
-      latlons: geofence.latlons,
+      latlngs: geofence.latlngs,
       notify: geofence.notify,
     }
     return apiClient.post(url, data).then(() => {
@@ -194,7 +200,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const updateGeofence = () => {
     const geofence = selected_fence.value as Geofence
     const data = {
-      latlons: geofence.latlons,
+      latlngs: geofence.latlngs,
       name: geofence.name,
       notify: geofence.notify,
     }
@@ -216,15 +222,18 @@ export const useGeoFencesStore = defineStore('geofences', () => {
 
     // confirm deletion on backend
     const url = '/geofence/' + id
-    apiClient.delete(url).then(() => {
-      // Refresh
-      getGeofences()
-      eventsStore.get_events()
-    }).catch((error) => {
-      // if deletion fails, reload all geofences to restore state
-      console.error('Failed to delete geofence:', error)
-      getGeofences()
-    })
+    apiClient
+      .delete(url)
+      .then(() => {
+        // Refresh
+        getGeofences()
+        eventsStore.get_events()
+      })
+      .catch((error) => {
+        // if deletion fails, reload all geofences to restore state
+        console.error('Failed to delete geofence:', error)
+        getGeofences()
+      })
   }
 
   // function find_on_name(name: string) {
@@ -239,7 +248,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     geofences.value[id] = data
   }
 
-  // function push_latlon(id, )
+  // function push_latlng(id, )
 
   function add(name: string) {
     // new key will always be 0
@@ -249,7 +258,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     geofences.value[temp_fence_key] = {
       name: name,
       selected: false,
-      latlons: [] as Latlon[],
+      latlngs: [] as Latlng[],
       notify: false,
     }
     return temp_fence_key
@@ -306,9 +315,9 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     set_force_map_update(true)
   }
 
-  // function append_cord_selected_fence(lat_lon) {
+  // function append_cord_selected_fence(lat_lng) {
   //   const key = selected_fence_key.value
-  //   geofences.value[key].latlons[geofences.value[key].latlons.length - 1] = lat_lon
+  //   geofences.value[key].latlngs[geofences.value[key].latlngs.length - 1] = lat_lng
   // }
 
   return {

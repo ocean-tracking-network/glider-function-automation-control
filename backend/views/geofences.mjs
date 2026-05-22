@@ -8,8 +8,8 @@ const get_geofences = async (req, res) => {
   res.send(results).status(200)
 }
 
-function filter_latlons(latlon) {
-  if (!latlon.lat || !latlon.lng) {
+function filter_latlngs(latlng) {
+  if (!latlng.lat || !latlng.lng) {
     return false
   }
   return true
@@ -17,15 +17,15 @@ function filter_latlons(latlon) {
 
 const post_geofences = async (req, res, next) => {
   console.log(req.body)
-  const latlons = req.body.latlons.filter(filter_latlons).map((latlon) => {
-    return {lat: parseFloat(latlon.lat), lng: parseFloat(latlon.lng)}
+  const latlngs = req.body.latlngs.filter(filter_latlngs).map((latlng) => {
+    return { lat: parseFloat(latlng.lat), lng: parseFloat(latlng.lng) }
   })
-  console.log(latlons)
+  console.log(latlngs)
   const name = req.body.name
   const notify = req.body.notify
 
-  if (!latlons || !name) {
-    res.send({ error: 'need to provide latlons and name' })
+  if (!latlngs || !name) {
+    res.send({ error: 'need to provide latlngs and name' })
   }
 
   // filter out any empty values
@@ -33,7 +33,7 @@ const post_geofences = async (req, res, next) => {
   let collection = await db.collection('geofences')
   let newdocument = {
     name: name,
-    latlons: latlons,
+    latlngs: latlngs,
     gliders_inside: [],
     notify: notify,
   }
@@ -54,9 +54,9 @@ const delete_geofences = async (req, res) => {
 const patch_geofences = async (req, res) => {
   const id = req.params.id
   let data = req.body
-  if (data.latlons) {
-    data.latlons = data.latlons.filter(filter_latlons).map((latlon) => {
-      return {lat: parseFloat(latlon.lat), lng: parseFloat(latlon.lng)}
+  if (data.latlngs) {
+    data.latlngs = data.latlngs.filter(filter_latlngs).map((latlng) => {
+      return { lat: parseFloat(latlng.lat), lng: parseFloat(latlng.lng) }
     })
   }
 

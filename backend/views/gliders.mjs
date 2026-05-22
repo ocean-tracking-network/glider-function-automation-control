@@ -67,13 +67,13 @@ const delete_gliders = async (req, res) => {
 }
 
 const post_gliders_track = async (req, res) => {
-  // body {latlon: array[int,int]}
-  const latlon = req.body.latlon
+  // body {latlng: array[int,int]}
+  const latlng = req.body.latlng
   let collect = await db.collection('gliders')
   const filter = { _id: ObjectId.createFromHexString(req.params.id) }
   const result = await collect.findOne(filter)
   let tracks = result.track
-  tracks.push(latlon)
+  tracks.push(latlng)
   let update_result = await collect.updateOne(filter, { $set: { track: tracks } })
   res.send(update_result).status(200)
 }

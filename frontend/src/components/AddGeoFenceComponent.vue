@@ -6,7 +6,7 @@ import { useFilesStore } from '@/stores/files';
 import { useDropZone } from '@vueuse/core'
 import ModalComponent from './ModalComponent.vue';
 import draggable from 'vuedraggable'
-import type { DraggableMoveEvent, kmlGeoJson, Latlon } from '@/lib/types';
+import type { DraggableMoveEvent, kmlGeoJson, Latlng } from '@/lib/types';
 import type { SortableEvent } from 'sortablejs';
 
 const filesStore = useFilesStore()
@@ -32,24 +32,24 @@ const fence_key = ref("")
 const lock_fence = ref(true)
 const initial_snapshot = ref('')
 const pressed_handle_index = ref<number | null>(null)
-const is_dragging_latlon = ref(false)
+const is_dragging_latlng = ref(false)
 
-const emptyRow = {lat: null, lng: null} as unknown as Latlon
+const emptyRow = {lat: null, lng: null} as unknown as Latlng
 
 onBeforeMount(() => {
 
   if (props.fenceKey && selected_fence.value) {
     fence_key.value = props.fenceKey
-    const latlons = selected_fence.value.latlons
-    if (latlons.length === 0 || (latlons[latlons.length - 1]?.lat || latlons[latlons.length - 1]?.lng)) {
-      selected_fence.value.latlons.push(emptyRow)
+    const latlngs = selected_fence.value.latlngs
+    if (latlngs.length === 0 || (latlngs[latlngs.length - 1]?.lat || latlngs[latlngs.length - 1]?.lng)) {
+      selected_fence.value.latlngs.push(emptyRow)
     }
   }
   else {
     lock_fence.value = false
     fence_key.value = store.add("")
     store.select(fence_key.value)
-    geofences.value[fence_key.value]?.latlons.push({...emptyRow})
+    geofences.value[fence_key.value]?.latlngs.push({...emptyRow})
   }
 })
 
@@ -57,10 +57,10 @@ function on_input() {
   if (!props.canEdit || lock_fence.value || !selected_fence.value) {
     return
   }
-  const latlons = selected_fence.value.latlons
-  const idx = latlons.length - 1
-  if (latlons[idx]?.lat || latlons[idx]?.lng) {
-    selected_fence.value.latlons.push({...emptyRow})
+  const latlngs = selected_fence.value.latlngs
+  const idx = latlngs.length - 1
+  if (latlngs[idx]?.lat || latlngs[idx]?.lng) {
+    selected_fence.value.latlngs.push({...emptyRow})
   }
 }
 
@@ -68,14 +68,14 @@ function focus_out(idx: number) {
   if (!props.canEdit || lock_fence.value || !selected_fence.value) {
     return
   }
-  const latlons = selected_fence.value.latlons
+  const latlngs = selected_fence.value.latlngs
   const geofence = selected_fence.value
-  if (idx === latlons.length - 1) {
+  if (idx === latlngs.length - 1) {
     return
   }
-  if (!latlons[idx]?.lat && !latlons[idx]?.lng) {
-    latlons.splice(idx, 1)
-    geofence.latlons = latlons
+  if (!latlngs[idx]?.lat && !latlngs[idx]?.lng) {
+    latlngs.splice(idx, 1)
+    geofence.latlngs = latlngs
     store.set_geofence(store.selected_fence_key, geofence)
   }
 }
@@ -98,12 +98,12 @@ function on_row_pointer_down(index: number, event: PointerEvent) {
     return
   }
 
-  if (!props.canEdit || lock_fence.value || selected_fence.value && index >= selected_fence.value.latlons.length - 1) {
+  if (!props.canEdit || lock_fence.value || selected_fence.value && index >= selected_fence.value.latlngs.length - 1) {
     return
   }
 
   pressed_handle_index.value = index
-  is_dragging_latlon.value = false
+  is_dragging_latlng.value = false
   focus_in(index)
 }
 
@@ -118,8 +118,8 @@ function on_row_pointer_up(index: number, event: PointerEvent) {
 
   pressed_handle_index.value = null
 
-  if (is_dragging_latlon.value) {
-    is_dragging_latlon.value = false
+  if (is_dragging_latlng.value) {
+    is_dragging_latlng.value = false
     return
   }
 
@@ -135,7 +135,7 @@ function onDrop(files: File[] | null) {
 
 function remove_idx(idx: number) {
   if (props.canEdit && !lock_fence.value) {
-    selected_fence.value?.latlons.splice(idx, 1)
+    selected_fence.value?.latlngs.splice(idx, 1)
     if (idx === store.selected_idx) {
       clear_focus()
     }
@@ -159,7 +159,7 @@ function apply_all_kml_coordinates() {
     return
   }
 
-  const combined_coordinates: Latlon[] = []
+  const combined_coordinates: Latlng[] = []
 
   valid_kml_placemarks.value.forEach((placemark) => {
     if (placemark.type === 'Point') {
@@ -178,14 +178,14 @@ function apply_all_kml_coordinates() {
     return
   }
 
-  const latlons = selected_fence.value.latlons ?? [emptyRow]
-  const last_latlon = latlons[latlons.length - 1]!
-  const has_trailing_blank = !last_latlon.lat && !last_latlon.lng
+  const latlngs = selected_fence.value.latlngs ?? [emptyRow]
+  const last_latlng = latlngs[latlngs.length - 1]!
+  const has_trailing_blank = !last_latlng.lat && !last_latlng.lng
 
   if (has_trailing_blank) {
-    latlons.splice(latlons.length - 1, 0, ...combined_coordinates)
+    latlngs.splice(latlngs.length - 1, 0, ...combined_coordinates)
   } else {
-    latlons.push(...combined_coordinates)
+    latlngs.push(...combined_coordinates)
   }
 }
 
@@ -212,15 +212,15 @@ function apply_kml_item(geofence: kmlGeoJson, index: number) {
   scroll_to_next_kml_item(index)
 }
 
-function normalize_latlons(latlons?: Latlon[]) {
-  if (!Array.isArray(latlons)) {
+function normalize_latlngs(latlngs?: Latlng[]) {
+  if (!Array.isArray(latlngs)) {
     return []
   }
 
-  const normalized = Array.from(latlons)
+  const normalized = Array.from(latlngs)
 
-  const last_latlon = normalized[normalized.length - 1]
-  if (last_latlon && !last_latlon.lat && !last_latlon.lng) {
+  const last_latlng = normalized[normalized.length - 1]
+  if (last_latlng && !last_latlng.lat && !last_latlng.lng) {
     normalized.pop()
   }
 
@@ -231,12 +231,12 @@ function create_snapshot() {
   return JSON.stringify({
     name: selected_fence.value?.name ?? '',
     notify: selected_fence.value?.notify ?? false,
-    latlons: normalize_latlons(selected_fence.value?.latlons),
+    latlngs: normalize_latlngs(selected_fence.value?.latlngs),
   })
 }
 
 const overflowed = computed(() => {
-  return selected_fence.value && selected_fence.value.latlons.length >= 6
+  return selected_fence.value && selected_fence.value.latlngs.length >= 6
 })
 
 const has_unsaved_changes = computed(() => {
@@ -268,8 +268,8 @@ const { isOverDropZone } = useDropZone(dropZoneRef, {
   // preventDefaultForUnhandled: false,
 })
 
-function onMoveLatLon(evt: DraggableMoveEvent<Latlon[]>) {
-  const rows = selected_fence.value?.latlons ?? []
+function onMoveLatlng(evt: DraggableMoveEvent<Latlng[]>) {
+  const rows = selected_fence.value?.latlngs ?? []
   const last = rows.length - 1
 
   const from = evt.draggedContext?.index
@@ -281,14 +281,14 @@ function onMoveLatLon(evt: DraggableMoveEvent<Latlon[]>) {
   return true
 }
 
-function on_latlon_drag_start(evt: SortableEvent) {
+function on_latlng_drag_start(evt: SortableEvent) {
   if (evt.oldIndex === undefined) return
   const start_index = evt.oldIndex
-  is_dragging_latlon.value = true
+  is_dragging_latlng.value = true
   focus_in(start_index)
 }
 
-function on_latlon_drag_end(evt: SortableEvent) {
+function on_latlng_drag_end(evt: SortableEvent) {
   if (evt.newIndex === undefined) return
   const end_index = evt.newIndex
   pressed_handle_index.value = null
@@ -312,35 +312,35 @@ onBeforeMount(() => {
         <input :disabled="lock_fence || !props.canEdit" class="text-input" id="name-input" v-model="selected_fence!.name"
           placeholder="Name" type="text">
       </div>
-      <div class="lat-lon-container">
+      <div class="lat-lng-container">
         <div id="main-container" :class="{ overflow: overflowed }">
-          <draggable :move="onMoveLatLon" :list="selected_fence?.latlons" @start="on_latlon_drag_start"
-            @end="on_latlon_drag_end" :item-key="(_: unknown, index: number) => `latlon-${index}`"
+          <draggable :move="onMoveLatlng" :list="selected_fence?.latlngs" @start="on_latlng_drag_start"
+            @end="on_latlng_drag_end" :item-key="(_: unknown, index: number) => `latlng-${index}`"
             filter="input, .x-btn, .no-x-btn, .no-drag-handle" :prevent-on-filter="false"
-            :disabled="lock_fence || !props.canEdit" class="latlon-draggable">
-            <template #item="{ element: lat_lon, index }">
+            :disabled="lock_fence || !props.canEdit" class="latlng-draggable">
+            <template #item="{ element: lat_lng, index }">
               <div class="inputs" @pointerdown="on_row_pointer_down(index, $event)"
                 @pointerup="on_row_pointer_up(index, $event)" @pointercancel="on_row_pointer_up(index, $event)">
-                <button v-if="selected_fence && index < selected_fence.latlons.length - 1" type="button" class="drag-handle">
+                <button v-if="selected_fence && index < selected_fence.latlngs.length - 1" type="button" class="drag-handle">
                   ⋮⋮
                 </button>
-                <button v-if="selected_fence && index >= selected_fence.latlons.length - 1" type="button" disabled="true"
+                <button v-if="selected_fence && index >= selected_fence.latlngs.length - 1" type="button" disabled="true"
                   class="no-drag-handle">
                   ⋮⋮
                 </button>
                 <span style="width: 20px;"></span>
 
                 <p id="index">{{ index }}</p>
-                <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon.lat" placeholder="lat" type="text" />
+                <input :disabled="lock_fence || !props.canEdit" class="text-input latlng" @focusout="focus_out(index)"
+                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lng.lat" placeholder="lat" type="text" />
                 <p>:</p>
-                <input :disabled="lock_fence || !props.canEdit" class="text-input latlon" @focusout="focus_out(index)"
-                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lon.lng" placeholder="lon" type="text" />
+                <input :disabled="lock_fence || !props.canEdit" class="text-input latlng" @focusout="focus_out(index)"
+                  @focusin="focus_in(index)" @input="on_input()" v-model="lat_lng.lng" placeholder="lng" type="text" />
                 <button class="x-btn" @click="remove_idx(index)"
-                  v-if="props.canEdit && selected_fence && index < selected_fence.latlons.length - 1">
+                  v-if="props.canEdit && selected_fence && index < selected_fence.latlngs.length - 1">
                   x
                 </button>
-                <button class="no-x-btn" v-if="selected_fence && index >= selected_fence.latlons.length - 1" disabled="true">
+                <button class="no-x-btn" v-if="selected_fence && index >= selected_fence.latlngs.length - 1" disabled="true">
                   x
                 </button>
               </div>
@@ -423,7 +423,7 @@ onBeforeMount(() => {
   cursor: grabbing;
 }
 
-.latlon-draggable {
+.latlng-draggable {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -469,7 +469,7 @@ onBeforeMount(() => {
   flex: 1;
 }
 
-.lat-lon-container {
+.lat-lng-container {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -668,7 +668,7 @@ onBeforeMount(() => {
   color: var(--color-text);
 }
 
-.latlon {
+.latlng {
   width: 7rem;
 }
 

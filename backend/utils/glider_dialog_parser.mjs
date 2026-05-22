@@ -111,8 +111,8 @@ function parseLocation(text, label) {
   if (!match) return null
 
   const lat = convertSlocumCoordinate(match[1], match[2])
-  const lon = convertSlocumCoordinate(match[3], match[4])
-  return lat == null || lon == null ? null : { lat, lon, source: label }
+  const lng = convertSlocumCoordinate(match[3], match[4])
+  return lat == null || lng == null ? null : { lat, lng, source: label }
 }
 
 function parseMission(text) {
@@ -127,7 +127,7 @@ function parseWaypoint(text) {
   return match
     ? {
         lat: parseNumber(match[1]),
-        lon: parseNumber(match[2]),
+        lng: parseNumber(match[2]),
         rangeMeters: parseNumber(match[3]),
         bearingDegrees: parseNumber(match[4]),
       }
@@ -154,7 +154,8 @@ function classifyDialog(text, fields) {
   const hasSurfacePrompt = /^Glider\s+\S+\s+at surface\./im.test(text)
   const hasConnectionHeader = /^Connection Event:/im.test(text)
   const hasAbortSubject = PATTERNS.abortSubject.test(text)
-  const abortHistoryOnly = /^\s*ABORT HISTORY:/i.test(text) && !hasSurfacePrompt && !hasConnectionHeader
+  const abortHistoryOnly =
+    /^\s*ABORT HISTORY:/i.test(text) && !hasSurfacePrompt && !hasConnectionHeader
   const criticalAbortActive = /sensor:x_critical_abort_active\(int\)=1\b/i.test(text)
   const hasAbortSinceReset = fields.abortHistory?.totalSinceReset > 0
 

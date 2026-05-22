@@ -311,7 +311,7 @@ function emitDrawerOffset() {
   emit('drawer-offset-change', offset)
 }
 
-const latlons = computed(() => {
+const latlngs = computed(() => {
   const ret: FileBoxType<Geofence>[] = []
   Object.keys(geofences.value).forEach((key) => {
     if (geofences.value[key] === undefined) return
@@ -368,7 +368,7 @@ onBeforeUnmount(() => {
     <div class="geofence-list">
       <FilesBoxComponent
         id="geo"
-        :list="latlons"
+        :list="latlngs"
         :draggable="false"
         :add_btn="isAdmin"
         :can_delete="isAdmin"

@@ -1,8 +1,8 @@
 import type { GeoJsonGeometryTypes } from 'geojson'
-import type { MoveEvent } from 'sortablejs';
-import type { Component } from 'vue';
+import type { MoveEvent } from 'sortablejs'
+import type { Component } from 'vue'
 
-export type Latlon = {
+export type Latlng = {
   lat: number
   lng: number
 }
@@ -10,20 +10,20 @@ export type Latlon = {
 export type Glider = {
   _id: string
   name: string
-  track: (Latlon & { date?: string })[]
+  track: (Latlng & { date?: string })[]
   enabled: boolean
-  next_waypoint?: Latlon
+  next_waypoint?: Latlng
 }
 
 export type Geofence = {
-  latlons: Latlon[]
+  latlngs: Latlng[]
   name: string
   notify: boolean
   selected?: boolean
 }
 
 export type kmlGeoJson = {
-  coordinates: Latlon[]
+  coordinates: Latlng[]
   placemark: string
   type?: GeoJsonGeometryTypes
   isValid: boolean
@@ -102,7 +102,7 @@ export type DraggableMoveEvent<T> = MoveEvent & {
 }
 
 // AIS Report derrived boat type
-// export type Boat = Latlon & {
+// export type Boat = Latlng & {
 //   vid: number
 //   mmsi: number
 //   courseOverGround: number
@@ -129,7 +129,7 @@ export type DraggableMoveEvent<T> = MoveEvent & {
 export type Boat = {
   locations: {
     LATITUDE: number
-    LONGITUDE: number
+    lngGITUDE: number
     NAVSTAT: string
     COURSE: string
     HEADING: string

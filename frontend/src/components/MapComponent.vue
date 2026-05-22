@@ -10,7 +10,7 @@ import boat from "@/assets/boat.png"
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
-import type { Boat, Glider, Latlon } from '@/lib/types';
+import type { Boat, Glider, Latlng } from '@/lib/types';
 import type { GeoJsonObject, GeoJsonTypes } from 'geojson'
 
 const store = useGeoFencesStore();
@@ -36,7 +36,7 @@ const clickTimeout = ref<number | null>(null)
 const DOUBLE_CLICK_DELAY = 300
 
 // The box we have AIS data for
-const ais_border: Latlon[] = [
+const ais_border: Latlng[] = [
   [49.725633, -65.114883],
   [48.487933, -61.889883],
   [48.416617, -61.892367],
@@ -129,7 +129,7 @@ function draw_boats() {
   })
   boats.value.forEach((ele) => {
     const last_location = ele.locations[ele.locations.length - 1]!
-    const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: slocum_icon })
+    const new_marker = L.marker([last_location["LATITUDE"], last_location["lngGITUDE"]], { icon: slocum_icon })
       .addTo(initialMap.value as L.Map).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${last_location["NAME"]}</b>`)
     boat_markers.value.push(new_marker)
   })
@@ -160,19 +160,19 @@ function convert_gps(val: number) {
   return ret
 }
 
-function generate_geojson(latlons: Latlon[]) {
+function generate_geojson(latlngs: Latlng[]) {
   const geo_json: GeoJsonObject[] = []
-  for (let i = 0; i < latlons.length - 1; i++) {
+  for (let i = 0; i < latlngs.length - 1; i++) {
     const new_json = {
       "type": "Feature" as GeoJsonTypes,
       "properties": { "line_num": i },
       "geometry": {
         "type": "LineString",
         "coordinates": [
-          [latlons[i]!.lng, latlons[i]!.lat],
-          [latlons[i + 1]!.lng, latlons[i + 1]!.lat]
+          [latlngs[i]!.lng, latlngs[i]!.lat],
+          [latlngs[i + 1]!.lng, latlngs[i + 1]!.lat]
         ]
-      } //WHY IS IT IN LON:LAT FORMAT!
+      } //WHY IS IT IN LNG:LAT FORMAT!
     }
     geo_json.push(new_json)
   }
@@ -191,7 +191,7 @@ function create_polygons() {
     if (geofence.key === store.selected_fence_key) {
       options.color = "orange"
     }
-    const new_polygon = L.polygon(geofence.latlons, options)
+    const new_polygon = L.polygon(geofence.latlngs, options)
       .on("click", on_polygon_click)
       .addTo(initialMap.value as L.Map)
     polygon_to_geofence_map.value[L.Util.stamp(new_polygon)] = geofence.key
@@ -276,7 +276,7 @@ function set_glider_track() {
   clear_glider_map_elements()
   if (!selected_glider.value || !Array.isArray(selected_glider.value.track)) return
 
-  const tracks: Latlon[] = []
+  const tracks: Latlng[] = []
   glider_track_points.value = []
   selected_glider.value.track.forEach((element) => {
     tracks.push({ lat: convert_gps(element.lat), lng: convert_gps(element.lng) })
@@ -323,7 +323,7 @@ function set_glider_track() {
   }
   gliderStore.gliders.forEach((glider) => {
     if (selected_glider.value && glider._id != selected_glider.value._id && glider_has_track(glider)) {
-      const current_pos: Latlon = {
+      const current_pos: Latlng = {
         lat: convert_gps(glider.track[glider.track.length - 1]!.lat),
         lng: convert_gps(glider.track[glider.track.length - 1]!.lng),
       }
@@ -350,7 +350,7 @@ function map_click(e: L.LeafletMouseEvent) {
     const lng = +e.latlng.lng.toFixed(4)
     const fence = geofences.value[store.selected_fence_key]
     if (store.selected_fence_key && fence) {
-      fence.latlons[fence.latlons.length - 1] = { lat: lat, lng: lng }
+      fence.latlngs[fence.latlngs.length - 1] = { lat: lat, lng: lng }
     }
   }
 }
@@ -405,9 +405,9 @@ watch(selected_idx, (new_idx) => {
     return
   }
 
-  const lat_lon = store.selected_fence.latlons?.[new_idx]
-  if (lat_lon?.lat && lat_lon?.lng) {
-    idx_marker.value = L.marker(lat_lon).addTo(initialMap.value as L.Map)
+  const lat_lng = store.selected_fence.latlngs?.[new_idx]
+  if (lat_lng?.lat && lat_lng?.lng) {
+    idx_marker.value = L.marker(lat_lng).addTo(initialMap.value as L.Map)
   }
 })
 
@@ -420,9 +420,9 @@ watch(selected_fence, () => {
   if (selected_fence.value && initialMap.value) {
     try {
       // compute polygon centroid using shoelace formula for better centering
-      const pts = selected_fence.value.latlons
+      const pts = selected_fence.value.latlngs
         .filter((p) => p && p.lat !== null && p.lng !== null)
-        .map((p) => ({ x: p.lng, y: p.lat })) // x=lon, y=lat
+        .map((p) => ({ x: p.lng, y: p.lat })) // x=lng, y=lat
 
       if (pts.length < 1) return
 
@@ -464,15 +464,15 @@ watch(selected_fence, () => {
 })
 
 const geofences_filtered = computed(() => {
-  const ret: {key: string, latlons: Latlon[]}[] = []
+  const ret: {key: string, latlngs: Latlng[]}[] = []
   Object.keys(geofences.value).forEach((key) => {
-    const lat_lon_filtered: Latlon[] = []
-    geofences.value[key]?.latlons.forEach((element) => {
+    const lat_lng_filtered: Latlng[] = []
+    geofences.value[key]?.latlngs.forEach((element) => {
       if (element.lat && element.lng) {
-        lat_lon_filtered.push(element)
+        lat_lng_filtered.push(element)
       }
     })
-    ret.push({ key: key, latlons: lat_lon_filtered })
+    ret.push({ key: key, latlngs: lat_lng_filtered })
   })
   return ret
 })

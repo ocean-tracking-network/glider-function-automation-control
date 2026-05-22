@@ -170,7 +170,7 @@ const update_geofences = async () => {
       }
       const in_geofence = is_in_polygon(
         [last_glider_point.lat, last_glider_point.lng],
-        [...geofence.latlons, [null]] //Yeah, no idea why it needs [null] right now, temp fix
+        [...geofence.latlngs, [null]], //Yeah, no idea why it needs [null] right now, temp fix
       )
       let last_in_geofence = false
       let gliders_in_geofence = []
@@ -202,7 +202,7 @@ const update_geofences = async () => {
           create_log(
             `Failed to upload files to ${glider.name} - Will try again next refresh (60 seconds) ---- ${error}`,
             'error',
-            glider._id.toHexString()
+            glider._id.toHexString(),
           )
         }
       }
