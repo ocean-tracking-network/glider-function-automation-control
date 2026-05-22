@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import "leaflet/dist/leaflet.css"
 import * as L from 'leaflet'
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, type Ref } from "vue";
 import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
@@ -10,56 +10,51 @@ import boat from "@/assets/boat.png"
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
+import type { Boat, Glider, Latlon } from '@/lib/types';
+import type { GeoJsonObject, GeoJsonTypes } from 'geojson'
 
 const store = useGeoFencesStore();
 const gliderStore = useGlidersStore();
 const userStore = useUserStore();
 
-const initialMap = ref()
-const polygons = ref([])
-const polygon_to_geofence_map = ref({})
-const idx_marker = ref(null)
+const initialMap = ref<L.Map>()
+const polygons = ref<L.Polygon[]>([])
+const polygon_to_geofence_map = ref<Record<number, string>>({})
+const idx_marker = ref<L.Marker | null>(null)
 
-const glider_track_polyline = ref(null)
-const glider_track_points = ref(null)
-const glider_current_location = ref(null)
-const glider_next_waypoint = ref(null)
+const glider_track_polyline = ref<L.GeoJSON | null>(null)
+const glider_track_points = ref<L.Circle[] | null>(null)
+const glider_current_location = ref<L.Marker | null>(null)
+const glider_next_waypoint = ref<L.Marker | null>(null)
 
-const all_glider_markers = ref([])
+const all_glider_markers = ref<L.Marker[]>([])
 
 // Double-click tracking
-const lastClickedFenceKey = ref(null)
+const lastClickedFenceKey = ref<string | null>(null)
 const lastClickTime = ref(0)
-const clickTimeout = ref(null)
+const clickTimeout = ref<number | null>(null)
 const DOUBLE_CLICK_DELAY = 300
 
-
 // The box we have AIS data for
-const ais_border = [[49.725633, -65.114883],
-[48.487933, -61.889883],
-[48.416617, -61.892367],
-[49.332867, -65.130500],
-[49.725633, -65.114883]
-]
+const ais_border: Latlon[] = [
+  [49.725633, -65.114883],
+  [48.487933, -61.889883],
+  [48.416617, -61.892367],
+  [49.332867, -65.130500],
+  [49.725633, -65.114883]
+].map((ele) => { return { lat: ele[0]!, lng: ele[1]! } })
 
 const ais_offset_amount = 60
 const boat_slide_time_offset = ref(0)
 const boat_slider_min = ref(0)
-const boat_slider_max = ref(0)
-const boat_predict_lines = ref([])
-const boat_markers = ref([])
-const boats = ref([])
-
+const boat_slider_max = ref()
+const boat_predict_lines = ref<(L.Polyline | L.Circle)[]>([])
+const boat_markers = ref<L.Marker[]>([])
+const boats = ref<Boat[]>([])
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
 const { isAdmin } = storeToRefs(userStore)
-
-
-
-
-
-
 
 function get_boats() {
   console.log("Getting boats")
@@ -67,7 +62,7 @@ function get_boats() {
     .then((res) => {
       boats.value = res.data
       if(boats.value.length > 0){
-        const offsets = res.data[0].prediction_range.intervals.map((element) => element.offset)
+        const offsets = res.data[0].prediction_range.intervals.map((element: { offset: unknown}) => element.offset)
 
         boat_slider_max.value = Math.max(...offsets)
         boat_slider_min.value = Math.min(...offsets)
@@ -77,17 +72,17 @@ function get_boats() {
     })
 }
 
-function clear_map_data(ref_arr) {
-  if (ref_arr.value.length) {
-    ref_arr.value.forEach((ele) => {
-      ele.removeFrom(initialMap.value)
+function clear_map_data(map_element_arr: Ref<L.Marker[]>) {
+  if (map_element_arr.value.length) {
+    map_element_arr.value.forEach((ele) => {
+      ele.removeFrom(initialMap.value as L.Map)
     })
   }
-  ref_arr.value = []
+  map_element_arr.value = []
 }
 
 async function draw_predict() {
-  let temp_array = boat_predict_lines.value
+  const temp_array = boat_predict_lines.value
   boat_predict_lines.value = []
   for (const boat of boats.value) {
     let predict_data = undefined
@@ -100,17 +95,21 @@ async function draw_predict() {
       }
     }
     console.log(predict_data)
-    const ghost_line = L.polyline(predict_data.line, { color: "white" }).addTo(initialMap.value)
+    // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
+    // @ts-expect-error predict data unknown
+    const ghost_line = L.polyline(predict_data.line!, { color: "white" }).addTo(initialMap.value as L.Map)
     boat_predict_lines.value.push(ghost_line)
-    const predict_cone = L.polyline(predict_data.cone, { color: "green" }).addTo(initialMap.value)
+    // @ts-expect-error predict data unknown
+    const predict_cone = L.polyline(predict_data.cone!, { color: "green" }).addTo(initialMap.value as L.Map)
     boat_predict_lines.value.push(predict_cone)
-    const ghost = L.circle(predict_data.center, { radius: 3 }).addTo(initialMap.value)
+    // @ts-expect-error predict data unknown
+    const ghost = L.circle(predict_data.center!, { radius: 3 }).addTo(initialMap.value as L.Map)
     boat_predict_lines.value.push(ghost)
   }
 
   if (temp_array.length) {
     temp_array.forEach((ele) => {
-      ele.removeFrom(initialMap.value)
+      ele.removeFrom(initialMap.value as L.Map)
     })
   }
 
@@ -121,17 +120,17 @@ watch(boat_slide_time_offset, () => {
 })
 
 function draw_boats() {
-  clear_map_data(boat_markers)
+  clear_map_data(boat_markers as Ref<L.Marker[]>)
   const boat_size = 30
-  let slocum_icon = L.icon({
+  const slocum_icon = L.icon({
     iconUrl: boat,
     iconSize: [boat_size, boat_size],
     iconAnchor: [Math.floor(boat_size / 2), Math.floor(boat_size / 2)],
   })
   boats.value.forEach((ele) => {
-    const last_location = ele.locations[ele.locations.length - 1]
+    const last_location = ele.locations[ele.locations.length - 1]!
     const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: slocum_icon })
-      .addTo(initialMap.value).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${last_location["NAME"]}</b>`)
+      .addTo(initialMap.value as L.Map).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${last_location["NAME"]}</b>`)
     boat_markers.value.push(new_marker)
   })
 }
@@ -146,13 +145,12 @@ function draw_ais_border() {
         color: "blue"
       }
     }
-  }).addTo(initialMap.value)
-
+  }).addTo(initialMap.value as L.Map)
 }
 
 // SFMC outputs in an annoying format compared to what leaflet wants
 //  (Degrees decimal minutes -> Decimal degrees), so (4932.822) is actually 49* 32.822'
-function convert_gps(val) {
+function convert_gps(val: number) {
   let degrees = Math.floor(val / 100)
   if (val < 0) {
     degrees = Math.ceil(val / 100)
@@ -162,45 +160,46 @@ function convert_gps(val) {
   return ret
 }
 
-function generate_geojson(latlons) {
-  let geo_json = []
+function generate_geojson(latlons: Latlon[]) {
+  const geo_json: GeoJsonObject[] = []
   for (let i = 0; i < latlons.length - 1; i++) {
     const new_json = {
-      "type": "Feature",
+      "type": "Feature" as GeoJsonTypes,
       "properties": { "line_num": i },
-      "geometry": { "type": "LineString", "coordinates": [[latlons[i][1], latlons[i][0]], [latlons[i + 1][1], latlons[i + 1][0]]] } //WHY IS IT IN LON:LAT FORMAT!
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [latlons[i]!.lng, latlons[i]!.lat],
+          [latlons[i + 1]!.lng, latlons[i + 1]!.lat]
+        ]
+      } //WHY IS IT IN LON:LAT FORMAT!
     }
     geo_json.push(new_json)
   }
   return geo_json
 }
 
-function get_geojson_opacity(line_num, total_num) {
+function get_geojson_opacity(line_num: number, total_num: number) {
   const min = 0
   const normalized = (line_num - min) / (total_num - min)
   return normalized + .1
 }
 
 function create_polygons() {
-  let index = 0
   geofences_filtered.value.forEach((geofence) => {
-    let options = {}
+    const options: L.PolylineOptions = {}
     if (geofence.key === store.selected_fence_key) {
       options.color = "orange"
-      //CHANGE #JS0002
-      // console.log("red?")
-      //END CHANGE #JS0002
     }
-    index++
-    let new_polygon = L.polygon(geofence.latlons, options)
+    const new_polygon = L.polygon(geofence.latlons, options)
       .on("click", on_polygon_click)
-      .addTo(initialMap.value)
-    polygon_to_geofence_map.value[new_polygon._leaflet_id] = geofence.key
+      .addTo(initialMap.value as L.Map)
+    polygon_to_geofence_map.value[L.Util.stamp(new_polygon)] = geofence.key
     polygons.value.push(new_polygon)
   })
 }
 
-const on_polygon_click = (e) => {
+const on_polygon_click = (e: L.LeafletMouseEvent) => {
   if (e.originalEvent) {
     e.originalEvent.preventDefault()
     e.originalEvent.stopPropagation()
@@ -208,9 +207,9 @@ const on_polygon_click = (e) => {
 
   const fenceKey = polygon_to_geofence_map.value[e.target._leaflet_id]
   const currentTime = Date.now()
+  if (!fenceKey) return
 
   console.log("CLICK on polygon, fenceKey:", fenceKey, "currentTime:", currentTime, "lastClickTime:", lastClickTime.value)
-
 
   if (lastClickedFenceKey.value === fenceKey && (currentTime - lastClickTime.value) < DOUBLE_CLICK_DELAY) {
     console.log("DOUBLE CLICK DETECTED")
@@ -242,12 +241,12 @@ const on_polygon_click = (e) => {
 
 function clear_glider_map_elements() {
   if (glider_track_polyline.value) {
-    glider_track_polyline.value.removeFrom(initialMap.value)
+    glider_track_polyline.value.removeFrom(initialMap.value as L.Map)
     glider_track_polyline.value = null
   }
   if (glider_track_points.value) {
     glider_track_points.value.forEach((ele) => {
-      ele.removeFrom(initialMap.value)
+      ele.removeFrom(initialMap.value as L.Map)
     })
     glider_track_points.value = []
   }
@@ -257,17 +256,17 @@ function clear_glider_map_elements() {
         ele.removeFrom(initialMap.value)
       })
     } else {
-      glider_current_location.value.removeFrom(initialMap.value)
+      glider_current_location.value.removeFrom(initialMap.value as L.Map)
     }
     glider_current_location.value = null
   }
   if (glider_next_waypoint.value) {
-    glider_next_waypoint.value.removeFrom(initialMap.value)
+    glider_next_waypoint.value.removeFrom(initialMap.value as L.Map)
     glider_next_waypoint.value = null
   }
   if (all_glider_markers.value.length > 0) {
     all_glider_markers.value.forEach((glider_marker) => {
-      glider_marker.removeFrom(initialMap.value)
+      glider_marker.removeFrom(initialMap.value as L.Map)
     })
     all_glider_markers.value = []
   }
@@ -277,17 +276,17 @@ function set_glider_track() {
   clear_glider_map_elements()
   if (!selected_glider.value || !Array.isArray(selected_glider.value.track)) return
 
-  let tracks = []
+  const tracks: Latlon[] = []
   glider_track_points.value = []
   selected_glider.value.track.forEach((element) => {
-    tracks.push([convert_gps(element.lat), convert_gps(element.lon)])
-    glider_track_points.value.push(
-      L.circle([convert_gps(element.lat), convert_gps(element.lon)], { radius: 200, stroke: false, color: 'red' })
-        .addTo(initialMap.value).bindPopup(`<b>${element.date}</b><p>200m</p>`)
+    tracks.push({ lat: convert_gps(element.lat), lng: convert_gps(element.lng) })
+    glider_track_points.value?.push(
+      L.circle({lat: convert_gps(element.lat), lng: convert_gps(element.lng)}, { radius: 200, stroke: false, color: 'red' })
+        .addTo(initialMap.value as L.Map).bindPopup(`<b>${element.date ?? 'No Attached Date'}</b><p>200m</p>`)
     )
   })
 
-  let slocum_icon = L.icon({
+  const slocum_icon = L.icon({
     iconUrl: slocum1,
     iconSize: [37, 61],
     iconAnchor: [18, 61],
@@ -299,37 +298,44 @@ function set_glider_track() {
     glider_track_polyline.value = L.geoJSON(geo_json, {
       style: function (feature) {
         return {
-          opacity: get_geojson_opacity(feature.properties.line_num, tracks.length),
+          opacity: get_geojson_opacity(feature?.properties.line_num ?? 0, tracks.length),
           color: "red"
         }
       }
-    }).addTo(initialMap.value)
-    glider_current_location.value = L.marker(tracks[tracks.length - 1], { icon: slocum_icon }).addTo(initialMap.value)
-    initialMap.value.setView(tracks[tracks.length - 1])
+    }).addTo(initialMap.value as L.Map)
+    glider_current_location.value = L.marker(
+      tracks[tracks.length - 1]!,
+      { icon: slocum_icon }
+    ).addTo(initialMap.value as L.Map)
+    initialMap.value!.setView(tracks[tracks.length - 1]!)
   }
   if (selected_glider.value.next_waypoint) {
-    let waypoint_icon = L.icon({
+    const waypoint_icon = L.icon({
       iconUrl: waypointIcon,
       iconSize: [32, 32],
       iconAnchor: [16, 16]
     })
     const waypoint = selected_glider.value.next_waypoint
-    glider_next_waypoint.value = L.marker([convert_gps(waypoint[0]), convert_gps(waypoint[1])], { icon: waypoint_icon }).addTo(initialMap.value)
+    glider_next_waypoint.value = L.marker(
+      {lat: convert_gps(waypoint.lat), lng: convert_gps(waypoint.lng)},
+      { icon: waypoint_icon }
+    ).addTo(initialMap.value as L.Map)
   }
-  let i = 0
   gliderStore.gliders.forEach((glider) => {
-    if (selected_glider.value && glider._id != selected_glider._id && glider_has_track(glider)) {
-      const current_pos = [convert_gps(glider.track[glider.track.length - 1].lat), convert_gps(glider.track[glider.track.length - 1].lon)]
+    if (selected_glider.value && glider._id != selected_glider.value._id && glider_has_track(glider)) {
+      const current_pos: Latlon = {
+        lat: convert_gps(glider.track[glider.track.length - 1]!.lat),
+        lng: convert_gps(glider.track[glider.track.length - 1]!.lng),
+      }
       const new_marker = L.marker(current_pos, { icon: slocum_icon, opacity: .4 })
         .on("click", () => { gliderStore.select_glider(glider._id) })
-        .addTo(initialMap.value)
+        .addTo(initialMap.value as L.Map)
       all_glider_markers.value.push(new_marker)
     }
-    i++
   })
 }
 
-function map_click(e) {
+function map_click(e: L.LeafletMouseEvent) {
   if (!isAdmin.value) {
     return
   }
@@ -340,14 +346,13 @@ function map_click(e) {
   if (store.selected_fence && interactive_map.value) {
     // store.selected_fence
     // //console.log(e.latlng)
-    const lat = e.latlng.lat.toFixed(4)
-    const lon = e.latlng.lng.toFixed(4)
-    if (store.selected_fence_key && geofences.value[store.selected_fence_key]) {
-      const fence = geofences.value[store.selected_fence_key]
-      fence.latlons[fence.latlons.length - 1] = [lat, lon]
+    const lat = +e.latlng.lat.toFixed(4)
+    const lng = +e.latlng.lng.toFixed(4)
+    const fence = geofences.value[store.selected_fence_key]
+    if (store.selected_fence_key && fence) {
+      fence.latlons[fence.latlons.length - 1] = { lat: lat, lng: lng }
     }
   }
-
 }
 
 onMounted(() => {
@@ -363,20 +368,20 @@ onMounted(() => {
 function update_map() {
   //console.log("Map Update")
   polygons.value.forEach((poly) => {
-    poly.removeFrom(initialMap.value)
+    poly.removeFrom(initialMap.value as L.Map)
   })
   polygons.value = []
   create_polygons()
 
-  get_boats()
+  // get_boats()
   draw_ais_border()
 }
 
-function glider_has_track(glider) {
+function glider_has_track(glider: Glider) {
   return (glider.track && glider.track.length > 0)
 }
 
-watch(geofences, async (new_fence, old_fence) => {
+watch(geofences, async () => {
   update_map()
 }, { deep: true })
 
@@ -393,7 +398,7 @@ watch(force_map_update, (new_val) => {
 // When the user clicks on a geofence cord box
 watch(selected_idx, (new_idx) => {
   if (idx_marker.value != null) {
-    idx_marker.value.removeFrom(initialMap.value)
+    idx_marker.value.removeFrom(initialMap.value as L.Map)
     idx_marker.value = null
   }
   if (!store.selected_fence || new_idx == null) {
@@ -401,8 +406,8 @@ watch(selected_idx, (new_idx) => {
   }
 
   const lat_lon = store.selected_fence.latlons?.[new_idx]
-  if (lat_lon?.[0] && lat_lon?.[1]) {
-    idx_marker.value = L.marker(lat_lon).addTo(initialMap.value)
+  if (lat_lon?.lat && lat_lon?.lng) {
+    idx_marker.value = L.marker(lat_lon).addTo(initialMap.value as L.Map)
   }
 })
 
@@ -411,14 +416,13 @@ watch(selected_glider, () => {
   set_glider_track()
 })
 
-//BEGIN CHANGES #JS0001
 watch(selected_fence, () => {
-  if (selected_fence.value) {
+  if (selected_fence.value && initialMap.value) {
     try {
       // compute polygon centroid using shoelace formula for better centering
       const pts = selected_fence.value.latlons
-        .filter((p) => p && p[0] !== undefined && p[1] !== undefined)
-        .map((p) => ({ x: parseFloat(p[1]), y: parseFloat(p[0]) })) // x=lon, y=lat
+        .filter((p) => p && p.lat !== null && p.lng !== null)
+        .map((p) => ({ x: p.lng, y: p.lat })) // x=lon, y=lat
 
       if (pts.length < 1) return
 
@@ -427,10 +431,10 @@ watch(selected_fence, () => {
       let cy = 0
       for (let i = 0; i < pts.length; i++) {
         const j = (i + 1) % pts.length
-        const a = pts[i].x * pts[j].y - pts[j].x * pts[i].y
+        const a = pts[i]!.x * pts[j]!.y - pts[j]!.x * pts[i]!.y
         area += a
-        cx += (pts[i].x + pts[j].x) * a
-        cy += (pts[i].y + pts[j].y) * a
+        cx += (pts[i]!.x + pts[j]!.x) * a
+        cy += (pts[i]!.y + pts[j]!.y) * a
       }
       area = area / 2
       if (Math.abs(area) < 1e-9) {
@@ -444,7 +448,8 @@ watch(selected_fence, () => {
         const avgx = sumx / pts.length
         const avgy = sumy / pts.length
         initialMap.value.setView([avgy, avgx])
-        console.log(avgx + "," + avgy)
+        // console.log(avgx + "," + avgy)
+        console.log(`Set view to ${avgy}, ${avgx}`)
       } else {
         cx = cx / (6 * area)
         cy = cy / (6 * area)
@@ -457,15 +462,13 @@ watch(selected_fence, () => {
     }
   }
 })
-//END CHANGES #JS0001
-
 
 const geofences_filtered = computed(() => {
-  let ret = []
-  Object.keys(geofences.value).forEach((key, index) => {
-    let lat_lon_filtered = []
-    geofences.value[key].latlons.forEach((element) => {
-      if (element[0] && element[1]) {
+  const ret: {key: string, latlons: Latlon[]}[] = []
+  Object.keys(geofences.value).forEach((key) => {
+    const lat_lon_filtered: Latlon[] = []
+    geofences.value[key]?.latlons.forEach((element) => {
+      if (element.lat && element.lng) {
         lat_lon_filtered.push(element)
       }
     })
@@ -478,7 +481,7 @@ watch(gliders, (new_val) => {
   if (!new_val.length) return
   const stillExists = new_val.some((g) => g._id === gliderStore.selected_glider_id)
   if (!stillExists) {
-    gliderStore.select_glider(new_val[0]._id)
+    gliderStore.select_glider((new_val[0] as Glider)._id)
   }
 })
 

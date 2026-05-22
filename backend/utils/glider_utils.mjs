@@ -8,11 +8,11 @@ import {
 } from './sfmc_api.mjs'
 
 async function update_glider_waypoint(glider, sfmc_json) {
-  const next_waypoint = [sfmc_json.nextWaypointLat, sfmc_json.nextWaypointLon]
+  const next_waypoint = {lat: sfmc_json.nextWaypointLat, lng: sfmc_json.nextWaypointLon}
   if (
     !glider.next_waypoint ||
-    glider.next_waypoint[0] != next_waypoint[0] ||
-    glider.next_waypoint[1] != next_waypoint[1]
+    glider.next_waypoint.lat != next_waypoint.lat ||
+    glider.next_waypoint.lng != next_waypoint.lng
   ) {
     const collection = await db.collection('gliders')
     console.log('Glider waypoint update!!!!')
@@ -66,15 +66,15 @@ async function update_glider_position(glider, collection = undefined) {
     return
   }
   let tracks = glider.track
-  let last_track = { lat: 0, lon: 0 }
+  let last_track = { lat: 0, lng: 0 }
   if (tracks.length > 0) {
     last_track = tracks[tracks.length - 1]
   }
 
-  if (last_track.lat != sfmc_json.gpsValidLat || last_track.lon != sfmc_json.gpsValidLon) {
+  if (last_track.lat != sfmc_json.gpsValidLat || last_track.lng != sfmc_json.gpsValidLon) {
     const track = {
       lat: sfmc_json.gpsValidLat,
-      lon: sfmc_json.gpsValidLon,
+      lng: sfmc_json.gpsValidLon,
       date: new Date(),
     }
 

@@ -21,11 +21,17 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@types/sortablejs": "^1.15.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/eslint-config-prettier": "^10.1.0",
+    "@vue/eslint-config-typescript": "^14.7.0",
+    "@vue/tsconfig": "^0.9.0",
     "eslint-plugin-vue": "^10.8.0",
+    "jiti": "^2.6.1",
     "prettier": "^3.4.2",
+    "typescript": "^5.9.3",
     "vite": "^6.0.11",
-    "vite-plugin-vue-devtools": "^8.0.5"
+    "vite-plugin-vue-devtools": "^8.0.5",
+    "vue-tsc": "^3.2.6"
   }
 }

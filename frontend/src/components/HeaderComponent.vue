@@ -1,19 +1,24 @@
-<script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
+<script setup lang="ts">
+import { computed, ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
+import type { User, UserRole } from '@/lib/types';
 
 const version_number = "0.2.1"
 const userStore = useUserStore();
-const emit = defineEmits(['toggle-user-management']);
+
+const emit = defineEmits<{
+  'toggle-user-management': []
+}>();
+
 const menuOpen = ref(false);
-const menuContainer = ref(null);
+const menuContainer = useTemplateRef('menuContainer');
 const showDeleteModal = ref(false);
 const showDeleteConfirmModal = ref(false);
 const roleToDelete = ref('');
 const userSearch = ref('');
 const deleteUsername = ref('');
-const deletableUsers = ref([]);
+const deletableUsers = ref<User[]>([]);
 const loadingDeletableUsers = ref(false);
 const deleteMessage = ref('');
 const deleteMessageType = ref('');
@@ -24,7 +29,7 @@ const sortedDeletableUsers = computed(() => {
     if (a.role !== b.role) {
       return a.role === 'admin' ? -1 : 1;
     }
-    return a.username.localeCompare(b.username);
+    return a.username?.localeCompare(b.username ?? '') ?? 1;
   });
 });
 
@@ -35,7 +40,7 @@ const usersForSelectedRole = computed(() => {
 const filteredUsersForSelectedRole = computed(() => {
   const searchText = userSearch.value.trim().toLowerCase();
   return usersForSelectedRole.value.filter((user) => {
-    return user.username.toLowerCase().includes(searchText);
+    return user.username?.toLowerCase().includes(searchText);
   });
 });
 
@@ -50,11 +55,11 @@ const selectedUserLastLogin = computed(() => {
   return matchedUser?.lastLogin || null;
 });
 
-function formatLastLogin(dateString) {
+function formatLastLogin(dateString: string | null) {
   if (!dateString) return 'Never logged in';
   const date = new Date(dateString);
   const now = new Date();
-  const diffMs = now - date;
+  const diffMs = now.getUTCMilliseconds() - date.getUTCMilliseconds();
   const diffSecs = Math.floor(diffMs / 1000);
   const diffMins = Math.floor(diffSecs / 60);
   const diffHours = Math.floor(diffMins / 60);
@@ -72,7 +77,7 @@ function formatLastLogin(dateString) {
   });
 }
 
-function setDeleteMessage(type, text) {
+function setDeleteMessage(type: string, text: string) {
   deleteMessageType.value = type;
   deleteMessage.value = text;
 }
@@ -115,7 +120,7 @@ async function deleteUser() {
   deletableUsers.value = usersResult.users;
 }
 
-function selectRole(role) {
+function selectRole(role: UserRole) {
   roleToDelete.value = role;
   userSearch.value = '';
   deleteUsername.value = '';
@@ -178,8 +183,8 @@ function toggleMenu() {
   menuOpen.value = !menuOpen.value;
 }
 
-function handleClickOutside(event) {
-  if (menuContainer.value && !menuContainer.value.contains(event.target)) {
+function handleClickOutside(event: PointerEvent) {
+  if (menuContainer.value && !menuContainer.value.contains(event.target as Node)) {
     menuOpen.value = false;
   }
 }

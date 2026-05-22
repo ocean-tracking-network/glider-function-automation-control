@@ -1,10 +1,11 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import apiClient, { getEvenSource } from '@/apiClient'
+import type { Glider } from '@/lib/types'
 
 export const useGlidersStore = defineStore('gliders', () => {
-  const gliders = ref([])
-  const selected_glider_id = ref(null)
+  const gliders = ref<Glider[]>([])
+  const selected_glider_id = ref<string | null>(null)
 
   const register_sse = () => {
     const eventSource = getEvenSource()
@@ -31,7 +32,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     })
   }
 
-  const select_glider = (glider_id) => {
+  const select_glider = (glider_id: string) => {
     selected_glider_id.value = glider_id ?? null
   }
 
@@ -49,7 +50,7 @@ export const useGlidersStore = defineStore('gliders', () => {
       })
   }
 
-  const save_glider = (name) => {
+  const save_glider = (name: string) => {
     const data = {
       name: name,
     }
@@ -59,7 +60,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     })
   }
 
-  const delete_glider = (glider) => {
+  const delete_glider = (glider: Glider) => {
     apiClient.delete(`/glider/${glider._id}`).then((res) => {
       console.log(res)
       get_gliders()
@@ -67,7 +68,7 @@ export const useGlidersStore = defineStore('gliders', () => {
   }
 
   const gliders_obj = computed(() => {
-    const ret = {}
+    const ret: {[_id: string]: Glider} = {}
     gliders.value.forEach((ele) => {
       ret[ele._id] = { ...ele }
     })

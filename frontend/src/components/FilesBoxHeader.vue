@@ -1,22 +1,24 @@
-<script setup>
+<script setup lang="ts">
 import FileBoxTabs from './FileBoxTabs.vue';
 
-const props = defineProps({
-  title: String,
-  tabs: Array,
-  selected_tab: String,
-  tabs_disabled: {
-    type: Boolean,
-    default: false,
-  },
-  add_btn: {
-    type: Boolean,
-    default: true,
-  },
-  tab_sort_key: String,
+const props = withDefaults(defineProps<{
+  title: string
+  tabs: string[]
+  selected_tab: string
+  tabs_disabled: boolean
+  add_btn: boolean
+  tab_sort_key?: string
+}>(), {
+  tabs_disabled: false,
+  add_btn: true,
 })
 
-const emit = defineEmits(['add_btn', 'tab_select', 'tab_add', 'tab_rename'])
+const emit = defineEmits<{
+  add_btn: []
+  tab_select: [selected_tab: string]
+  tab_add: [new_val: string]
+  tab_rename: [vals: {old: string; new: string}]
+}>()
 </script>
 
 <template>
@@ -28,7 +30,7 @@ const emit = defineEmits(['add_btn', 'tab_select', 'tab_add', 'tab_rename'])
       class="file-box-tabs"
       @rename="(vals) => { emit('tab_rename', vals) }"
       @add="(tab) => { emit('tab_add', tab) }"
-      :static="tab_sort_key == undefined"
+      :static="tab_sort_key === undefined"
       v-if="tabs"
       @select="(tab) => { emit('tab_select', tab) }"
       :selected="selected_tab"

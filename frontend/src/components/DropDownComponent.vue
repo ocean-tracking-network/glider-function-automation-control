@@ -1,9 +1,16 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import DropDownIcon from '@/assets/arrow_drop_down.svg'
 
-const emit = defineEmits(["select"])
-const props = defineProps(["options", "selected", "default", "disabled"])
+const emit = defineEmits<{
+  select: [option: string]
+}>()
+const props = defineProps<{
+  options: string[]
+  selected: string | null
+  default: string
+  disabled: boolean
+}>()
 
 const show_dropdown = ref(false)
 const filter_text = ref("")
@@ -15,11 +22,11 @@ const filtered_options = computed(() => {
   return props.options.filter(option => option.includes(filter_text.value))
 })
 
-function option_click(option) {
+function option_click(option: string) {
   if (props.disabled) {
     return
   }
-  emit("select", option)
+  emit('select', option)
   show_dropdown.value = false;
 }
 
@@ -35,9 +42,9 @@ function option_click(option) {
       <DropDownIcon class="dropdown-icon" />
     </button>
     <div v-if="show_dropdown" class="dropdown-content" @click.stop>
-      <input :disabled="props.disabled" @focusin="" @click.stop type="text" placeholder="Search.." class="dropdown-search"
+      <input :disabled="props.disabled" @focusin.stop @click.stop type="text" placeholder="Search.." class="dropdown-search"
         v-model="filter_text">
-      <button :disabled="props.disabled" @click.stop="option_click(option)" v-for="option in filtered_options">
+      <button :disabled="props.disabled" @click.stop="option_click(option)" :key="`${option}-${index}`" v-for="(option, index) in filtered_options">
         {{ option }}
       </button>
     </div>

@@ -1,14 +1,15 @@
 import apiClient from '@/apiClient'
 import { defineStore } from 'pinia'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useEventsStore } from './events'
+import type { UploadedFile } from '@/lib/types'
 
 export const useFilesStore = defineStore('files', () => {
-  const files_raw = ref([])
-  const local_kml_file = ref(null)
+  const files_raw = ref<UploadedFile[]>([])
+  const local_kml_file = ref<File | null>(null)
   const eventsStore = useEventsStore()
 
-  const colours = [
+  const colours: string[] = [
     'purple',
     'darkgreen',
     'orange',
@@ -75,34 +76,38 @@ export const useFilesStore = defineStore('files', () => {
     '#9ACD32', // YellowGreen
   ]
 
-  //
-
   const get_files = () => {
     apiClient.get('/files').then((res) => {
       files_raw.value = res.data
     })
   }
 
-  const delete_file = (id) => {
-    apiClient.delete('/files/' + id).then((res) => {
+  const delete_file = (id: string) => {
+    apiClient.delete('/files/' + id).then(() => {
       get_files()
       eventsStore.get_events()
     })
   }
 
-  const upload_kml_file = (event, files) => {
-    const file = event ? event.target.files[0] : files[0]
-    local_kml_file.value = file
+  // ((payload: Event) => void)
+  const upload_kml_file = (file: Event | File[]) => {
+    if (file instanceof Event) {
+      if (file.target instanceof HTMLInputElement) {
+        local_kml_file.value = file.target!.files?.item(0) ?? null
+      }
+    }
+    else local_kml_file.value = file[0] ?? null
   }
 
   const clear_kml_file = () => {
     local_kml_file.value = null
   }
 
-  const upload_files = (event, category) => {
-    let formData = new FormData()
+  const upload_files = (event: Event, category: string) => {
+    const formData = new FormData()
+    if (!(event.target instanceof HTMLInputElement) || event.target.files === null) return
     for (let i = 0; i < event.target.files.length; i++) {
-      formData.append('files', event.target.files[i])
+      formData.append('files', event.target.files[i] ?? 'undefined')
       formData.append('category', category)
     }
     const headers = {
@@ -119,10 +124,10 @@ export const useFilesStore = defineStore('files', () => {
       })
   }
 
-  const update_files_category = (files) => {
+  const update_files_category = (files: {_id: string, category: string}[]) => {
     apiClient
       .patch('/files', files)
-      .then((res) => {
+      .then(() => {
         get_files()
       })
       .catch((err) => {
@@ -131,7 +136,7 @@ export const useFilesStore = defineStore('files', () => {
   }
 
   const files_obj = computed(() => {
-    let ret = {}
+    const ret: {[_id: string]: UploadedFile} = {}
 
     files_raw.value.forEach((ele) => {
       ret[ele._id] = ele
@@ -141,17 +146,14 @@ export const useFilesStore = defineStore('files', () => {
   })
 
   const files_arr = computed(() => {
-    let ret = []
+    const ret: UploadedFile[] = []
     files_raw.value.forEach((ele) => {
-      ret.push({
-        ...ele,
-        name: ele.filename,
-      })
+      ret.push({...ele})
     })
     return ret
   })
   const categories = computed(() => {
-    let cats = []
+    const cats: string[] = []
     files_raw.value.forEach((ele) => {
       if (!cats.includes(ele.category)) {
         cats.push(ele.category)
@@ -161,12 +163,12 @@ export const useFilesStore = defineStore('files', () => {
   })
 
   const colour_by_category = computed(() => {
-    let ret = {}
+    const ret: {[category: string]: string} = {}
     for (let i = 0; i < categories.value.length; i++) {
       if (i > colours.length) {
         console.log('wow, too many categories for my chatgpt colour list... please remove some')
       } else {
-        ret[categories.value[i]] = colours[i]
+        ret[categories.value[i]!] = colours[i]!
       }
     }
     return ret

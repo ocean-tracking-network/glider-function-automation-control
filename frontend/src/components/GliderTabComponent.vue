@@ -1,9 +1,10 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { useGlidersStore } from '@/stores/gliders';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
+import type { Glider } from '@/lib/types';
 
 const gliderStore = useGlidersStore()
 const userStore = useUserStore()
@@ -14,7 +15,7 @@ const show_add_modal = ref(false)
 const new_glider_name = ref('')
 const error_msg = ref('')
 
-const selected_delete = ref(null)
+const selected_delete = ref<Glider | null>(null)
 
 function enable_disable_glider() {
   if (!isAdmin.value) return
@@ -47,6 +48,7 @@ function add_glider() {
 function delete_glider() {
   if (!isAdmin.value) return
 
+  if (!selected_delete.value) return
   gliderStore.delete_glider(selected_delete.value)
   selected_delete.value = null
 }
@@ -63,11 +65,11 @@ function hide_add_modal() {
     @close="hide_add_modal()"
     @confirm="add_glider()"
   >
-    <form action="">
+    <form @submit.prevent="add_glider()">
       <p v-if="error_msg" class="danger">{{ error_msg }}</p>
       <input v-model="new_glider_name" type="text" placeholder="Enter Glider Name">
       <br>
-      <button type="button" @click="add_glider()">Add</button>
+      <button type="submit">Add</button>
       <button type="button" @click="hide_add_modal()">Cancel</button>
     </form>
   </ModalComponent>

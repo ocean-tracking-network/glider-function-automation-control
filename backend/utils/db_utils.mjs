@@ -16,7 +16,7 @@ const deleteMany = async (collection_name, ids) => {
 }
 const updateOne = async (collection_name, id, update_dict) => {
   let collection = await db.collection(collection_name);
-  const filter_id = typeof id == String ? ObjectId.createFromHexString(id) : id;
+  const filter_id = typeof id === 'string' ? ObjectId.createFromHexString(id) : id;
   const filter = { _id: filter_id };
   let updateDoc = {
     $set: {

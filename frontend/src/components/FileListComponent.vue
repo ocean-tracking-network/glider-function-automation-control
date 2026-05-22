@@ -1,69 +1,65 @@
-<script setup>
-import { computed, onMounted, ref } from 'vue';
+<script setup lang="ts" generic="T">
+import { onMounted, ref } from 'vue';
 import FileComponent from './FileComponent.vue';
-import draggable from 'vuedraggable'
+import draggable from 'vuedraggable';
+import type { FileBoxType } from '@/lib/types';
 
-const props = defineProps({
-  draggable: {
-    type: Boolean,
-    default: true,
-  },
-  group: [Object, String],
-  list: Array,
-  sort: {
-    type: Boolean,
-    default: true,
-  },
-  can_delete: {
-    type: Boolean,
-    default: true,
-  },
-  can_edit: {
-    type: Boolean,
-    default: false,
-  },
-  move: Function,
+const props = withDefaults(defineProps<{
+  isDraggable: boolean
+  group?: object | string
+  list: FileBoxType<T>[]
+  sort: boolean
+  can_delete: boolean
+  can_edit: boolean
+}>(), {
+  isDraggable: true,
+  sort: true,
+  can_delete: true,
+  can_edit: false,
 })
 
-const emit = defineEmits(['click', 'dblclick', 'delete', 'edit'])
+const emit = defineEmits<{
+  click: [list_element: FileBoxType<T>]
+  dblclick: [list_element: FileBoxType<T>]
+  delete: [list_element: FileBoxType<T>]
+  edit: [list_element: FileBoxType<T>]
+}>()
 
-const sort = ref()
-const group = ref()
+const sortRef = ref()
+const groupRef = ref()
 
 onMounted(() => {
   if (props.sort != undefined) {
-    sort.value = props.sort
+    sortRef.value = props.sort
   } else {
-    sort.value = true
+    sortRef.value = true
   }
 
-  if (!props.draggable) {
-    group.value = {
+  if (!props.isDraggable) {
+    groupRef.value = {
       name: "no-dragable",
       pull: false,
       clone: false,
       put: false,
     }
-    sort.value = false
+    sortRef.value = false
   } else {
-    group.value = props.group
+    groupRef.value = props.group
   }
 })
 
-function delete_element(index, element_id) {
-  if (!props.can_delete) {
-    return
-  }
-  emit("delete", element_id)
-  props.list.splice(index, 1)
+function delete_element(element: FileBoxType<T>) {
+  if (!props.can_delete) return
+  emit("delete", element)
 }
+
 </script>
 
 <template>
-  <draggable :sort="sort" :list="list" :group="group" itemKey="id" class="list-group files-container">
-    <template #item="{ element, index }">
+  <draggable :sort="sortRef" :list="list" :group="groupRef" itemKey="id" class="list-group files-container">
+    <template #item="{ element }">
       <a class="clickable" href="#" @click.prevent="emit('click', element)" @dblclick.prevent="emit('dblclick', element)">
-        <FileComponent :canDelete="props.can_delete" :canEdit="props.can_edit" :selected="element.selected" @remove="delete_element(index, element)" @edit="emit('edit', element)" :element="element"
+        <FileComponent :canDelete="props.can_delete" :canEdit="props.can_edit" :selected="element.selected" @remove="delete_element(element)" @edit="emit('edit', element)" :element="element"
           class="files list-group-item" />
       </a>
     </template>
