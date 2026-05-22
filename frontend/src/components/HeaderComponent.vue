@@ -23,7 +23,7 @@ const loadingDeletableUsers = ref(false);
 const deleteMessage = ref('');
 const deleteMessageType = ref('');
 const deleting = ref(false);
-const showSmsSignupDrawer = ref(false);
+
 
 const sortedDeletableUsers = computed(() => {
   return [...deletableUsers.value].sort((a, b) => {
@@ -221,9 +221,6 @@ onBeforeUnmount(() => {
             <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
               Create User
             </button>
-            <button v-if="userStore.isAdmin" class="menu-item" @click="openSmsSignup">
-              SMS Signup
-            </button>
             <button v-if="userStore.isAdmin" class="menu-item delete-item" @click="deleteUser">
               Delete User
             </button>
@@ -329,7 +326,7 @@ onBeforeUnmount(() => {
     </div>
   </ModalComponent>
 
-  <SmsSignupComponent v-if="showSmsSignupDrawer" @close="showSmsSignupDrawer = false" />
+
 
   <ModalComponent
     v-if="showDeleteConfirmModal"

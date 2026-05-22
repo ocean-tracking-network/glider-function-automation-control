@@ -6,6 +6,7 @@ from pymongo import ASCENDING
 from zoneinfo import ZoneInfo
 
 DATA_DIR = "./data"
+FILENAME_TIMESTAMP_FORMATS = ["%Y-%m-%dT%H_%M_%S", "%Y-%m-%dT%H:%M:%S"]
 
 # Read Mongo connection from environment so the service can run in Docker
 MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
@@ -60,6 +61,18 @@ def _process_cur(cur):
         doc["_id"] = str(doc["_id"])
         ret.append(doc)
     return ret
+
+
+def _parse_fixture_timestamp(file_name: str) -> datetime:
+    timestamp_text = file_name.split(".")[0]
+    for timestamp_format in FILENAME_TIMESTAMP_FORMATS:
+        try:
+            return datetime.strptime(timestamp_text, timestamp_format)
+        except ValueError:
+            continue
+    raise ValueError(
+        f"time data {timestamp_text!r} does not match supported formats {FILENAME_TIMESTAMP_FORMATS!r}"
+    )
     
 
 def get_by_index(idx) -> list[dict[str, str]]:
@@ -147,16 +160,14 @@ def get_all_unique():
 
 def insert_data():
     group = 0
-    string_format = "%Y-%m-%dT%H:%M:%S"
-    files = [(datetime.strptime(file.split(".")[0], string_format), file) for file in os.listdir(DATA_DIR)]
+    files = [(_parse_fixture_timestamp(file), file) for file in os.listdir(DATA_DIR)]
     sorted_files = sorted(files)
     for _, file in sorted_files:
         file_path = os.path.join(DATA_DIR, file)
         with open(file_path, "r") as f:
             file_data = json.load(f)
             for ais in file_data:
-                time_str = file.split(".")[0]
-                api_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
+                api_time = _parse_fixture_timestamp(file)
                 api_time = api_time.replace(tzinfo=ZoneInfo("America/Toronto"))
                 api_time = api_time.astimezone(timezone.utc)
                 ais["api_time"] = api_time
