@@ -118,14 +118,23 @@ def _process_date(doc):
 
 def get_mimic():
     config_cur = config_col.find_one({})
+
+    # Calculate how many groups exist
+    # You may need to import `os` and `DATA_DIR` if not already available
+    total_groups = len(os.listdir(DATA_DIR))
+
     group = 0
     if config_cur is not None:
         group = config_cur["next_group"]
-        config_col.update_one({}, {"$set" : {"next_group": group+1}})
+
+        # Increment and wrap-around
+        new_group = (group + 1) % total_groups
+        config_col.update_one({}, {"$set" : {"next_group": new_group}})
     else:
         config_col.insert_one({
             "next_group": 1
         })
+
     return [{"AIS": _process_date(doc)["AIS"]} for doc in get_by_index(group)]
 
 
