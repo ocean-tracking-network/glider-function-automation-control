@@ -43,7 +43,6 @@ import {
 import './loadEnvironment.mjs'
 import { gliders_sse } from './views/sse/gliders.mjs'
 import { update_boats } from './utils/boat_utils.mjs'
-import { delete_contacts, get_contacts, create_contact, edit_contact } from './views/notify.mjs'
 
 const app = express()
 app.use(cors())
@@ -98,11 +97,7 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 // sse
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
-//sms
-app.get('/notify', authenticateToken, get_contacts)
-app.post('/notify', authenticateToken, create_contact)
-app.patch('/notify/:id', authenticateToken, edit_contact)
-app.delete('/notify/:id', authenticateToken, delete_contacts)
+
 
 
 
