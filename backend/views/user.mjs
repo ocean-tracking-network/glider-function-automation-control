@@ -122,4 +122,14 @@ const delete_user = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { login, create_user, get_deletable_users, user_exists, delete_user }
+const get_all_users = async (req, res) => {
+  const collection = await db.collection('users')
+  const users = await collection
+    .find({}, { projection: { _id: 0, username: 1 } })
+    .sort({ username: 1 })
+    .toArray()
+
+  res.status(200).send({ users })
+}
+
+export { login, create_user, get_deletable_users, user_exists, delete_user, get_all_users }

@@ -8,7 +8,7 @@ const deleteOne = async (collection_name, id) => {
 }
 
 const deleteMany = async (collection_name, ids) => {
-  results = []
+  let results = []
   for (let id of ids) {
     results.push(await deleteOne(collection_name, id))
   }

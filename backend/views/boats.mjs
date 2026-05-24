@@ -8,6 +8,12 @@ import {
 } from "../utils/boat_utils.mjs";
 
 const get_boats = async (req, res) => {
+  try {
+    await update_boats();
+  } catch (error) {
+    console.error("Could not refresh boats before serializing:", error);
+  }
+
   const boats = await serialize_boats(parseInt(req.params.end_offset));
   return res.send(boats).status(200);
 };

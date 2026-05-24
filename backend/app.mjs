@@ -28,7 +28,7 @@ import {
   trigger_events,
 } from './views/events.mjs'
 import { get_boats, get_boat_predict, check_gliders_safe } from './views/boats.mjs'
-import { login, create_user, get_deletable_users, delete_user, user_exists } from './views/user.mjs'
+import { login, create_user, get_deletable_users, delete_user, user_exists, get_all_users } from './views/user.mjs'
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
 import { get_logs, post_logs } from './views/logs.mjs'
@@ -56,6 +56,7 @@ const port = 3000
 
 // user
 app.post('/login', login)
+app.get('/users/list', authenticateToken, get_all_users)
 app.post('/users', authenticateToken, requireAdmin, create_user)
 app.get('/users', authenticateToken, requireAdmin, get_deletable_users)
 app.get('/users/:username/exists', authenticateToken, requireAdmin, user_exists)
@@ -96,19 +97,26 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 // sse
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
+
+
+
+
 // boats
-// app.get('/boats/:end_offset', authenticateToken, get_boats)
-// app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
-// app.get('/boats/test', check_gliders_safe)
+app.get('/boats/:end_offset', authenticateToken, get_boats)
+app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
+app.get('/boats/test', check_gliders_safe)
 
 // Schedule
 const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
 const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
-  await update_glider_positions()
-  await update_geofences()
-
-  await delete_old_tracks()
-  // update_boats()
+  try {
+    await update_glider_positions()
+    await update_geofences()
+    await delete_old_tracks()
+    await update_boats()
+  } catch (error) {
+    console.error('Scheduled backend update failed:', error)
+  }
 })
 
 const ensureAdminUser = async () => {
@@ -151,7 +159,7 @@ app.listen(port, async () => {
   await ensureAdminUser()
 
   const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
-  if (pause == 'false') {
+  if (pause === 'false') {
     for (let i = 0; i < 20; i++) {
       console.log('CAUTION: SENDING FLIES TO REAL GLIDERS IS ENABLED! ONLY USE THIS IN PRODUCTION!')
     }

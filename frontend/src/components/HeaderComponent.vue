@@ -24,6 +24,7 @@ const deleteMessage = ref('');
 const deleteMessageType = ref('');
 const deleting = ref(false);
 
+
 const sortedDeletableUsers = computed(() => {
   return [...deletableUsers.value].sort((a, b) => {
     if (a.role !== b.role) {
@@ -324,6 +325,8 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </ModalComponent>
+
+
 
   <ModalComponent
     v-if="showDeleteConfirmModal"
