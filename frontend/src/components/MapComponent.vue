@@ -53,7 +53,7 @@ const boats = ref<Boat[]>([])
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
-const { isAdmin } = storeToRefs(userStore)
+const { isAdmin, loggedin } = storeToRefs(userStore)
 
 function get_boats() {
   console.log("Getting boats")
@@ -398,8 +398,13 @@ onMounted(() => {
   initialMap.value.on('click', map_click)
   create_polygons()
   draw_ais_border()
-  get_boats()
 })
+
+watch(loggedin, (isLoggedIn) => {
+  if (isLoggedIn) {
+    get_boats()
+  }
+}, { immediate: true })
 
 function update_map() {
   //console.log("Map Update")
