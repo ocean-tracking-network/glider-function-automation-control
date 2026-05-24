@@ -1,0 +1,3 @@
+To run the AIS mimic properly, un-example these docker files, and download the AIS data from https://cove-files.ceotr.ca/share/OMmPy-4E.
+
+It needs to be in dev_utilities/fastapi_ais/data/.

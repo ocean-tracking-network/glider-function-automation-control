@@ -10,6 +10,8 @@ WORKDIR /usr/src/app
 
 COPY docker/sfmc.tgz ../docker/
 
+RUN apk add --no-cache python3 make g++
+
 RUN --mount=type=bind,source=./backend/package.json,target=package.json \
     --mount=type=bind,source=./backend/package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
@@ -20,7 +22,7 @@ RUN mkdir uploads && \
 
 USER node
 
-COPY ./backend ./
+COPY --chown=node:node ./backend ./
 
 EXPOSE 3000
 

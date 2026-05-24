@@ -7,24 +7,18 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ceotr
       MONGO_INITDB_ROOT_PASSWORD: ceotr
-    healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "mongodb://ceotr:ceotr@localhost:27017/admin", "--eval", "db.runCommand({ ping: 1 }).ok"]
-      interval: 5s
-      timeout: 5s
-      retries: 12
     volumes:
-      - mongo-data:/data/db
+      - /tmp/mongo:/data/db
   mongo-express:
     image: mongo-express
     depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
     restart: no
     ports:
       - 8081:8081
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ceotr
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ceotr
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://ceotr:ceotr@mongo:27017/
       ME_CONFIG_BASICAUTH: false
 
@@ -34,32 +28,12 @@ services:
     build:
       context: ../
       dockerfile: ./docker/backend.dockerfile
-    environment:
-      AIS_API_URL: http://fastapi:8000/ais/mimic
     volumes:
-      - backend-uploads:/usr/src/app/uploads
+      - /home/ellis/resource/gas/uploads:/usr/src/app/uploads
     ports:
       - 3000:3000
     depends_on:
-      mongo:
-        condition: service_healthy
-  fastapi:
-    image: glider-ais-fastapi
-    restart: unless-stopped
-    build:
-      context: ../
-      dockerfile: ./docker/fastapi.dockerfile
-    environment:
-      MONGO_URL: "mongodb://ceotr:ceotr@mongo:27017"
-      MONGO_USER: "ceotr"
-      MONGO_PASS: "ceotr"
-    ports:
-      - 8000:8000
-    volumes:
-      - ../dev_utilities/fastapi_ais/data:/usr/src/app/data:rw
-    depends_on:
-      mongo:
-        condition: service_healthy
+      - mongo
 
   frontend:
     image: glider-automation-frontend
@@ -69,7 +43,3 @@ services:
       dockerfile: ./docker/frontend.dockerfile
     ports:
       - 8080:8080
-
-volumes:
-  mongo-data:
-  backend-uploads:
