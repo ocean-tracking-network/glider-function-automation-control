@@ -1,8 +1,6 @@
 import db from '../db/conn.mjs'
 import { comparePassword, generateAuthToken, hashPassword } from '../utils/auth.mjs'
 
-
-
 //GETTING USER AND PASS FROM TEXTBOXES (ENTERED IN PAGE)
 const login = async (req, res) => {
   const { username, password } = req.body
@@ -36,7 +34,6 @@ const login = async (req, res) => {
     role: user.role,
   })
 
-
   await collection.updateOne({ username }, { $set: { lastLogin: new Date() } })
 
   res.status(200).send({ token, role: user.role, username: user.username })
@@ -55,7 +52,6 @@ const create_user = async (req, res) => {
 
   //GET USERS FROM DB
   const collection = await db.collection('users')
-
 
   //IF EXISTING USER FOUND, ERR 409, OTHERWISE CONTINUE
   const existing = await collection.findOne({ username })
@@ -81,7 +77,10 @@ const create_user = async (req, res) => {
 const get_deletable_users = async (req, res) => {
   const collection = await db.collection('users')
   const users = await collection
-    .find({ username: { $ne: req.user?.name } }, { projection: { _id: 0, username: 1, role: 1, lastLogin: 1 } })
+    .find(
+      { username: { $ne: req.user?.name } },
+      { projection: { _id: 0, username: 1, role: 1, lastLogin: 1 } },
+    )
     .sort({ username: 1 })
     .toArray()
 
@@ -125,7 +124,7 @@ const delete_user = async (req, res) => {
 const get_all_users = async (req, res) => {
   const collection = await db.collection('users')
   const users = await collection
-    .find({}, { projection: { _id: 0, username: 1, role: 1 } })
+    .find({}, { projection: { _id: 0, username: 1 } })
     .sort({ username: 1 })
     .toArray()
 

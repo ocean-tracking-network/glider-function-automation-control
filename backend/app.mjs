@@ -49,7 +49,12 @@ import {
 import './loadEnvironment.mjs'
 import { gliders_sse } from './views/sse/gliders.mjs'
 import { update_boats } from './utils/boat_utils.mjs'
-import { delete_notifications, get_notifications, create_notification, edit_notification } from './views/notify.mjs'
+import {
+  delete_notifications,
+  get_notifications,
+  create_notification,
+  edit_notification,
+} from './views/notify.mjs'
 
 const app = express()
 app.use(cors())
@@ -111,17 +116,21 @@ app.patch('/notify/:id', authenticateToken, edit_notification)
 app.delete('/notify/:id', authenticateToken, delete_notifications)
 
 // boats
-// app.get('/boats/:end_offset', authenticateToken, get_boats)
-// app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
-// app.get('/boats/test', check_gliders_safe)
+app.get('/boats/:end_offset', authenticateToken, get_boats)
+app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
+app.get('/boats/test', check_gliders_safe)
 
 // Schedule
 const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
 const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
-  await update_glider_positions()
-  await update_geofences()
-  await delete_old_tracks()
-  // update_boats()
+  try {
+    await update_glider_positions()
+    await update_geofences()
+    await delete_old_tracks()
+    await update_boats()
+  } catch (error) {
+    console.error('Scheduled backend update failed:', error)
+  }
 })
 
 const ensureAdminUser = async () => {
@@ -164,7 +173,7 @@ app.listen(port, async () => {
   await ensureAdminUser()
 
   const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
-  if (pause == 'false') {
+  if (pause === 'false') {
     for (let i = 0; i < 20; i++) {
       console.log('CAUTION: SENDING FLIES TO REAL GLIDERS IS ENABLED! ONLY USE THIS IN PRODUCTION!')
     }

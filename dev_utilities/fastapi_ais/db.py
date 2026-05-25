@@ -6,11 +6,14 @@ from pymongo import ASCENDING
 from zoneinfo import ZoneInfo
 
 DATA_DIR = "./data"
+FILENAME_TIMESTAMP_FORMATS = ["%Y-%m-%dT%H_%M_%S", "%Y-%m-%dT%H:%M:%S"]
 
+# Read Mongo connection from environment so the service can run in Docker
+MONGO_URL = os.getenv("MONGO_URL", "mongodb://localhost:27017")
+MONGO_USER = os.getenv("MONGO_USER", "ceotr")
+MONGO_PASS = os.getenv("MONGO_PASS", "ceotr")
 
-myclient = pymongo.MongoClient("mongodb://localhost:27017",
-                               username="ceotr",
-                               password="ceotr")
+myclient = pymongo.MongoClient(MONGO_URL, username=MONGO_USER, password=MONGO_PASS)
 mydb = myclient["ais"]
 mycol = mydb["ais"]
 config_col = mydb['ais_config']
@@ -58,6 +61,18 @@ def _process_cur(cur):
         doc["_id"] = str(doc["_id"])
         ret.append(doc)
     return ret
+
+
+def _parse_fixture_timestamp(file_name: str) -> datetime:
+    timestamp_text = file_name.split(".")[0]
+    for timestamp_format in FILENAME_TIMESTAMP_FORMATS:
+        try:
+            return datetime.strptime(timestamp_text, timestamp_format)
+        except ValueError:
+            continue
+    raise ValueError(
+        f"time data {timestamp_text!r} does not match supported formats {FILENAME_TIMESTAMP_FORMATS!r}"
+    )
     
 
 def get_by_index(idx) -> list[dict[str, str]]:
@@ -103,14 +118,23 @@ def _process_date(doc):
 
 def get_mimic():
     config_cur = config_col.find_one({})
+
+    # Calculate how many groups exist
+    # You may need to import `os` and `DATA_DIR` if not already available
+    total_groups = len(os.listdir(DATA_DIR))
+
     group = 0
     if config_cur is not None:
         group = config_cur["next_group"]
-        config_col.update_one({}, {"$set" : {"next_group": group+1}})
+
+        # Increment and wrap-around
+        new_group = (group + 1) % total_groups
+        config_col.update_one({}, {"$set" : {"next_group": new_group}})
     else:
         config_col.insert_one({
             "next_group": 1
         })
+
     return [{"AIS": _process_date(doc)["AIS"]} for doc in get_by_index(group)]
 
 
@@ -145,16 +169,14 @@ def get_all_unique():
 
 def insert_data():
     group = 0
-    string_format = "%Y-%m-%dT%H:%M:%S"
-    files = [(datetime.strptime(file.split(".")[0], string_format), file) for file in os.listdir(DATA_DIR)]
+    files = [(_parse_fixture_timestamp(file), file) for file in os.listdir(DATA_DIR)]
     sorted_files = sorted(files)
     for _, file in sorted_files:
         file_path = os.path.join(DATA_DIR, file)
         with open(file_path, "r") as f:
             file_data = json.load(f)
             for ais in file_data:
-                time_str = file.split(".")[0]
-                api_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
+                api_time = _parse_fixture_timestamp(file)
                 api_time = api_time.replace(tzinfo=ZoneInfo("America/Toronto"))
                 api_time = api_time.astimezone(timezone.utc)
                 ais["api_time"] = api_time
@@ -163,8 +185,16 @@ def insert_data():
         group+=1
 
 
-if __name__ == '__main__':
+def ensure_data_loaded():
+    if mycol.estimated_document_count() > 0:
+        return
+
+    print("AIS collection is empty; loading AIS fixture data")
     insert_data()
+
+
+if __name__ == '__main__':
+    ensure_data_loaded()
     # fun()
     # get_all_unique()
     # get_grouped()
