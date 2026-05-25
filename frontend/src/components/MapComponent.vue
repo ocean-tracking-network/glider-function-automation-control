@@ -88,7 +88,7 @@ async function draw_predict() {
   boat_predict_lines.value = []
   for (const boat of boats.value) {
     if (!boat || !boat.prediction) continue
-    let predict_data = undefined
+    let predict_data: Boat['prediction'] | undefined = undefined
     if (boat_slide_time_offset.value == 0) {
       predict_data = boat.prediction
     } else if (boat.prediction_range && boat.prediction_range.intervals) {
@@ -131,7 +131,7 @@ watch(boat_slide_time_offset, () => {
   draw_predict()
 })
 
-function get_boat_rotation(last_location) {
+function get_boat_rotation(last_location: Boat['locations'][number]) {
   const heading = Number(last_location["HEADING"])
   if (Number.isFinite(heading) && heading >= 0 && heading <= 360) {
     return heading
@@ -145,7 +145,7 @@ function get_boat_rotation(last_location) {
   return 0
 }
 
-function create_boat_icon(rotation) {
+function create_boat_icon(rotation: number) {
   return L.divIcon({
     className: 'boat-arrow-marker',
     iconSize: [30, 30],

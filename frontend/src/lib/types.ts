@@ -139,7 +139,7 @@ export type DraggableMoveEvent<T> = MoveEvent & {
 export type Boat = {
   locations: {
     LATITUDE: number
-    lngGITUDE: number
+    LONGITUDE: number
     NAVSTAT: string
     COURSE: string
     HEADING: string
