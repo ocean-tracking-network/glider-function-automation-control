@@ -16,6 +16,7 @@ const props = withDefaults(defineProps<{
   tabs?: string[]
   tab_sort_key?: string
   tabs_disabled?: boolean
+  tabs_static?: boolean
   add_btn?: boolean
   dblclick?: boolean
 }>(), {
@@ -108,6 +109,7 @@ const all_tabs = computed(() => {
         :tabs_disabled="props.tabs_disabled"
         :add_btn="props.add_btn"
         :tab_sort_key="props.tab_sort_key"
+        :tabs_static="tabs_static"
         @add_btn="emit('add_btn')"
         @tab_select="tab_select"
         @tab_add="tab_add"

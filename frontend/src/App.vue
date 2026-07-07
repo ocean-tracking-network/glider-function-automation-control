@@ -25,7 +25,7 @@ const geofenceStore = useGeoFencesStore()
 const gliderStore = useGlidersStore()
 const userStore = useUserStore()
 
-const { selected_fence } = storeToRefs(geofenceStore)
+const { selected_fence, is_geofence_tab_selected } = storeToRefs(geofenceStore)
 const { enter_files_ref, exit_files_ref } = storeToRefs(eventsStore)
 const { files_arr } = storeToRefs(filesStore)
 
@@ -44,7 +44,7 @@ function delete_event_enter(event: FileBoxType<EventGliderFile>) {
 }
 
 const display_events = computed(() => {
-  return selected_fence.value && gliderStore.selected_glider != undefined
+  return (selected_fence.value || !is_geofence_tab_selected.value) && gliderStore.selected_glider != undefined
 })
 
 function add_file() {
@@ -174,7 +174,7 @@ function onGeofenceDrawerOffsetChange(offset: number) {
 
             </FilesBoxComponent>
             <div v-if="!display_events" id="middle-placeholder" class="middle border center-div">
-              <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong></h2>
+              <h2 class="unselected-text">Please select a <strong>glider</strong> and <strong>geofence</strong>, or selected the <strong>Ships</strong> tab</h2>
             </div>
             <FilesBoxComponent @tab_rename="rename_tab_category" @tab_select="select_file_tab"
               :tabs="filesStore.categories" :tab_sort_key="'category'" @add_btn="add_file" @delete="delete_file"
@@ -276,11 +276,6 @@ header {
   text-align: center;
 }
 
-.center-div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 
 #file-upload {

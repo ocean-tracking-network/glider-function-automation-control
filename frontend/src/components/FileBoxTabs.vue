@@ -88,7 +88,7 @@ const all_tabs = computed(() => {
   <div class="tab-container">
     <button :class="{ first: index == 0 }" :key="index" v-for="(tab, index) in all_tabs" @click="select(tab)"
       :disabled="props.disabled">
-      <p :class="{ tabtext: true, selected: (selected == tab && !static), last: static }"
+      <p :class="{ tabtext: true, selected: (selected == tab), last: static }"
         :style="{ color: filesStore.colour_by_category[tab] }"
         v-if="(!rename || selected != tab) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
         {{ tab }}
@@ -106,6 +106,7 @@ const all_tabs = computed(() => {
   display: flex;
   /* gap: 1rem; */
   max-width: 500px;
+  /* height: 2rem; */
   overflow-x: scroll;
   margin-bottom: 0 !important;
 }
@@ -118,6 +119,7 @@ const all_tabs = computed(() => {
   padding-right: .5rem;
   padding-left: .5rem;
   max-width: 100px;
+  height: 100%;
   text-wrap: nowrap;
   overflow: hidden;
   transition: 1s;
@@ -146,6 +148,7 @@ button:hover {
 .selected {
   /* color: white !important; */
   font-weight: bold;
+  /* color: red !important; */
 }
 
 input {

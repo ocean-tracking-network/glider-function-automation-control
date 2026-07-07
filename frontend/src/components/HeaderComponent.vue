@@ -4,7 +4,7 @@ import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
 import type { User, UserRole } from '@/lib/types';
 
-const version_number = "0.2.1"
+const version_number = "0.2.1-DEV"
 const userStore = useUserStore();
 
 const emit = defineEmits<{
@@ -219,10 +219,10 @@ onBeforeUnmount(() => {
           </button>
           <div class="dropdown-menu" v-if="menuOpen">
             <button v-if="userStore.isAdmin" class="menu-item" @click="openUserManagement">
-              Create User
+              Create a User
             </button>
             <button v-if="userStore.isAdmin" class="menu-item delete-item" @click="deleteUser">
-              Delete User
+              Delete a User
             </button>
             <button class="menu-item logout-item" @click="logout">
               Logout
@@ -232,7 +232,6 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="placeholder" v-else></div>
-  </div>
   <ModalComponent
     v-if="showDeleteModal && !showDeleteConfirmModal"
     header="Delete User"
@@ -352,6 +351,7 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </ModalComponent>
+  </div>
 </template>
 
 <style scoped>

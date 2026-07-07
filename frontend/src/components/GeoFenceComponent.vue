@@ -27,12 +27,14 @@ const geofence_is_dirty = ref(false)
 const pending_fence_key = ref<string | null>(null)
 const pending_from_map = ref(false)
 const pending_delete_element = ref<FileBoxType<Geofence> | null>(null)
+const tabs = ["Geofences", "Ships"]
+const selected_tab = ref("")
 
 const emit = defineEmits<{
   'drawer-offset-change': [number]
 }>()
 
-const { geofences, selected_fence, selected_fence_key } = storeToRefs(store)
+const { geofences, selected_fence, selected_fence_key, is_geofence_tab_selected } = storeToRefs(store)
 const { selected_glider } = storeToRefs(gliderStore)
 
 //GET USER ROLE FROM STORED USER
@@ -331,7 +333,8 @@ const latlons = computed(() => {
       name: name,
       selected: selected_fence_local.value === key,
       key: key,
-      bold: has_geofence_event
+      bold: has_geofence_event,
+      type: "Geofences" // For the tabs
     })
   })
   return ret;
@@ -360,6 +363,10 @@ onBeforeUnmount(() => {
   emit('drawer-offset-change', 0)
 })
 
+function tab_select(tab: string){
+  selected_tab.value = tab
+  is_geofence_tab_selected.value = tab == tabs[0]
+}
 
 //UI/UX DRIVEN BY isAdmin WHERE NEEDED
 </script>
@@ -375,12 +382,21 @@ onBeforeUnmount(() => {
         :can_edit="isAdmin"
         :standard_delete="isAdmin"
         :dblclick="false"
-        title="Geofences"
+        :tabs="tabs"
+        :tabs_disabled="false"
+        :tabs_static="true"
+        tab_sort_key="type"
+        title="Event Triggers"
         @delete="remove"
         @add_btn="add_geo"
         @click="on_click"
         @edit="open_selected_geofence_editor"
-      />
+        @tab_select="tab_select"
+        >
+          <div v-if="selected_tab == tabs[1]" id="boats-text" class="center-div">
+            <h2 class="unselected-text">Files/script changes for when a glider is in the path of a ship</h2>
+          </div>
+      </FilesBoxComponent>
     </div>
     <!-- <div class="geofence-actions"> -->
       <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
@@ -441,6 +457,11 @@ onBeforeUnmount(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+#boats-text{
+  margin-bottom: 5rem;
+  font-size: large;
 }
 
 .geofence-list {

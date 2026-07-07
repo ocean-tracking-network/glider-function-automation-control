@@ -110,10 +110,15 @@ app.get('/boats/test', check_gliders_safe)
 const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
 const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
   try {
-    await update_glider_positions()
+
+    if(process.env.SFMC_CONNECTION_METHOD?.toLowerCase() == "get"){
+      await update_glider_positions()
+    }
     await update_geofences()
     await delete_old_tracks()
-    await update_boats()
+    if(process.env.GET_AIS?.toLowerCase() == "true"){
+      await update_boats()
+    }
   } catch (error) {
     console.error('Scheduled backend update failed:', error)
   }
@@ -167,7 +172,12 @@ app.listen(port, async () => {
     await new Promise((r) => setTimeout(r, 5000))
   }
 
-  subscribe_sfmc_gliders()
+  const CONN_METHOD = process.env.SFMC_CONNECTION_METHOD?.toLowerCase()
+  console.log(CONN_METHOD)
+  if(CONN_METHOD == "socket"){
+    console.log("Subscribing to Sockets")
+    subscribe_sfmc_gliders()
+  }
 
   console.log(`example app listening on port ${port}`)
   send_slack_message('debug: Backend started and listening')

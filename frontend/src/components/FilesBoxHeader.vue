@@ -8,6 +8,7 @@ const props = withDefaults(defineProps<{
   tabs_disabled: boolean
   add_btn: boolean
   tab_sort_key?: string
+  tabs_static?: boolean
 }>(), {
   tabs_disabled: false,
   add_btn: true,
@@ -30,7 +31,7 @@ const emit = defineEmits<{
       class="file-box-tabs"
       @rename="(vals) => { emit('tab_rename', vals) }"
       @add="(tab) => { emit('tab_add', tab) }"
-      :static="tab_sort_key === undefined"
+      :static="tabs_static || tabs_static === undefined"
       v-if="tabs"
       @select="(tab) => { emit('tab_select', tab) }"
       :selected="selected_tab"

@@ -60,6 +60,26 @@ function hide_add_modal() {
 }
 </script>
 <template>
+  <div class="border tab-border">
+    <div id="button-div">
+      <button v-for="glider in gliders"
+        :key="glider._id"
+        :class="{ selected: selected_glider_id === glider._id, gliders: true }"
+        @click="gliderStore.select_glider(glider._id)"
+      >
+        <input v-model="glider.enabled"
+          @change="enable_disable_glider"
+          :disabled="!isAdmin || selected_glider_id !== glider._id"
+          class="enable" type="checkbox"
+        >
+        {{ glider.name }}
+        <button v-if="isAdmin && selected_glider_id === glider._id"
+          @click="selected_delete = glider"
+          class="x-btn"
+        >X</button>
+      </button>
+    </div>
+    <button v-if="isAdmin" class="add-btn" @click="show_add_modal = true">+</button>
   <ModalComponent v-if="show_add_modal"
     header="Add a New Glider"
     :blur="true"
@@ -82,27 +102,6 @@ function hide_add_modal() {
       <button type="button" @click="selected_delete = null">Cancel</button>
     </form>
   </ModalComponent>
-
-  <div class="border tab-border">
-    <div id="button-div">
-      <button v-for="glider in gliders"
-        :key="glider._id"
-        :class="{ selected: selected_glider_id === glider._id, gliders: true }"
-        @click="gliderStore.select_glider(glider._id)"
-      >
-        <input v-model="glider.enabled"
-          @change="enable_disable_glider"
-          :disabled="!isAdmin || selected_glider_id !== glider._id"
-          class="enable" type="checkbox"
-        >
-        {{ glider.name }}
-        <button v-if="isAdmin && selected_glider_id === glider._id"
-          @click="selected_delete = glider"
-          class="x-btn"
-        >X</button>
-      </button>
-    </div>
-    <button v-if="isAdmin" class="add-btn" @click="show_add_modal = true">+</button>
   </div>
 </template>
 <style scoped>

@@ -84,7 +84,8 @@ export type User = {
 
 export type FileBoxType<T> = T & {
   key?: string
-  bold?: boolean
+  bold?: boolean,
+  type?: string
 }
 
 export type DraggableMoveEvent<T> = MoveEvent & {

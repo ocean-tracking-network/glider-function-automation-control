@@ -23,6 +23,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   const filesStore = useFilesStore()
   const { local_kml_file } = storeToRefs(filesStore)
   const supported_kml_geometry_types = new Set<GeoJsonGeometryTypes>(['Point', 'Polygon', 'LineString'])
+  const is_geofence_tab_selected = ref<boolean>(true)
 
   const toLatLonPairs = (coordinates: number[][] = []): Latlon[] => {
     return coordinates
@@ -320,6 +321,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     force_map_update,
     interactive_map,
     show_alert_modal,
+    is_geofence_tab_selected,
     set_geofence,
     set_force_map_update,
     select_idx,

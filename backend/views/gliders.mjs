@@ -36,11 +36,13 @@ const post_gliders = async (req, res) => {
   }
   let result = await collection.insertOne(new_doc)
   // subscribe to SFMC events for this new glider so it receives connections/dialogs
-  try {
-    await subscribe_sfmc_glider(glider_name)
-  } catch (err) {
-    console.log('Failed to auto-subscribe new glider: ' + glider_name)
-    console.log(err)
+  if(process.env.SFMC_CONNECTION_METHOD?.toLowerCase() == "socket"){
+    try {
+      await subscribe_sfmc_glider(glider_name)
+    } catch (err) {
+      console.log('Failed to auto-subscribe new glider: ' + glider_name)
+      console.log(err)
+    }
   }
   res.send(result).status(200)
 }

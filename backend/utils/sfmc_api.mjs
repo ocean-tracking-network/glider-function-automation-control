@@ -1,5 +1,6 @@
 import sfmc, { glider } from 'sfmc'
 import { send_slack_message } from './slack.mjs'
+import { create_log } from './log_utils.mjs'
 
 async function get_active_deployment_details(glider_name) {
   let result = {}
@@ -24,7 +25,9 @@ async function get_glider_details(glider_name, token="") {
     result = await sfmc.glider.getGliderDetails(token, glider_name)
   } catch (sfmc_error){
     console.log(sfmc_error)
+    await create_log('Could not get glider details for glider: '+glider_name, 'error', glider_name)
     console.log('Could not get glider details for: ' + glider_name)
+
   }
   return result.data
 }
