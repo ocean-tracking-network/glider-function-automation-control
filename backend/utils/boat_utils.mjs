@@ -263,7 +263,7 @@ async function serialize_boats(minute_range) {
     const minute_offset =
       (new Date().getTime() - last_location_time.getTime()) /
       (1000 * 60)
-    let min_minutes = Math.floor(minute_offset - minute_range)
+    let min_minutes = Math.floor(minute_offset)
     const max_minutes = Math.floor(minute_offset + minute_range)
     if (min_minutes < 0){
       min_minutes = 0

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import "leaflet/dist/leaflet.css"
+import * as EL from 'esri-leaflet';
 import * as L from 'leaflet'
-import { computed, onMounted, ref, watch, type Ref } from "vue";
+import { computed, onMounted, ref, shallowRef, watch, type Ref } from "vue";
 import { useGeoFencesStore } from "@/stores/geofences";
 import { storeToRefs } from "pinia";
 import { useGlidersStore } from "@/stores/gliders";
@@ -9,14 +10,14 @@ import slocum1 from "@/assets/slocum_marker.png";
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
-import type { Boat, Glider, Latlon } from '@/lib/types';
+import type { Boat, BoatLocation, Glider, Latlon } from '@/lib/types';
 import type { GeoJsonObject, GeoJsonTypes } from 'geojson'
 
 const store = useGeoFencesStore();
 const gliderStore = useGlidersStore();
 const userStore = useUserStore();
 
-const initialMap = ref<L.Map>()
+const initialMap = shallowRef<L.Map>()
 const polygons = ref<L.Polygon[]>([])
 const polygon_to_geofence_map = ref<Record<number, string>>({})
 const idx_marker = ref<L.Marker | null>(null)
@@ -36,14 +37,21 @@ const DOUBLE_CLICK_DELAY = 300
 
 // The box we have AIS data for
 const ais_border: Latlon[] = [
-  [49.725633, -65.114883],
-  [48.487933, -61.889883],
-  [48.416617, -61.892367],
-  [49.332867, -65.130500],
-  [49.725633, -65.114883]
+  [50.2823, -65.3394],
+  [49.1961, -66.2842],
+  [49.2319, -64.9988],
+  [48.9946, -64.3066],
+  [47.7836, -61.7578],
+  [48.8575, -60.835],
+  [49.0883, -62.1753],
+  [49.3681, -63.4717],
+  [49.6427, -63.8892],
+  [ 49.8238, -64.4641],
+  [50.2823, -65.3394],
 ].map((ele) => { return { lat: ele[0]!, lng: ele[1]! } })
 
-const ais_offset_amount = 60
+
+const ais_offset_amount = 180
 const boat_slide_time_offset = ref(0)
 const boat_slider_min = ref(0)
 const boat_slider_max = ref()
@@ -131,7 +139,7 @@ watch(boat_slide_time_offset, () => {
   draw_predict()
 })
 
-function get_boat_rotation(last_location) {
+function get_boat_rotation(last_location: BoatLocation) {
   const heading = Number(last_location["HEADING"])
   if (Number.isFinite(heading) && heading >= 0 && heading <= 360) {
     return heading
@@ -145,7 +153,7 @@ function get_boat_rotation(last_location) {
   return 0
 }
 
-function create_boat_icon(rotation) {
+function create_boat_icon(rotation: Number) {
   return L.divIcon({
     className: 'boat-arrow-marker',
     iconSize: [30, 30],
@@ -164,7 +172,7 @@ function draw_boats() {
 
     const rotation = get_boat_rotation(last_location)
     const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: create_boat_icon(rotation) })
-      .addTo(initialMap.value as L.Map).bindPopup(`<b>navstat: ${last_location["NAVSTAT"]} course: ${last_location["COURSE"]}, heading: ${last_location["HEADING"]} boat: ${ele["NAME"]}</b>`)
+      .addTo(initialMap.value as L.Map).bindPopup(`<b>Last Known Time: ${last_location["TIMESTAMP"]} boat: ${ele["NAME"]}</b>`)
     boat_markers.value.push(new_marker)
   })
 }
@@ -395,6 +403,15 @@ onMounted(() => {
     maxZoom: 19,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(initialMap.value);
+
+  const dl = EL.dynamicMapLayer({
+    url: 'https://egisp.dfo-mpo.gc.ca/arcgis/rest/services/open_data_donnees_ouvertes/vessel_traffic_routes_en/MapServer',
+    opacity: 1,
+    attribution: "DFO Canada"
+  })
+
+  dl.addTo(initialMap.value)
+
   initialMap.value.on('click', map_click)
   create_polygons()
   draw_ais_border()
@@ -536,7 +553,7 @@ watch(gliders, (new_val) => {
       <div class="slider-flex" id="slider-header">
       <div class="slider-flex" id="slider-lhs">
           <p>Ship predictor minute offset:</p>
-          <p v-if="boat_slide_time_offset != 0">{{ boat_slide_time_offset }}m</p>
+          <p v-if="boat_slide_time_offset != 0">+{{ boat_slide_time_offset }} minutes</p>
           <p v-else>Current Time</p>
       </div>
       <div id="slider-rhs">

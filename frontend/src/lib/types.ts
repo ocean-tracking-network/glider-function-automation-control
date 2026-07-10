@@ -126,9 +126,8 @@ export type DraggableMoveEvent<T> = MoveEvent & {
 //   timeStamp: string
 // }
 
-// Boat type inferred from boat_utils
-export type Boat = {
-  locations: {
+
+export type BoatLocation = {
     LATITUDE: number
     LONGITUDE: number
     NAVSTAT: string
@@ -136,7 +135,11 @@ export type Boat = {
     HEADING: string
     NAME: string
     TIMESTAMP: string
-  }[]
+}
+
+// Boat type inferred from boat_utils
+export type Boat = {
+  locations: BoatLocation[]
   prediction: {
     line: [number, number]
     center: number[]
