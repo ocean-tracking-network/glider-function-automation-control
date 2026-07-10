@@ -3,6 +3,7 @@ import { computed, ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
 import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
 import type { User, UserRole } from '@/lib/types';
+import UTCClock from './UTCClockComponent.vue';
 
 const version_number = "0.2.1-DEV"
 const userStore = useUserStore();
@@ -200,6 +201,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
+  <div>
   <div class="header-wrapper">
     <div class="placeholder"></div>
     <div class="header-title">
@@ -351,6 +353,10 @@ onBeforeUnmount(() => {
       </div>
     </div>
   </ModalComponent>
+  </div>
+  <div id="time-div">
+    <h3 id="time"><UTCClock/> </h3>
+  </div>
   </div>
 </template>
 
@@ -762,5 +768,15 @@ small {
     width: 100%;
     margin-top: 0;
   }
+}
+#time-div{
+display: flex;
+width: 12rem;
+justify-content: center;
+width: 100%;
+}
+#time{
+  display: flex;
+  flex-wrap: nowrap;
 }
 </style>
