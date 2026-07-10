@@ -76,6 +76,7 @@ function _get_new_location_obj(ais_data) {
     COURSE: ais_data.COURSE,
     HEADING: ais_data.HEADING,
     SPEED: ais_data.SPEED,
+    SRC: ais_data.SRC,
     api_time: new Date(),
   };
 }

@@ -134,7 +134,8 @@ export type BoatLocation = {
     COURSE: string
     HEADING: string
     NAME: string
-    TIMESTAMP: string
+    TIMESTAMP: string,
+    SRC: string
 }
 
 // Boat type inferred from boat_utils

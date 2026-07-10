@@ -172,7 +172,7 @@ function draw_boats() {
 
     const rotation = get_boat_rotation(last_location)
     const new_marker = L.marker([last_location["LATITUDE"], last_location["LONGITUDE"]], { icon: create_boat_icon(rotation) })
-      .addTo(initialMap.value as L.Map).bindPopup(`<b>Last Known Time: ${last_location["TIMESTAMP"]} boat: ${ele["NAME"]}</b>`)
+      .addTo(initialMap.value as L.Map).bindPopup(`<b>Last Known Time: ${last_location["TIMESTAMP"]} boat: ${ele["NAME"]} src: ${last_location["SRC"]}</b>`)
     boat_markers.value.push(new_marker)
   })
 }
