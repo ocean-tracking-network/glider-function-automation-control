@@ -134,18 +134,20 @@ export type BoatLocation = {
     COURSE: string
     HEADING: string
     NAME: string
-    TIMESTAMP: string,
+    TIMESTAMP: string
     SRC: string
+}
+
+export type BoatPrediction = {
+  line: [number, number]
+  center: number[]
+  cone: number[]
 }
 
 // Boat type inferred from boat_utils
 export type Boat = {
   locations: BoatLocation[]
-  prediction: {
-    line: [number, number]
-    center: number[]
-    cone: number[]
-  }
+  prediction: BoatPrediction
   prediction_range: {
     count: number
     cone: number[]
@@ -157,4 +159,8 @@ export type Boat = {
     }[]
   }
   minute_offset: number
+}
+
+export type ShortestDistance = {
+
 }

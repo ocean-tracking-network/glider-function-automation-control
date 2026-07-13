@@ -10,7 +10,7 @@ import slocum1 from "@/assets/slocum_marker.png";
 import waypointIcon from "@/assets/target-opaque-32x32.png"
 import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
-import type { Boat, BoatLocation, Glider, Latlon } from '@/lib/types';
+import type { Boat, BoatLocation, BoatPrediction, Glider, Latlon } from '@/lib/types';
 import type { GeoJsonObject, GeoJsonTypes } from 'geojson'
 
 const store = useGeoFencesStore();
@@ -58,6 +58,8 @@ const boat_slider_max = ref()
 const boat_predict_lines = shallowRef<(L.Polyline | L.Circle)[]>([])
 const boat_markers = shallowRef<L.Marker[]>([])
 const boats = shallowRef<Boat[]>([])
+const shortest_distance = shallowRef<L.Polyline>()
+
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
@@ -76,6 +78,7 @@ function get_boats() {
       }
       draw_boats()
       draw_predict()
+      draw_glider_to_ship_line()
     })
     .catch((error) => {
       console.error("Error fetching boats:", error)
@@ -91,28 +94,59 @@ function clear_map_data(map_element_arr: Ref<L.Marker[]>) {
   map_element_arr.value = []
 }
 
+
+function get_current_predict(boat: Boat): BoatPrediction{
+  let predict_data = boat.prediction
+  if (boat.prediction_range && boat.prediction_range.intervals) {
+    const other = boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
+    if (other){
+      predict_data = {
+        cone: boat.prediction.cone,
+        line: other.line,
+        center: other.center
+      }
+  }
+  }
+  return predict_data
+}
+
+async function draw_glider_to_ship_line(){
+  const truncateToTwoDecimals = (num: number): number => Math.trunc(num * 100) / 100;
+  const glider_latlng = glider_current_location.value?.getLatLng()
+  if (!glider_latlng) return
+  if(shortest_distance) shortest_distance.value?.removeFrom(initialMap.value as L.Map)
+  let shortest = 100000
+  let shortest_boat_latlng = new L.LatLng(0,0)
+  for (const boat of boats.value){
+    if (!boat || !boat.prediction) continue
+    const boat_predict = get_current_predict(boat)
+    const boat_ghost_latlng = new L.LatLng(boat_predict.center[0] as number, boat_predict.center[1] as number)
+    const distance = initialMap.value?.distance(glider_latlng, boat_ghost_latlng)
+    if (distance as number < shortest) {
+      shortest = distance as number
+      shortest_boat_latlng = boat_ghost_latlng
+    }
+  }
+  const shortest_distance_line = L.polyline([glider_latlng, shortest_boat_latlng], {color: "blue", dashArray: '10, 10'}).addTo(initialMap.value as L.Map)
+  shortest_distance_line.bindTooltip(
+    `${truncateToTwoDecimals(shortest / 1000)}km`,
+    // {sticky: true, permanent: true}
+  )
+  shortest_distance.value = shortest_distance_line
+}
+
 async function draw_predict() {
   const temp_array = boat_predict_lines.value
   boat_predict_lines.value = []
   for (const boat of boats.value) {
     if (!boat || !boat.prediction) continue
-    let predict_data = undefined
-    if (boat_slide_time_offset.value == 0) {
-      predict_data = boat.prediction
-    } else if (boat.prediction_range && boat.prediction_range.intervals) {
-      predict_data = {
-        cone: boat.prediction.cone,
-        ...boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
-      }
-    }
-
-    if (!predict_data) continue
+    const predict_data = get_current_predict(boat)
 
     console.log(predict_data)
     // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
     // @ts-expect-error predict data unknown
     if (predict_data.line) {
-        const ghost_line = L.polyline(predict_data.line, { color: "white" }).addTo(initialMap.value as L.Map)
+        const ghost_line = L.polyline([predict_data.line[0], predict_data.center, predict_data.line[1]], { color: "white" }).addTo(initialMap.value as L.Map)
         boat_predict_lines.value.push(ghost_line)
     }
     // @ts-expect-error predict data unknown
@@ -124,6 +158,7 @@ async function draw_predict() {
     if (predict_data.center) {
         const ghost = L.circle(predict_data.center, { radius: 3 }).addTo(initialMap.value as L.Map)
         boat_predict_lines.value.push(ghost)
+        const ghost_point = L.latLng(predict_data.center[0], predict_data.center[1]);
     }
   }
 
@@ -137,6 +172,7 @@ async function draw_predict() {
 
 watch(boat_slide_time_offset, () => {
   draw_predict()
+  draw_glider_to_ship_line()
 })
 
 function get_boat_rotation(last_location: BoatLocation) {
@@ -472,6 +508,7 @@ watch(selected_idx, (new_idx) => {
 watch(selected_glider, () => {
   console.log("Updating glider track")
   set_glider_track()
+  draw_glider_to_ship_line()
 })
 
 watch(selected_fence, () => {
