@@ -18,16 +18,16 @@ const gliderStore = useGlidersStore();
 const userStore = useUserStore();
 
 const initialMap = shallowRef<L.Map>()
-const polygons = ref<L.Polygon[]>([])
-const polygon_to_geofence_map = ref<Record<number, string>>({})
-const idx_marker = ref<L.Marker | null>(null)
+const polygons = shallowRef<L.Polygon[]>([])
+const polygon_to_geofence_map = shallowRef<Record<number, string>>({})
+const idx_marker = shallowRef<L.Marker | null>(null)
 
-const glider_track_polyline = ref<L.GeoJSON | null>(null)
-const glider_track_points = ref<L.Circle[] | null>(null)
-const glider_current_location = ref<L.Marker | null>(null)
-const glider_next_waypoint = ref<L.Marker | null>(null)
+const glider_track_polyline = shallowRef<L.GeoJSON | null>(null)
+const glider_track_points = shallowRef<L.Circle[] | null>(null)
+const glider_current_location = shallowRef<L.Marker | null>(null)
+const glider_next_waypoint = shallowRef<L.Marker | null>(null)
 
-const all_glider_markers = ref<L.Marker[]>([])
+const all_glider_markers = shallowRef<L.Marker[]>([])
 
 // Double-click tracking
 const lastClickedFenceKey = ref<string | null>(null)
@@ -55,9 +55,9 @@ const ais_offset_amount = 180
 const boat_slide_time_offset = ref(0)
 const boat_slider_min = ref(0)
 const boat_slider_max = ref()
-const boat_predict_lines = ref<(L.Polyline | L.Circle)[]>([])
-const boat_markers = ref<L.Marker[]>([])
-const boats = ref<Boat[]>([])
+const boat_predict_lines = shallowRef<(L.Polyline | L.Circle)[]>([])
+const boat_markers = shallowRef<L.Marker[]>([])
+const boats = shallowRef<Boat[]>([])
 
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
