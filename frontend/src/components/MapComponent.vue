@@ -127,10 +127,13 @@ async function draw_glider_to_ship_line(){
       shortest_boat_latlng = boat_ghost_latlng
     }
   }
+  const popup_text =`${truncateToTwoDecimals(shortest / 1000)}km` 
   const shortest_distance_line = L.polyline([glider_latlng, shortest_boat_latlng], {color: "blue", opacity: .5}).addTo(initialMap.value as L.Map)
+  shortest_distance_line.bindPopup(
+    popup_text,
+  )
   shortest_distance_line.bindTooltip(
-    `${truncateToTwoDecimals(shortest / 1000)}km`,
-    // {sticky: true, permanent: true}
+    popup_text,
   )
   shortest_distance.value = shortest_distance_line
 }
