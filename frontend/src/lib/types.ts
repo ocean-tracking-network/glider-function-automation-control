@@ -139,9 +139,9 @@ export type BoatLocation = {
 }
 
 export type BoatPrediction = {
-  line: [number, number]
-  center: number[]
-  cone: number[]
+  line: [number, number][]
+  center: [number, number]
+  cone: [number, number][]
 }
 
 // Boat type inferred from boat_utils
@@ -153,12 +153,17 @@ export type Boat = {
     cone: number[]
     intervals: {
       offset: number
-      line: [number, number]
+      line: [number, number][]
       center: [number, number]
-      cone: [number, number]
+      cone: [number, number][]
+      
+      // line: [number, number][]
+      // center: [number, number]
+      // cone: [number, number]
     }[]
   }
   minute_offset: number
+  NAME: number
 }
 
 export type ShortestDistance = {

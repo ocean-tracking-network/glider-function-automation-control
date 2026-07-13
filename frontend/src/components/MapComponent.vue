@@ -98,14 +98,7 @@ function clear_map_data(map_element_arr: Ref<L.Marker[]>) {
 function get_current_predict(boat: Boat): BoatPrediction{
   let predict_data = boat.prediction
   if (boat.prediction_range && boat.prediction_range.intervals) {
-    const other = boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
-    if (other){
-      predict_data = {
-        cone: other.cone,
-        line: other.line,
-        center: other.center
-      }
-  }
+    predict_data = boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value ) as BoatPrediction
   }
   return predict_data
 }
@@ -147,21 +140,21 @@ async function draw_predict() {
 
     console.log(predict_data)
     // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
-    // @ts-expect-error predict data unknown
     if (predict_data.line) {
-        const ghost_line = L.polyline([predict_data.line[0], predict_data.center, predict_data.line[1]], { color: "white" }).addTo(initialMap.value as L.Map)
+        const ghost_line = L.polyline([predict_data.line[0] as [number, number],
+                                        predict_data.center,
+                                        predict_data.line[1] as [number, number]],
+                                        { color: "white" }).addTo(initialMap.value as L.Map)
         boat_predict_lines.value.push(ghost_line)
     }
-    // @ts-expect-error predict data unknown
     if (predict_data.cone) {
         const predict_cone = L.polyline(predict_data.cone, { color: "green" }).addTo(initialMap.value as L.Map)
         boat_predict_lines.value.push(predict_cone)
     }
-    // @ts-expect-error predict data unknown
     if (predict_data.center) {
         const ghost = L.circle(predict_data.center, { radius: 3 }).addTo(initialMap.value as L.Map)
         boat_predict_lines.value.push(ghost)
-        const ghost_point = L.latLng(predict_data.center[0], predict_data.center[1]);
+        // const ghost_point = L.latLng(predict_data.center[0], predict_data.center[1]);
     }
   }
 
