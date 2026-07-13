@@ -101,7 +101,7 @@ function get_current_predict(boat: Boat): BoatPrediction{
     const other = boat.prediction_range.intervals.find((element) => element.offset == boat_slide_time_offset.value )
     if (other){
       predict_data = {
-        cone: boat.prediction.cone,
+        cone: other.cone,
         line: other.line,
         center: other.center
       }
@@ -127,7 +127,7 @@ async function draw_glider_to_ship_line(){
       shortest_boat_latlng = boat_ghost_latlng
     }
   }
-  const shortest_distance_line = L.polyline([glider_latlng, shortest_boat_latlng], {color: "blue", dashArray: '10, 10'}).addTo(initialMap.value as L.Map)
+  const shortest_distance_line = L.polyline([glider_latlng, shortest_boat_latlng], {color: "blue", opacity: .5}).addTo(initialMap.value as L.Map)
   shortest_distance_line.bindTooltip(
     `${truncateToTwoDecimals(shortest / 1000)}km`,
     // {sticky: true, permanent: true}
