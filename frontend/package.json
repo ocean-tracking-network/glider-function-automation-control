@@ -13,9 +13,11 @@
   "dependencies": {
     "@tmcw/togeojson": "^7.1.2",
     "axios": "^1.7.9",
+    "dinkumjs": "^0.0.1",
     "esri-leaflet": "^3.1.0",
     "leaflet": "^1.9.4",
     "pinia": "^2.3.1",
+    "three": "^0.185.1",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.13",
     "vue-map-ui": "^0.0.18",
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@types/esri-leaflet": "^3.0.4",
     "@types/sortablejs": "^1.15.0",
+    "@types/three": "^0.185.1",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/eslint-config-prettier": "^10.1.0",
     "@vue/eslint-config-typescript": "^14.7.0",
