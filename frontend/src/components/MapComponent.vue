@@ -66,7 +66,6 @@ const { selected_glider, gliders } = storeToRefs(gliderStore)
 const { isAdmin, loggedin } = storeToRefs(userStore)
 
 function get_boats() {
-  console.log("Getting boats")
   apiClient.get(`/boats/${ais_offset_amount}`)
     .then((res) => {
       boats.value = res.data
@@ -138,7 +137,6 @@ async function draw_predict() {
     if (!boat || !boat.prediction) continue
     const predict_data = get_current_predict(boat)
 
-    console.log(predict_data)
     // Will need more specifc typing on predict_data properties (preferrably in latlng object format like leaflet)
     if (predict_data.line) {
         const ghost_line = L.polyline([predict_data.line[0] as [number, number],
@@ -418,8 +416,6 @@ function map_click(e: L.LeafletMouseEvent) {
     return
   }
   if (store.selected_fence && interactive_map.value) {
-    // store.selected_fence
-    // //console.log(e.latlng)
     const lat = +e.latlng.lat.toFixed(4)
     const lng = +e.latlng.lng.toFixed(4)
     const fence = geofences.value[store.selected_fence_key]
@@ -456,7 +452,6 @@ watch(loggedin, (isLoggedIn) => {
 }, { immediate: true })
 
 function update_map() {
-  //console.log("Map Update")
   polygons.value.forEach((poly) => {
     poly.removeFrom(initialMap.value as L.Map)
   })
@@ -476,10 +471,7 @@ watch(geofences, async () => {
 }, { deep: true })
 
 watch(force_map_update, (new_val) => {
-  // console.log("Map update?")
-  //console.log(new_val)
   if (new_val == true) {
-    // console.log("Map update? - Yes")
     update_map()
     store.set_force_map_update(false)
   }
@@ -539,7 +531,6 @@ watch(selected_fence, () => {
         const avgx = sumx / pts.length
         const avgy = sumy / pts.length
         initialMap.value.setView([avgy, avgx])
-        // console.log(avgx + "," + avgy)
         console.log(`Set view to ${avgy}, ${avgx}`)
       } else {
         cx = cx / (6 * area)
