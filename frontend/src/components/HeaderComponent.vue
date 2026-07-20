@@ -4,6 +4,8 @@ import { useUserStore } from '@/stores/user';
 import ModalComponent from './ModalComponent.vue';
 import type { User, UserRole } from '@/lib/types';
 import UTCClock from './UTCClockComponent.vue';
+import gliderimg from "@/assets/slocum1.png"
+import gliderViz from './gliderViz/gliderViz.vue';
 
 const version_number = "0.2.1-DEV"
 const userStore = useUserStore();
@@ -24,6 +26,7 @@ const loadingDeletableUsers = ref(false);
 const deleteMessage = ref('');
 const deleteMessageType = ref('');
 const deleting = ref(false);
+const showGliderVizModal = ref(false)
 
 
 const sortedDeletableUsers = computed(() => {
@@ -203,10 +206,10 @@ onBeforeUnmount(() => {
 <template>
   <div>
   <div class="header-wrapper">
-    <div class="placeholder"></div>
-    <div class="header-title">
-      <h1>Glider Function Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
-    </div>
+    <button class="badge" @click="showGliderVizModal = !showDeleteConfirmModal" id="glider-viz">Glider Viz<img id="slocum-badge" :src="gliderimg" alt=""></button>
+    <!-- <div class="header-title"> -->
+      <h1 class="header-title">Glider Function Automation Control (GFAC)<small>v{{ version_number }}</small></h1>
+    <!-- </div> -->
     <div class="login-badge-container" v-if="userStore.loggedin">
       <div class="badge">
         <div class="user-info">
@@ -234,6 +237,15 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div class="placeholder" v-else></div>
+
+    <ModalComponent
+      :full="true"
+      :blur="true"
+      @close="showGliderVizModal = false"
+      v-if="showGliderVizModal">
+      <gliderViz></gliderViz>
+    </ModalComponent>
+
   <ModalComponent
     v-if="showDeleteModal && !showDeleteConfirmModal"
     header="Delete User"
@@ -398,12 +410,19 @@ small {
 }
 
 .login-badge-container {
-  flex: 1;
   display: flex;
+  /* width: 20%; */
   justify-content: flex-end;
   padding: 0;
 }
 
+#glider-viz:hover{
+  background: linear-gradient(135deg, var(--color-background-mute), var(--color-background-mute));
+}
+
+#slocum-badge{
+  width: 2rem;
+}
 .badge {
   display: flex;
   align-items: center;

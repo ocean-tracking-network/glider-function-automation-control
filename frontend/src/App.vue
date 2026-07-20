@@ -16,7 +16,6 @@ import { storeToRefs } from 'pinia';
 import { useGlidersStore } from './stores/gliders';
 import { useUserStore } from './stores/user';
 import ScriptComponent from './components/ScriptComponent.vue';
-import GliderViz from './components/gliderViz/gliderViz.vue'
 import type { EventGliderFile, FileBoxType, UploadedFile } from './lib/types';
 
 
@@ -157,17 +156,16 @@ function onGeofenceDrawerOffsetChange(offset: number) {
           <div id="side">
             <GliderTabComponent />
 
-            <GliderViz></GliderViz>
-            <!-- <GeoFenceComponent id="geo" @drawer-offset-change="onGeofenceDrawerOffsetChange" /> -->
+            <GeoFenceComponent id="geo" @drawer-offset-change="onGeofenceDrawerOffsetChange" />
 
-            <!-- <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
+            <FilesBoxComponent @tab_select="trigger_events('enter')" :tabs="show_send_now_btn(enter_files_ref)"
               :add_btn="false" @delete="delete_event_enter" :standard_delete="false" :can_delete="isAdmin"
               v-if="display_events" :list="enter_files_ref" group="files" :draggable="isAdmin" title="On Enter"
               class="middle" id="enter">
 
               <ScriptComponent event_type="enter" />
 
-            </FilesBoxComponent> -->
+            </FilesBoxComponent>
             <FilesBoxComponent @tab_select="trigger_events('exit')" :tabs="show_send_now_btn(exit_files_ref)"
               :add_btn="false" @delete="delete_event_exit" :standard_delete="false" :can_delete="isAdmin"
               v-if="display_events" :list="exit_files_ref" group="files" :draggable="isAdmin" title="On Exit"

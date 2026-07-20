@@ -13,13 +13,17 @@
   "dependencies": {
     "@tmcw/togeojson": "^7.1.2",
     "axios": "^1.7.9",
-    "dinkumjs": "^0.0.1",
+    "chart.js": "^4.5.1",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^4.4.0",
+    "dinkumjs": "^0.1.1",
     "esri-leaflet": "^3.1.0",
     "leaflet": "^1.9.4",
     "pinia": "^2.3.1",
     "three": "^0.185.1",
     "vite-svg-loader": "^5.1.0",
     "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.4",
     "vue-map-ui": "^0.0.18",
     "vuedraggable": "^4.1.0"
   },
