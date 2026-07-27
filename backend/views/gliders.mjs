@@ -5,6 +5,7 @@ import { deleteGliderCascade } from '../utils/cascade_delete.mjs'
 import {
   get_available_scripts,
   get_glider_details,
+  get_glider_ls_dir
 } from '../utils/sfmc_api.mjs'
 import { subscribe_sfmc_glider } from '../utils/glider_utils.mjs'
 
@@ -81,6 +82,14 @@ const get_scripts = async (req, res) => {
   const scripts = await get_available_scripts(glider.name)
   res.send(scripts).status(200)
 }
+
+const get_glider_file_list = async (req, res) => {
+  // let collection = await db.collection('gliders')
+  // let glider = await collection.findOne({ _id: ObjectId.createFromHexString(req.params.id) })
+  const scripts = await get_glider_ls_dir()
+  res.send(scripts).status(200)
+}
+
 export {
   get_gliders,
   post_gliders,
@@ -88,4 +97,5 @@ export {
   update_gliders,
   get_scripts,
   delete_gliders,
+  get_glider_file_list
 }

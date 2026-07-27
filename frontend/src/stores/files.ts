@@ -1,6 +1,6 @@
 import apiClient from '@/apiClient'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useEventsStore } from './events'
 import type { UploadedFile } from '@/lib/types'
 
@@ -145,12 +145,16 @@ export const useFilesStore = defineStore('files', () => {
     return ret
   })
 
-  const files_arr = computed(() => {
+  const files_arr_computed = computed(() => {
     const ret: UploadedFile[] = []
     files_raw.value.forEach((ele) => {
       ret.push({...ele})
     })
     return ret
+  })
+  const files_arr = ref<UploadedFile[]>([])
+  watch(files_arr_computed, (new_val) => {
+    files_arr.value = new_val
   })
   const categories = computed(() => {
     const cats: string[] = []

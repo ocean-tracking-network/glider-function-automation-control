@@ -98,6 +98,22 @@ async function get_available_scripts(glider_name) {
   return result
 }
 
+async function get_glider_ls_dir(){
+  let result = {}
+  try{
+    let token = await sfmc.accessToken.getAccessToken()
+    result = await sfmc.glider.getFolderFileListing(
+      token.token, "fundy", "from-glider", 2, "*bd", 2025
+    )
+  } catch(sfmc_error){
+    console.error(sfmc_error)
+  }
+  if(result.data){
+    result = result.data
+  }
+  return result
+}
+
 async function set_script(glider_name, script_name, script_type) {
   // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
   //   glider_name = 'adam'
@@ -136,5 +152,6 @@ export {
   clear_script,
   subscribe_for_glider_connection,
   subscribe_for_glider_dialog,
-  get_glider_details
+  get_glider_details,
+  get_glider_ls_dir
 }

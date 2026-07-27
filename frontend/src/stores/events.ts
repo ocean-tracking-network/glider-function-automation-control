@@ -25,7 +25,7 @@ export const useEventsStore = defineStore('events', () => {
     }
 
     const data: Script = {
-      file_id: options.file_id,
+      file: options.file,
       script: options.script,
       script_type: options.script_type,
       geofence: selected_fence_key.value,
@@ -109,9 +109,9 @@ export const useEventsStore = defineStore('events', () => {
     }
 
     events.value.forEach((ele) => {
-      if (!ele.file_id) return
+      if (!ele.file) return
 
-      const file_obj = filesStore.files_obj[ele.file_id]
+      const file_obj = filesStore.files_obj[ele.file]
 
       if (
         file_obj &&
@@ -139,9 +139,9 @@ export const useEventsStore = defineStore('events', () => {
     }
 
     events.value.forEach((ele) => {
-      if (!ele.file_id) return
+      if (!ele.file) return
 
-      const file_obj = filesStore.files_obj[ele.file_id]
+      const file_obj = filesStore.files_obj[ele.file]
 
       if (
         file_obj &&
@@ -182,22 +182,22 @@ export const useEventsStore = defineStore('events', () => {
   // This only changes when a new file get's dragged in
   watch(exit_files_ref, (new_exit_files_ref) => {
     new_exit_files_ref.forEach((exit_file) => {
-      if (exit_file.file_id === undefined) {
-        add_event('exit', { file_id: exit_file._id })
+      if (exit_file.file === undefined) {
+        add_event('exit', { file: exit_file._id })
       }
       if (exit_file.event_type === 'enter') {
-        add_event('exit', { file_id: exit_file.file_id })
+        add_event('exit', { file: exit_file.file })
         remove_event(exit_file._id)
       }
     })
   }, { deep: true })
   watch(enter_files_ref, (new_enter_files_ref) => {
     new_enter_files_ref.forEach((enter_file) => {
-      if (enter_file.file_id === undefined) {
-        add_event('enter', { file_id: enter_file._id })
+      if (enter_file.file == undefined) {
+        add_event('enter', { file: enter_file._id })
       }
       if (enter_file.event_type === 'exit') {
-        add_event('enter', { file_id: enter_file.file_id })
+        add_event('enter', { file: enter_file.file })
         remove_event(enter_file._id)
       }
     })

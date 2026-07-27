@@ -12,12 +12,14 @@ import {
   post_gliders_track,
   update_gliders,
   delete_gliders,
+  get_glider_file_list
 } from './views/gliders.mjs'
 import {
   delete_geofences,
   get_geofences,
   patch_geofences,
   post_geofences,
+  
 } from './views/geofences.mjs'
 import { get_files, post_files, delete_files, update_files } from './views/files.mjs'
 import {
@@ -67,9 +69,10 @@ app.get('/glider', authenticateToken, get_gliders)
 app.post('/glider', authenticateToken, requireAdmin, post_gliders)
 app.delete('/glider/:id', authenticateToken, requireAdmin, delete_gliders)
 app.patch('/glider/:id', authenticateToken, requireAdmin, update_gliders)
-// glider-tracks
+// glider-misc
 app.post('/glider/:id/add-track', authenticateToken, requireAdmin, post_gliders_track)
 app.get('/glider/:id/scripts', authenticateToken, get_scripts)
+app.get('/glider/:id/files', authenticateToken, get_glider_file_list)
 
 // geofence
 app.get('/geofence', authenticateToken, get_geofences)
@@ -108,6 +111,7 @@ app.get('/boats/test', check_gliders_safe)
 
 // Schedule
 const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
+console.log(`Schedule set for: ${scheduleSecs}s`)
 const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => {
   try {
 

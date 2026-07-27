@@ -38,7 +38,7 @@ export type UploadedFile = {
 }
 
 export type ScriptOptions = {
-  file_id?: string
+  file?: string
   script?: string
   script_type?: string
 }
