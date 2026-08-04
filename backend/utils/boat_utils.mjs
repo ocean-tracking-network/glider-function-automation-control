@@ -344,9 +344,9 @@ async function update_boat_locations() {
 
 
   const new_ais = await _fetch_ais();
-  // await insert_ais_historic_data(new_ais);
-  // await _insert_or_update_current_boats(new_ais);
-  // await _clean_boats();
+  await insert_ais_historic_data(new_ais);
+  await _insert_or_update_current_boats(new_ais);
+  await _clean_boats();
   
   
 
