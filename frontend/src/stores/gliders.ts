@@ -67,6 +67,13 @@ export const useGlidersStore = defineStore('gliders', () => {
     })
   }
 
+  const update_glider_boat_offset = (glider:Glider, new_cone_hour_offset: number) => {
+    apiClient.patch(`/glider/${glider._id}`, {boat_cone_hour_offset: new_cone_hour_offset}).then((res) => {
+      get_gliders()
+    })
+
+  }
+
   const gliders_obj = computed(() => {
     const ret: {[_id: string]: Glider} = {}
     gliders.value.forEach((ele) => {
@@ -86,6 +93,7 @@ export const useGlidersStore = defineStore('gliders', () => {
     select_glider,
     delete_glider,
     enable_disable_selected_glider,
+    update_glider_boat_offset,
     gliders_obj,
     selected_glider_id,
     selected_glider,

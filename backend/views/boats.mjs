@@ -2,8 +2,7 @@ import { ObjectId } from "mongodb";
 import db from '../db/conn.mjs'
 import {
   predict_boat_movement_range,
-  gliders_in_boath_path,
-  update_boats,
+  update_gliders_inside_boat_paths,
   serialize_boats,
 } from "../utils/boat_utils.mjs";
 
@@ -35,7 +34,7 @@ const get_boat_predict = async (req, res) => {
 };
 
 const check_gliders_safe = async (req, res) => {
-  update_boats();
+  await update_gliders_inside_boat_paths();
   const col = await db.collection("boats");
   const boats = await col.find({}).toArray();
   let ret = {};

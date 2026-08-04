@@ -58,6 +58,9 @@ const emit = defineEmits<{
 
 h2 {
   font-size: large;
+  width: 2.5rem;
+  overflow-x: visible;
+  white-space: nowrap;
 }
 
 .add-btn {
@@ -65,6 +68,9 @@ h2 {
   padding: .3rem;
   padding-top: .2rem;
   padding-bottom: .2rem;
+  width: 2.5rem;
+  margin-bottom: .2rem;
+  
 }
 
 .add-btn:hover {

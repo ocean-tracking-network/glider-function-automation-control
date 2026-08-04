@@ -6,6 +6,7 @@ import {
   subscribe_for_glider_connection,
   subscribe_for_glider_dialog,
 } from './sfmc_api.mjs'
+import {update_glider_boat_paths} from './boat_utils.mjs'
 
 async function update_glider_waypoint(glider, sfmc_json) {
   const next_waypoint = {lat: sfmc_json.nextWaypointLat, lng: sfmc_json.nextWaypointLon}
@@ -51,11 +52,11 @@ async function update_glider_position(glider, collection = undefined) {
     collection = await db.collection('gliders')
   }
   let sfmc_json = {}
-  console.log(glider)
+  // console.log(glider)
   sfmc_json = await get_active_deployment_details(glider.name)
   if (sfmc_json == false) {
     console.log('No SFMC JSON')
-    return
+    return false
   }
   sfmc_json = sfmc_json.data
   // Keep going if the glider wasn't skipped
@@ -63,7 +64,7 @@ async function update_glider_position(glider, collection = undefined) {
   await update_glider_waypoint(glider, sfmc_json)
   if (!sfmc_json.isGpsValid) {
     console.log('no valid gps for: ' + glider.name)
-    return
+    return false
   }
   let tracks = glider.track
   let last_track = { lat: 0, lng: 0 }
@@ -87,8 +88,10 @@ async function update_glider_position(glider, collection = undefined) {
     gliders_sse.broadcast_new_tracks(glider._id, track)
     console.log('updated track')
     create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
+    return true
   } else {
     // console.log('gps is the same')
+    return false
   }
 }
 
@@ -96,7 +99,12 @@ async function update_glider_positions() {
   const collection = await db.collection('gliders')
   const gliders = await collection.find({}).toArray()
   for (let glider of gliders) {
-    update_glider_position(glider, collection)
+    update_glider_position(glider, collection).then((updated) => {
+      if(updated){
+        console.log("Updating boat stuff!")
+        update_glider_boat_paths(glider)
+      }
+    })
   }
 }
 

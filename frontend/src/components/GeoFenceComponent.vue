@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import FilesBoxComponent from './FilesBoxComponent.vue';
+import FilesBoxHeader from './FilesBoxHeader.vue';
+import GeofenceListComponent from './GeofenceListComponent.vue';
 import AddGeoFenceComponent from './AddGeoFenceComponent.vue';
 import ModalComponent from './ModalComponent.vue';
 import { useGeoFencesStore } from '@/stores/geofences';
@@ -9,7 +10,8 @@ import { useEventsStore } from '@/stores/events';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from '@/stores/gliders';
 import { useUserStore } from '@/stores/user';
-import type { FileBoxType, Geofence } from '@/lib/types';
+import type { FileBoxType, Geofence, Glider } from '@/lib/types';
+import DropDownComponent from './DropDownComponent.vue';
 
 const store = useGeoFencesStore()
 const eventsStore = useEventsStore()
@@ -27,8 +29,9 @@ const geofence_is_dirty = ref(false)
 const pending_fence_key = ref<string | null>(null)
 const pending_from_map = ref(false)
 const pending_delete_element = ref<FileBoxType<Geofence> | null>(null)
-const tabs = ["Geofences", "Ships"]
-const selected_tab = ref("")
+const tabs: string[] = ["Geofences", "Ships"]
+const selected_tab = ref<string>(tabs[0] as string)
+const offset_time_ref = ref<number>(0)
 
 const emit = defineEmits<{
   'drawer-offset-change': [number]
@@ -340,6 +343,13 @@ const latlons = computed(() => {
   return ret;
 })
 
+const filtered_list = computed(() => {
+  if (selected_tab.value) {
+    return latlons.value.filter((element) => selected_tab.value === element.type)
+  }
+  return latlons.value
+})
+
 watch(selected_fence_key, (new_val) => {
   if (is_create_mode.value) {
     return
@@ -368,35 +378,68 @@ function tab_select(tab: string){
   is_geofence_tab_selected.value = tab == tabs[0]
 }
 
+watch(selected_glider, (() =>{
+  if (selected_glider.value?.boat_cone_hour_offset){
+    offset_time_ref.value = selected_glider.value?.boat_cone_hour_offset as number * 60
+  }
+  else{
+    offset_time_ref.value = 90
+  }
+}))
+
+function update_glider_offset_cone(){
+  const hour_offset =  offset_time_ref.value /60
+  gliderStore.update_glider_boat_offset(selected_glider.value as Glider, hour_offset)
+}
+
+const show_offset_time_update = computed(() => {
+  if(offset_time_ref.value/60 == selected_glider.value?.boat_cone_hour_offset){
+    return false
+  }
+  else{
+    return true
+  }
+})
+
 //UI/UX DRIVEN BY isAdmin WHERE NEEDED
 </script>
 <template>
   <div class="geofence-section">
     <div class="geofence-list">
-      <FilesBoxComponent
-        id="geo"
-        :list="latlons"
-        :draggable="false"
-        :add_btn="isAdmin"
-        :can_delete="isAdmin"
-        :can_edit="isAdmin"
-        :standard_delete="isAdmin"
-        :dblclick="false"
-        :tabs="tabs"
-        :tabs_disabled="false"
-        :tabs_static="true"
-        tab_sort_key="type"
-        title="Event Triggers"
-        @delete="remove"
-        @add_btn="add_geo"
-        @click="on_click"
-        @edit="open_selected_geofence_editor"
-        @tab_select="tab_select"
-        >
+      <div id="geo" class="border files-box">
+        <FilesBoxHeader
+          title="Event Triggers"
+          :tabs="tabs"
+          :selected_tab="selected_tab"
+          :tabs_disabled="false"
+          :add_btn="isAdmin"
+          tab_sort_key="type"
+          :tabs_static="true"
+          @add_btn="add_geo"
+          @tab_select="tab_select"
+        />
+        <hr>
+        <GeofenceListComponent
+          :list="filtered_list"
+          :can_delete="isAdmin"
+          :can_edit="isAdmin"
+          @click="on_click"
+          @delete="remove"
+          @edit="open_selected_geofence_editor"
+        />
+        <div class="footer">
           <div v-if="selected_tab == tabs[1]" id="boats-text" class="center-div">
-            <h2 class="unselected-text">Files/script changes for when a glider is in the path of a ship</h2>
+            <div style="text-align: center;">
+              <h2 class="unselected-text">Files/script changes for when a glider is in the path of a ship</h2>
+              <div class="center-div">
+                <input @change="show_offset_time_update = true" id="minute-input"  v-model="offset_time_ref" class="text-input" type="number">
+                <button @click="update_glider_offset_cone()" :class="{border: true, green: show_offset_time_update}" :disabled="!show_offset_time_update" id="update-btn">✓</button>
+                <h2>minute cone offset</h2>
+              </div>
+            </div>
           </div>
-      </FilesBoxComponent>
+        </div>
+      </div>
     </div>
     <!-- <div class="geofence-actions"> -->
       <!-- <button class="geofence-extra" type="button" :disabled="!selected_fence_local" @click="open_selected_geofence_editor">
@@ -472,6 +515,24 @@ function tab_select(tab: string){
 
 #geo {
   height: 100%;
+}
+
+.files-box {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.footer {
+  width: 95%;
+  position: absolute;
+  bottom: .5rem;
+}
+
+hr {
+  border-top-width: 1px;
+  border-top-color: var(--color-text);
+  width: 100%;
 }
 
 .drawer-panel {
@@ -607,5 +668,33 @@ function tab_select(tab: string){
 
 .btn-delete:hover {
   background-color: #c82333;
+}
+
+.text-input{
+  padding: .1rem;
+  background-color: var(--color-background-soft);
+  border-radius: 4px;
+  color: var(--color-text);
+  border: 1px solid var(--color-border, lightgray);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+#minute-input{
+  width: 3.2rem;
+}
+#minute-input[type=number]{
+  appearance: textfield;
+}
+#minute-input[type=number]:hover{
+  appearance: auto;
+}
+#update-btn{
+  padding: 0px 5px;
+  border-color: var(--color-border);
+  height: 30px;
+}
+.green{
+  color: green;
+  border-color: green;
 }
 </style>

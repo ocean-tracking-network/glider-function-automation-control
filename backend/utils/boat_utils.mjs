@@ -1,7 +1,9 @@
 import {updateOne } from "./db_utils.mjs";
+import { trigger_glider_event } from "./events.mjs";
 import db from '../db/conn.mjs'
 import axios from "axios";
 import { is_in_polygon, convert_gps } from "./geofence_utils.mjs";
+import { send_slack_message } from "./slack.mjs";
 
 async function _fetch_ais() {
   const url = process.env.AIS_API_URL;
@@ -89,6 +91,7 @@ async function _insert_or_update_current_boats(ais_data_list) {
     if (boat == null) {
       await col.insertOne({
         MMSI: ais_data.MMSI,
+        gliders_inside: [],
         NAME: ais_data.NAME,
         locations: [_get_new_location_obj(ais_data)],
       });
@@ -219,38 +222,170 @@ async function predict_boat_movement_range(boat_id, minutes_diff_start, minutes_
   }
 }
 
-async function update_boats() {
-  const new_ais = await _fetch_ais();
-  await insert_ais_historic_data(new_ais);
-  await _insert_or_update_current_boats(new_ais);
-  await _clean_boats();
 
-  const col = await db.collection("boats");
-  const boats = await col.find({});
+async function get_gliders_inside_current_all() {
+  const boats_col = await db.collection("boats");
+  const boats = boats_col.find({})
+  let gliders_inside = [] 
+  for await (const boat of boats){
+    const gliders = await gliders_in_boat_path(boat)
+    for(const glider of gliders){
+      if (!gliders_inside.includes(glider)){
+        gliders_inside.push(glider)
+      }
+    }
+  }
+  return gliders_inside
 }
 
-function get_boat_polygon(last_pos, hours_diff = 2) {
+
+async function get_glider_list_inside_all() {
+  const boats_col = await db.collection("boats");
+  const boats = boats_col.find({})
+  let gliders_inside = []
+  for await (const boat of boats){
+    // console.log(boat)
+    if(boat.gliders_inside == undefined){
+      console.log(`NO gliders_inside for boat: ${boat.NAME}`)
+      updateOne("boats", boat._id, {gliders_inside: []})
+      continue
+    }
+    for(const glider of boat.gliders_inside){
+      if (!gliders_inside.includes(glider)){
+        gliders_inside.push(glider)
+      }
+    }
+  }
+  return gliders_inside
+}
+
+// glider object
+async function update_glider_boat_paths(glider){
+  const glider_id = glider._id.toHexString()
+  const boats_col = await db.collection("boats");
+  const gliders_col = await db.collection("gliders");
+  
+  let glider_was_in_a_path = false
+  let glider_now_in_a_path = false
+  const boats = boats_col.find({})
+  for await (const boat of boats){
+    let glider_was_in_this_path = false
+    if(boat.gliders_inside.includes(glider_id)){
+      glider_was_in_a_path = true
+      glider_was_in_this_path = true
+    }
+    const currently_in_this_path = await is_glider_in_boat_path(glider, boat)
+    if(currently_in_this_path && !glider_was_in_this_path){
+      const gliders_inside = [...boat.gliders_inside, glider_id]
+      updateOne('boats', boat._id.toHexString(), {gliders_inside: gliders_inside})
+    }
+    else if(!currently_in_this_path && glider_was_in_this_path){
+      const gliders_inside = boat.gliders_inside.filter(g_id => g_id !== glider_id)
+      updateOne('boats', boat._id.toHexString(), {gliders_inside: gliders_inside})
+    }
+    if(currently_in_this_path){
+      glider_now_in_a_path = true
+    }
+  }
+
+  if(glider_was_in_a_path && !glider_now_in_a_path){
+    send_slack_message(`${glider.name} is no longer in the path of a ship :)`)
+    await trigger_glider_event(glider, "ship", "exit")
+  }
+  else if(!glider_was_in_a_path && glider_now_in_a_path){
+    send_slack_message(`${glider.name} is in the path of a ship! :slocum_glider: :ship:`)
+    await trigger_glider_event(glider, "ship", "enter")
+  }
+
+}
+
+async function update_gliders_inside_boat_paths(glider_id=undefined){
+  const gliders_that_were_in_path = await get_glider_list_inside_all()
+  console.log("Gliders that were in path:")
+  console.log(gliders_that_were_in_path)
+
+  const boats_col = await db.collection("boats");
+  const gliders_col = await db.collection("gliders");
+  const gliders_now_in_path = await get_gliders_inside_current_all()
+  console.log("Gliders now in path:")
+  console.log(gliders_now_in_path)
+
+  const boats = boats_col.find({})
+  for await (const boat of boats){
+    let new_gliders_inside = []
+    const gliders_inside = await gliders_in_boat_path(boat)
+    for(const glider of gliders_inside){}
+    updateOne('boats', boat._id.toHexString(), { gliders_inside: gliders_inside })
+  }
+  const gliders = gliders_col.find(glider_filter)
+  for await (const glider of gliders){
+    const glider_id_str = glider._id.toHexString() 
+    const glider_was_in = gliders_that_were_in_path.includes(glider_id_str)
+    const glider_is_in = gliders_now_in_path.includes(glider_id_str)
+    if(glider_was_in != glider_is_in){
+      if(glider_is_in){
+        send_slack_message(`${glider.name} is in the path of a ship! :slocum_glider: :ship:`)
+        await trigger_glider_event(glider, "ship", "enter")
+      }
+      else{
+        send_slack_message(`${glider.name} is no longer in the path of a ship :)`)
+        await trigger_glider_event(glider, "ship", "exit")
+      }
+    }
+  }
+
+}
+
+// There is going to be an assumption that boats that are about to leave the AIS area wont have a glider in their path
+// Because if a glider is in a ships path, then it gets cleaned, and the glider is in a ships path again, it will send
+// the glider enter again. Which isn't bad, but isn't expected.
+async function update_boat_locations() {
+  console.log("Updating boats")
+
+
+  const new_ais = await _fetch_ais();
+  // await insert_ais_historic_data(new_ais);
+  // await _insert_or_update_current_boats(new_ais);
+  // await _clean_boats();
+  
+  
+
+
+}
+
+function get_boat_polygon(last_pos, hours_diff) {
   const ship_pos = [last_pos["LATITUDE"], last_pos["LONGITUDE"]];
   const corners = _get_predicted_ship_position(last_pos, hours_diff);
   return [ship_pos, ...corners];
 }
 
+// glider: glider object, boat: boat object
+async function is_glider_in_boat_path(glider, boat){
+  if (glider.track) {
+    let glider_pos = glider.track[glider.track.length - 1];
+    glider_pos = [convert_gps(glider_pos.lat), convert_gps(glider_pos.lng)];
+    const last_location = boat.locations[boat.locations.length - 1];
+    const cone_hour_offset = glider.boat_cone_hour_offset ?? 1.5
+    const final_hour_offset = ((new Date().getTime() - last_location.TIMESTAMP.getTime()) / (1000 * 60 * 60)) + cone_hour_offset
+    console.log(`Using hour offset: ${final_hour_offset} for glider ${glider.name}`)
+    const boat_poly = get_boat_polygon(last_location, final_hour_offset);
+    if (is_in_polygon(glider_pos, [...boat_poly, [null]])) {
+    return true
+    }
+  }
+  return false
+
+}
+
+
 // returns list of gliders in range of boat
-async function gliders_in_boath_path(boat) {
+async function gliders_in_boat_path(boat) {
   const glider_collection = await db.collection("gliders");
   const gliders = await glider_collection.find({}).toArray();
   let ret_gliders = [];
   for (const glider of gliders) {
-    if (glider.track) {
-      let glider_pos = glider.track[glider.track.length - 1];
-      glider_pos = [convert_gps(glider_pos.lat), convert_gps(glider_pos.lng)];
-      const last_location = boat.locations[boat.locations.length - 1];
-      const boat_poly = get_boat_polygon(last_location);
-      // console.log(glider_pos);
-      // console.log(boat_poly);
-      if (is_in_polygon(glider_pos, [...boat_poly, [null]])) {
-        ret_gliders.push(glider.name);
-      }
+    if(await is_glider_in_boat_path(glider, boat)){
+      ret_gliders.push(glider._id.toHexString());
     }
   }
   return ret_gliders;
@@ -277,8 +412,10 @@ async function serialize_boats(minute_range) {
 }
 
 export {
-  update_boats,
   predict_boat_movement_range,
-  gliders_in_boath_path,
+  gliders_in_boat_path as gliders_in_boath_path,
   serialize_boats,
+  update_boat_locations,
+  update_gliders_inside_boat_paths,
+  update_glider_boat_paths
 };

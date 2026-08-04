@@ -105,9 +105,9 @@ function get_current_predict(boat: Boat): BoatPrediction{
 async function draw_glider_to_ship_line(){
   const truncateToTwoDecimals = (num: number): number => Math.trunc(num * 100) / 100;
   const glider_latlng = glider_current_location.value?.getLatLng()
-  if (!glider_latlng) return
   if(shortest_distance) shortest_distance.value?.removeFrom(initialMap.value as L.Map)
-  let shortest = 100000
+  if (!glider_latlng || boats.value.length == 0) return
+  let shortest = 10000000
   let shortest_boat_latlng = new L.LatLng(0,0)
   for (const boat of boats.value){
     if (!boat || !boat.prediction) continue

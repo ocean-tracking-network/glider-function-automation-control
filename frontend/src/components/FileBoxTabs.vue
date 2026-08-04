@@ -107,8 +107,9 @@ const all_tabs = computed(() => {
   /* gap: 1rem; */
   max-width: 500px;
   /* height: 2rem; */
-  overflow-x: scroll;
+  /* overflow-x: scroll; */
   margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .tab-container button {

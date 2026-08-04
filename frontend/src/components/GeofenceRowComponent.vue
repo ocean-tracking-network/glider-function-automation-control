@@ -1,10 +1,8 @@
-<script setup lang="ts" generic="T extends { category: string, filename: string }">
-import type { FileBoxType } from '@/lib/types';
-import { useFilesStore } from '@/stores/files';
-import { computed } from 'vue';
+<script setup lang="ts">
+import type { FileBoxType, Geofence } from '@/lib/types';
 
 const props = withDefaults(defineProps<{
-  element: FileBoxType<T>
+  element: FileBoxType<Geofence>
   canDelete?: boolean
   canEdit?: boolean
   selected?: boolean
@@ -15,34 +13,22 @@ const props = withDefaults(defineProps<{
 })
 
 const emit = defineEmits(["remove", "edit"])
-const filesStore = useFilesStore()
-
-const styleColor = computed(() => {
-  return filesStore.colour_by_category[props.element.category as string]
-})
-
-const elementName = computed(() => {
-  return props.element.filename
-})
-
 
 </script>
 <template>
   <div :class="{ border: true, selected: props.selected }">
-    <p :style="{ color: styleColor }"
-      :class="{ filename: true, bold: element.bold}">
-      {{ elementName }}
+    <p :class="{ filename: true, bold: element.bold}">
+      {{ element.name }}
     </p>
     <div class="buttons" v-if="(props.canEdit && props.selected) || (props.canDelete && props.selected)">
-      <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit file" title="Edit file"> ✎</button>
+      <button v-if="props.canEdit && props.selected" @click.stop="emit('edit')" class="edit" aria-label="Edit geofence" title="Edit geofence"> ✎</button>
       <span class="divider" v-if="props.canDelete && props.canEdit && props.selected">|</span>
-      <button v-if="props.canDelete && props.selected" @click.stop="emit('remove')" class="del" aria-label="Delete file" title="Delete file">🗑</button>
+      <button v-if="props.canDelete && props.selected" @click.stop="emit('remove')" class="del" aria-label="Delete geofence" title="Delete geofence">🗑</button>
     </div>
   </div>
 </template>
 <style scoped>
 .border {
-  /* margin-top: .5rem; */
   display: flex;
   justify-content: space-between;
   transition: .2s;

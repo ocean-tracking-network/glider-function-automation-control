@@ -44,7 +44,7 @@ import {
 } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
 import { gliders_sse } from './views/sse/gliders.mjs'
-import { update_boats } from './utils/boat_utils.mjs'
+import { update_boat_locations, update_gliders_inside_boat_paths } from './utils/boat_utils.mjs'
 
 const app = express()
 app.use(cors())
@@ -101,13 +101,10 @@ app.post('/logs', authenticateToken, requireAdmin, post_logs)
 app.get('/sse', authenticateToken, gliders_sse.listen)
 
 
-
-
-
 // boats
 app.get('/boats/:end_offset', authenticateToken, get_boats)
 app.get('/boats/predict/:id/:start_offset/:end_offset/:interval', get_boat_predict) //NOT USED BY THE FRONTEND ATM
-app.get('/boats/test', check_gliders_safe)
+// app.get('/boats/test', update_boats)
 
 // Schedule
 const scheduleSecs = Number.parseInt(process.env.SCHEDULE_SECS, 10) || 30
@@ -121,14 +118,14 @@ const backend_schedule = scheduleJob(`*/${scheduleSecs} * * * * *`, async () => 
     await update_geofences()
     await delete_old_tracks()
     if(process.env.GET_AIS?.toLowerCase() == "true"){
-      await update_boats()
+      await update_boat_locations()
     }
   } catch (error) {
     console.error('Scheduled backend update failed:', error)
   }
 })
 
-const ensureAdminUser = async () => {
+const CreateAdminIfNone = async () => {
   try {
     const autoCreateAdmin = process.env.AUTO_CREATE_ADMIN?.toLowerCase() === 'true'
 
@@ -165,7 +162,7 @@ const ensureAdminUser = async () => {
 
 // app start
 app.listen(port, async () => {
-  await ensureAdminUser()
+  await CreateAdminIfNone()
 
   const pause = process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase()
   if (pause === 'false') {

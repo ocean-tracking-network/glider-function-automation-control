@@ -31,54 +31,17 @@ const groupRef = computed(() => props.isDraggable
   ? props.group
   : { name: "no-dragable", pull: false, clone: false, put: false })
 
-// const sortRef = ref()
-// const groupRef = computed(() => {
-//     let ret = {}
-//     if (props.sort != undefined) {
-//       sortRef.value = props.sort
-//     } else {
-//       sortRef.value = true
-//     }
-
-//     if (!props.isDraggable) {
-//       groupRef.value = {
-//         name: "no-dragable",
-//         pull: false,
-//         clone: false,
-//         put: false,
-//       }
-//       sortRef.value = false
-//     } else {
-//       groupRef.value = props.group
-//     }
-//     return 
-// })
-
-// onMounted(() => {
-//   if (props.sort != undefined) {
-//     sortRef.value = props.sort
-//   } else {
-//     sortRef.value = true
-//   }
-
-//   if (!props.isDraggable) {
-//     groupRef.value = {
-//       name: "no-dragable",
-//       pull: false,
-//       clone: false,
-//       put: false,
-//     }
-//     sortRef.value = false
-//   } else {
-//     groupRef.value = props.group
-//   }
-// })
-
-
-
 function delete_element(element: FileBoxType<T>) {
   if (!props.can_delete) return
   emit("delete", element)
+}
+
+function select_element(element: FileBoxType<T>) {
+  const now_selected = !element.selected
+  props.list.forEach((el) => {
+    el.selected = el === element ? now_selected : false
+  })
+  emit('click', element)
 }
 
 </script>
@@ -86,7 +49,7 @@ function delete_element(element: FileBoxType<T>) {
 <template>
   <draggable :sort="sortRef" :list="list" :group="groupRef" itemKey="id" class="list-group files-container">
     <template #item="{ element }">
-      <a class="clickable" href="#" @click.prevent="{emit('click', element); element.selected = !element.selected}" @dblclick.prevent="emit('dblclick', element)">
+      <a class="clickable" href="#" @click.prevent="select_element(element)" @dblclick.prevent="emit('dblclick', element)">
         <FileComponent :canDelete="props.can_delete" :canEdit="props.can_edit" :selected="element.selected" @remove="delete_element(element)" @edit="emit('edit', element)" :element="element"
           class="files list-group-item" />
       </a>

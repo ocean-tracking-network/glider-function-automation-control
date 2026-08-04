@@ -12,14 +12,14 @@ export const useEventsStore = defineStore('events', () => {
   const geofenceStore = useGeoFencesStore()
   const events = ref<GliderEvent[]>([])
 
-  const { selected_fence_key } = storeToRefs(geofenceStore)
+  const { selected_fence_key, is_geofence_tab_selected } = storeToRefs(geofenceStore)
   const { selected_glider } = storeToRefs(gliderStore)
 
   const enter_files_ref = ref<EventGliderFile[]>([])
   const exit_files_ref = ref<EventGliderFile[]>([])
 
   const add_event = (event_type: 'enter' | 'exit', options: ScriptOptions) => {
-    if (!selected_glider.value?._id || !selected_fence_key) {
+    if (!selected_glider.value?._id) {
       console.warn('Cannot add event: missing selected glider or geofence')
       return
     }
@@ -28,9 +28,10 @@ export const useEventsStore = defineStore('events', () => {
       file: options.file,
       script: options.script,
       script_type: options.script_type,
-      geofence: selected_fence_key.value,
+      geofence: selected_fence_key.value || "ship",
       glider: selected_glider.value._id,
-      event_type: event_type
+      event_type: event_type,
+      ship_max_minute: 90
     }
 
     apiClient.post('/events', data).then(() => {
@@ -81,14 +82,16 @@ export const useEventsStore = defineStore('events', () => {
     return found
   }
 
-  const selected_glider_events = computed(() => {
+  const selected_glider_event_scripts = computed(() => {
     const ret: {enter?: GliderEvent, exit?: GliderEvent} = {}
-    if (gliderStore.selected_glider && geofenceStore.selected_fence_key) {
+    const geofence_filter = is_geofence_tab_selected.value ? selected_fence_key.value : "ship"
+    const glider_filter = selected_glider.value?._id
+    if (gliderStore.selected_glider && (geofenceStore.selected_fence_key || !is_geofence_tab_selected.value)) {
       events.value.forEach((event) => {
         if (
           event.script &&
-          event.glider == selected_glider.value?._id &&
-          event.geofence == selected_fence_key.value
+          event.glider == glider_filter &&
+          event.geofence == geofence_filter
         ) {
           if (event.event_type === 'exit') {
             ret.exit = event
@@ -103,8 +106,10 @@ export const useEventsStore = defineStore('events', () => {
 
   const exit_files = computed(() => {
     const ret: (UploadedFile & GliderEvent)[] = []
+    const geofence_filter = is_geofence_tab_selected.value ? selected_fence_key.value : "ship"
+    const glider_filter = selected_glider.value?._id
 
-    if (!selected_glider.value || !selected_fence_key.value) {
+    if (!selected_glider.value || (!selected_fence_key.value && is_geofence_tab_selected.value)) {
       return ret
     }
 
@@ -115,8 +120,8 @@ export const useEventsStore = defineStore('events', () => {
 
       if (
         file_obj &&
-        ele.glider == selected_glider.value?._id &&
-        ele.geofence == selected_fence_key.value &&
+        ele.glider == glider_filter &&
+        ele.geofence == geofence_filter &&
         ele.event_type === 'exit'
       ) {
         ret.push({
@@ -133,8 +138,10 @@ export const useEventsStore = defineStore('events', () => {
 
   const enter_files = computed(() => {
     const ret: (UploadedFile & GliderEvent)[] = []
+    const geofence_filter = is_geofence_tab_selected.value ? selected_fence_key.value : "ship"
+    const glider_filter = selected_glider.value?._id
 
-    if (!selected_glider.value || !selected_fence_key.value) {
+    if (!selected_glider.value || (!selected_fence_key.value && is_geofence_tab_selected.value)) {
       return ret
     }
 
@@ -142,11 +149,10 @@ export const useEventsStore = defineStore('events', () => {
       if (!ele.file) return
 
       const file_obj = filesStore.files_obj[ele.file]
-
       if (
         file_obj &&
-        ele.glider == selected_glider.value?._id &&
-        ele.geofence == selected_fence_key.value &&
+        ele.glider == glider_filter &&
+        ele.geofence == geofence_filter &&
         ele.event_type === 'enter'
       ) {
         ret.push({
@@ -209,7 +215,7 @@ export const useEventsStore = defineStore('events', () => {
     exit_files,
     enter_files_ref,
     exit_files_ref,
-    selected_glider_events,
+    selected_glider_event_scripts: selected_glider_event_scripts,
     trigger_event,
     get_events,
     add_event,

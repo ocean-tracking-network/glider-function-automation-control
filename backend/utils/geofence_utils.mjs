@@ -2,7 +2,7 @@ import { updateOne } from './db_utils.mjs'
 import db from '../db/conn.mjs'
 import { create_log } from './log_utils.mjs'
 import { send_slack_message } from './slack.mjs'
-import { trigger_event } from './events.mjs'
+import { trigger_event, trigger_glider_event } from './events.mjs'
 
 function is_in_polygon(point, polygon) {
   let in_polygon = false
@@ -117,26 +117,26 @@ function is_in_polygon(point, polygon) {
   return in_polygon
 }
 
-async function upload_event_files(glider, geofence, event_type) {
-  if (!glider.enabled) {
-    console.log('Glider not enabled, not sending file')
-    return
-  }
-  let collection = await db.collection('events')
-  let events = await collection
-    .find({
-      glider: glider._id.toHexString(),
-      geofence: geofence._id.toHexString(),
-      event_type: event_type,
-    })
-    .toArray()
-  if (events.length > 0) {
-    for (const event of events) {
-      trigger_event(event, geofence, glider)
-    }
-  } else {
-  }
-}
+// async function upload_event_files(glider, geofence, event_type) {
+//   if (!glider.enabled) {
+//     console.log('Glider not enabled, not sending file')
+//     return
+//   }
+//   let collection = await db.collection('events')
+//   let events = await collection
+//     .find({
+//       glider: glider._id.toHexString(),
+//       geofence: geofence._id.toHexString(),
+//       event_type: event_type,
+//     })
+//     .toArray()
+//   if (events.length > 0) {
+//     for (const event of events) {
+//       trigger_event(event, geofence, glider)
+//     }
+//   } else {
+//   }
+// }
 
 function convert_gps(val) {
   let degrees = Math.floor(val / 100)
@@ -187,7 +187,7 @@ const update_geofences = async () => {
             if (geofence.notify) {
               send_slack_message(`${glider.name} has entered geofence ${geofence.name}`)
             }
-            await upload_event_files(glider, geofence, 'enter')
+            await trigger_glider_event(glider, geofence, 'enter')
             gliders_in_geofence.push(glider_id)
           } else {
             //glider exited
@@ -195,7 +195,7 @@ const update_geofences = async () => {
               send_slack_message(`${glider.name} has exited geofence ${geofence.name}`)
             }
             const idx = gliders_in_geofence.indexOf(glider_id)
-            await upload_event_files(glider, geofence, 'exit')
+            await trigger_glider_event(glider, geofence, 'exit')
             gliders_in_geofence.splice(idx, 1)
           }
         } catch (error) {

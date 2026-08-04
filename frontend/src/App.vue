@@ -94,7 +94,7 @@ function trigger_events(event_type: string) {
     const events = event_type === "enter" ? eventsStore.enter_files : eventsStore.exit_files
     for (const event of events)
       eventsStore.trigger_event(event)
-    const script_event = eventsStore.selected_glider_events[event_type as ('enter' | 'exit')]
+    const script_event = eventsStore.selected_glider_event_scripts[event_type as ('enter' | 'exit')]
     if (script_event) {
       eventsStore.trigger_event(script_event)
     }

@@ -11,7 +11,7 @@ import type { EventType } from '@/lib/types';
 const props = defineProps<{event_type: EventType}>()
 const selected = ref<string | null>(null)
 
-const non_text = "None"
+const NONE_TEXT = "None"
 
 const gliderStore = useGlidersStore()
 const scriptsStore = useScriptsStore()
@@ -20,18 +20,21 @@ const userStore = useUserStore()
 const { scripts } = storeToRefs(scriptsStore)
 const { selected_glider } = storeToRefs(gliderStore)
 const { isAdmin } = storeToRefs(userStore)
-const { selected_glider_events } = storeToRefs(eventsStore)
+const { selected_glider_event_scripts } = storeToRefs(eventsStore)
 
 onMounted(() => {
   update_scripts()
 })
 
-watch(selected_glider_events, () => {
+watch(selected_glider_event_scripts, () => {
   update_scripts()
 })
 
 function update_scripts() {
-  selected.value = selected_glider_events.value[props.event_type]?.script ?? non_text
+  // const 
+  console.log(selected_glider_event_scripts.value)
+  console.log(selected_glider_event_scripts.value[props.event_type])
+  selected.value = selected_glider_event_scripts.value[props.event_type]?.script ?? NONE_TEXT
 }
 
 function get_script_type(script_name: string) {
@@ -51,27 +54,25 @@ function on_select(option: string) {
   if (!isAdmin.value) {
     return
   }
-  const selected_script_event = selected_glider_events.value[props.event_type]
-  if (option === non_text && selected_script_event) {
+  const selected_script_event = selected_glider_event_scripts.value[props.event_type]
+  if (option === NONE_TEXT && selected_script_event) {
     eventsStore.remove_event(selected_script_event._id)
-  } else if (option !== non_text) {
+  } else if (option !== NONE_TEXT) {
     eventsStore.add_event(props.event_type, { script: option, script_type: get_script_type(option) })
   }
   selected.value = option;
 }
 
-
 const combined_options = computed<string[]>(() => {
   if (!selected_glider.value) return []
   const selected_glider_scripts = scripts.value[selected_glider.value.name]
   try {
-    return [non_text, ...(selected_glider_scripts?.factory ?? []), ...(selected_glider_scripts?.user ?? [])]
+    return [NONE_TEXT, ...(selected_glider_scripts?.factory ?? []), ...(selected_glider_scripts?.user ?? [])]
   } catch (err) {
     console.log("Cannot combine options" + err)
     return []
   }
 })
-
 
 </script>
 <template>
@@ -79,7 +80,7 @@ const combined_options = computed<string[]>(() => {
     <hr>
     <div class="dropdown-container">
       <strong>Selected Script:</strong>
-      <DropDownComponent :selected="selected" @select="on_select" :default="non_text" :options="combined_options"
+      <DropDownComponent :selected="selected" @select="on_select" :default="NONE_TEXT" :options="combined_options"
         :disabled="!isAdmin" />
     </div>
   </div>

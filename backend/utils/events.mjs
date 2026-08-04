@@ -42,6 +42,32 @@ async function trigger_file_event(event, glider, geofence) {
   }
 }
 
+
+async function trigger_glider_event(glider, geofence, event_type) {
+  if (!glider.enabled) {
+    console.log('Glider not enabled, not sending file')
+    return
+  }
+  let geofence_filter = geofence
+  if(typeof geofence !== 'string' ){
+    geofence_filter = geofence.toHexString()
+  }
+  let collection = await db.collection('events')
+  let events = await collection
+    .find({
+      glider: glider._id.toHexString(),
+      geofence: geofence_filter,
+      event_type: event_type,
+    })
+    .toArray()
+  if (events.length > 0) {
+    for (const event of events) {
+      trigger_event(event, geofence, glider)
+    }
+  } else {
+  }
+}
+
 async function trigger_script_event(event, glider, geofence) {
   const generic_message_text = `Switched script: ${event.script} for ${glider.name}`
   await set_script(glider.name, event.script, event.script_type)
@@ -70,4 +96,4 @@ const trigger_event = async (event, geofence = null, glider = null) => {
   }
 }
 
-export { trigger_event }
+export { trigger_event, trigger_glider_event }

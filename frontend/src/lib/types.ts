@@ -13,6 +13,7 @@ export type Glider = {
   track: (Latlon & { date?: string })[]
   enabled: boolean
   next_waypoint?: Latlon
+  boat_cone_hour_offset?: number
 }
 
 export type Geofence = {
@@ -37,6 +38,10 @@ export type UploadedFile = {
   path: string
 }
 
+export type ShipOptions = {
+  ship_max_minute?: number,
+}
+
 export type ScriptOptions = {
   file?: string
   script?: string
@@ -45,7 +50,7 @@ export type ScriptOptions = {
 
 export type EventType = 'enter' | 'exit'
 
-export type Script = ScriptOptions & {
+export type Script = ScriptOptions & ShipOptions & {
   geofence: string
   glider: string
   event_type: EventType
@@ -86,6 +91,7 @@ export type FileBoxType<T> = T & {
   key?: string
   bold?: boolean,
   type?: string
+  selected?: boolean
 }
 
 export type DraggableMoveEvent<T> = MoveEvent & {

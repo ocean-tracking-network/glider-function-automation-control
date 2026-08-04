@@ -61,9 +61,9 @@ async function subscribe_for_glider_connection(glider_name, callback) {
 }
 
 async function upload_file(glider_name, glider_folder, file_path, category) {
-  // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
-  //   glider_name = 'adam'
-  // }
+  if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
+    glider_name = 'adam'
+  }
   let token = await sfmc.accessToken.getAccessToken()
   const result = await sfmc.glider.uploadFiles(token.token, glider_name, glider_folder, [file_path])
   // send a slack notification whenever a file get's sent
@@ -73,9 +73,9 @@ async function upload_file(glider_name, glider_folder, file_path, category) {
 }
 
 async function get_available_scripts(glider_name) {
-  // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
-  //   glider_name = 'adam'
-  // }
+  if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
+    glider_name = 'adam'
+  }
   let result = {}
   try {
     let token = await sfmc.accessToken.getAccessToken()
@@ -115,9 +115,9 @@ async function get_glider_ls_dir(){
 }
 
 async function set_script(glider_name, script_name, script_type) {
-  // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
-  //   glider_name = 'adam'
-  // }
+  if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
+    glider_name = 'adam'
+  }
   let result = {}
   try {
     let token = await sfmc.accessToken.getAccessToken()
@@ -130,9 +130,9 @@ async function set_script(glider_name, script_name, script_type) {
 }
 
 async function clear_script(glider_name) {
-  // if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
-  //   glider_name = 'adam'
-  // }
+  if (process.env.SEND_FILES_TO_DUMMY_GLIDER.toLowerCase() == 'true') {
+    glider_name = 'adam'
+  }
   let result = {}
   try {
     let token = await sfmc.accessToken.getAccessToken()
