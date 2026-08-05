@@ -5,8 +5,9 @@ async function send_slack_message(text) {
   if (process.env.SEND_SLACK_MESSAGES.toLowerCase() == 'false') {
     return
   }
+  const slack_text = process.env.SLACK_PREFIX ? `${process.env.SLACK_PREFIX} - ${text}` : text
   const data = {
-    text: text,
+    text: slack_text,
   }
   const url = process.env.SLACK_URL
   axios
