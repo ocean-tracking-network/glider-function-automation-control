@@ -154,10 +154,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
   }
 
   const saveGeoFence = () => {
-    // if (!Object.keys(geofences.value).includes(temp_fence_key.toString())) {
-    //   return
-    // }
-
     const geofence = geofences.value[temp_fence_key]
     const url = '/geofence'
     if (!geofence || !geofence.name && geofence.latlons.length == 1) {
@@ -228,24 +224,14 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     })
   }
 
-  // function find_on_name(name: string) {
-  //   for (let i = 0; i < Object.keys(geofences.value).length; i++) {
-  //     if (geofences.value[i].name == name) {
-  //       return i
-  //     }
-  //   }
-  // }
-
   function set_geofence(id: string, data: Geofence) {
     geofences.value[id] = data
   }
 
-  // function push_latlon(id, )
 
   function add(name: string) {
     // new key will always be 0
     if (geofences.value[temp_fence_key] != undefined) {
-      //console.log('ERROR, TWO NEW GEOFENCES')
     }
     geofences.value[temp_fence_key] = {
       name: name,
@@ -306,11 +292,6 @@ export const useGeoFencesStore = defineStore('geofences', () => {
     selected_idx.value = idx
     set_force_map_update(true)
   }
-
-  // function append_cord_selected_fence(lat_lon) {
-  //   const key = selected_fence_key.value
-  //   geofences.value[key].latlons[geofences.value[key].latlons.length - 1] = lat_lon
-  // }
 
   return {
     geofences,

@@ -167,17 +167,6 @@ export const useEventsStore = defineStore('events', () => {
     return ret
   })
 
-  // const glider_script_events = computed(() => {
-  //   const ret = {}
-  //   if (gliderStore.selected_glider && geofenceStore.selected_fence_key) {
-  //     events.value.forEach((event) => {
-  //       if (event.script) {
-  //         ret[event.event_type] = event.script
-  //       }
-  //     })
-  //   }
-  // })
-
   watch(enter_files, (new_Val) => {
     enter_files_ref.value = new_Val
   })

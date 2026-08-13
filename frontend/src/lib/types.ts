@@ -108,31 +108,6 @@ export type DraggableMoveEvent<T> = MoveEvent & {
   }
 }
 
-// AIS Report derrived boat type
-// export type Boat = Latlon & {
-//   vid: number
-//   mmsi: number
-//   courseOverGround: number
-//   speedOverGround: number
-//   heading: number
-//   rateOfTurn: number
-//   shipCargoType: number
-//   navigationStatus: number
-//   length: number
-//   breadth: number
-//   imoNumber: number
-//   dimensions: number
-//   vehicleName: string
-//   shipName: string
-//   callSign: string
-//   destination: string
-//   aisClass: string
-//   // ISO 8601 formatted date strings
-//   eta: string
-//   timeStamp: string
-// }
-
-
 export type BoatLocation = {
     LATITUDE: number
     LONGITUDE: number
@@ -162,10 +137,6 @@ export type Boat = {
       line: [number, number][]
       center: [number, number]
       cone: [number, number][]
-      
-      // line: [number, number][]
-      // center: [number, number]
-      // cone: [number, number]
     }[]
   }
   minute_offset: number

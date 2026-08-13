@@ -124,9 +124,6 @@ function select_file_tab(file_tab: string) {
   file_tab_select.value = file_tab
 }
 
-// const all_categories = computed(() => {
-//   return [...filesStore.categories, ...temp_file_categories.value]
-// })
 
 function toggleUserManagement() {
   showUserManagement.value = !showUserManagement.value
@@ -192,7 +189,6 @@ function onGeofenceDrawerOffsetChange(offset: number) {
     <UserManagementComponent v-if="showUserManagement && isAdmin" @close="showUserManagement = false"/>
   </div>
 </template>
-
 <style scoped>
 .logo {
   display: block;
@@ -204,7 +200,6 @@ function onGeofenceDrawerOffsetChange(offset: number) {
   align-items: flex-start;
   gap: 1.5rem;
   margin-top: 1rem;
-  /* height: 670px; */
 }
 
 #main-flex > div {
@@ -214,11 +209,6 @@ function onGeofenceDrawerOffsetChange(offset: number) {
 #main-flex > div:first-child {
   flex: 0 0 500px;
 }
-
-/* main {
-  margin-right: var(--geofence-drawer-offset, 0px);
-  transition: margin-right 0.25s ease;
-} */
 
 @media (max-width: 1200px) {
   main {
@@ -231,7 +221,6 @@ function onGeofenceDrawerOffsetChange(offset: number) {
   flex-wrap: wrap;
   flex: 1 1 0;
   min-width: 0;
-  /* gap: 1rem; */
 }
 
 #geo {
@@ -247,9 +236,6 @@ function onGeofenceDrawerOffsetChange(offset: number) {
 }
 
 .middle {
-  /* flex-grow: 1; */
-  /* max-width: 50%; */
-  /* width: 48%; */
   flex: 1;
   height: 12rem;
   flex-basis: 48%;
@@ -276,8 +262,6 @@ header {
 .unselected-text {
   text-align: center;
 }
-
-
 
 #file-upload {
   visibility: hidden;
