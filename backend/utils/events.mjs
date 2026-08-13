@@ -45,7 +45,7 @@ async function trigger_file_event(event, glider, geofence) {
 
 async function trigger_glider_event(glider, geofence, event_type) {
   if (!glider.enabled) {
-    console.log('Glider not enabled, not sending file')
+    console.log(`Glider ${glider.name} not enabled, not sending file`)
     return
   }
   let geofence_filter = geofence

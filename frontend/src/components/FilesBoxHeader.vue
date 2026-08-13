@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import FileBoxTabs from './FileBoxTabs.vue';
+import type { Tab } from '@/lib/types.ts';
 
 const props = withDefaults(defineProps<{
   title: string
-  tabs: string[]
+  tabs: Tab[]
   selected_tab: string
   tabs_disabled: boolean
   add_btn: boolean
   tab_sort_key?: string
   tabs_static?: boolean
+  tab_text_large?: boolean
 }>(), {
   tabs_disabled: false,
   add_btn: true,
@@ -36,6 +38,7 @@ const emit = defineEmits<{
       @select="(tab) => { emit('tab_select', tab) }"
       :selected="selected_tab"
       :tabs="tabs"
+      :tab_text_large="tab_text_large"
       :disabled="props.tabs_disabled"
     />
     <button v-if="props.add_btn" @click="emit('add_btn')" class="border add-btn">Add</button>

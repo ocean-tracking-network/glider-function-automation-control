@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue';
 import FileListComponent from './FileListComponent.vue';
 import FilesBoxHeader from './FilesBoxHeader.vue';
-import type { FileBoxType } from '@/lib/types';
+import { useFilesStore } from '@/stores/files.ts';
+import type { FileBoxType, Tab } from '@/lib/types';
 
 const props = withDefaults(defineProps<{
   title: string
@@ -42,6 +43,7 @@ const emit = defineEmits<{
 
 const selected_tab = ref("")
 const new_tabs = ref<string[]>([])
+const filesStore = useFilesStore()
 
 // function delete_element(element_id: string) {
 //   emit("delete", element_id)
@@ -59,7 +61,8 @@ function tab_select(value: string) {
 }
 
 function tab_add(new_val: string) {
-  if (!all_tabs.value.includes(new_val)) {
+  const tab_exists = all_tabs.value.some( tab => tab.text == new_val)
+  if (!tab_exists) {
     new_tabs.value.push(new_val)
   }
 }
@@ -89,13 +92,14 @@ const filtered_list = computed(() => {
   }
 })
 
-const all_tabs = computed(() => {
+const all_tabs = computed<Tab[]>(() => {
   const tabs = props.tabs
   if (!tabs) {
     return []
   }
   new_tabs.value = new_tabs.value.filter((tab) => !tabs.includes(tab))
-  return [...tabs, ...new_tabs.value]
+  const combined = [...tabs, ...new_tabs.value]
+  return combined.map((tab) => {return {text: tab, colour: filesStore.colour_by_category[tab]}}) as Tab[]
 })
 
 </script>

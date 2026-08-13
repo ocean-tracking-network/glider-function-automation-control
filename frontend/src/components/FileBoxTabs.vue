@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { useFilesStore } from '@/stores/files'
 import { computed, ref } from 'vue'
+import type { Tab } from '@/lib/types';
 
 const props = defineProps<{
-  tabs: string[]
+  tabs: Tab[]
   selected: string
   static?: boolean
   disabled?: boolean
+  tab_text_large?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -14,7 +15,6 @@ const emit = defineEmits<{
   select: [tab: string]
   rename: [{ old: string, new: string}]
 }>()
-const filesStore = useFilesStore()
 
 const rename = ref(false)
 const temp_rename_text = ref("")
@@ -78,7 +78,10 @@ function add() {
 const all_tabs = computed(() => {
   const tabs = [...props.tabs]
   if (adding_new.value) {
-    tabs.push(temp_rename_text.value)
+    tabs.push({
+      text: temp_rename_text.value,
+      colour: "white"
+  })
   }
   return tabs
 })
@@ -86,16 +89,16 @@ const all_tabs = computed(() => {
 </script>
 <template>
   <div class="tab-container">
-    <button :class="{ first: index == 0 }" :key="index" v-for="(tab, index) in all_tabs" @click="select(tab)"
+    <button :class="{ first: index == 0, last: static && index == all_tabs.length-1 }" :key="index" v-for="(tab, index) in all_tabs" @click="select(tab.text)"
       :disabled="props.disabled">
-      <p :class="{ tabtext: true, selected: (selected == tab), last: static }"
-        :style="{ color: filesStore.colour_by_category[tab] }"
-        v-if="(!rename || selected != tab) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
-        {{ tab }}
+      <p :class="{ tabtext: true, selected: (selected == tab.text), large: tab_text_large, small: !tab_text_large }"
+        :style="{ color: tab.colour }"
+        v-if="(!rename || selected != tab.text) && !(adding_new && index == all_tabs.length - 1)" class="tab-contents">
+        {{ tab.text }}
         <!-- {{ filesStore.colour_by_category[tab] }} -->
       </p>
       <input @focusout="stop_edit" v-model="temp_rename_text" :disabled="props.disabled"
-        v-if="(rename && selected == tab) || (adding_new && index == all_tabs.length - 1)" class="tab-contents"
+        v-if="(rename && selected == tab.text) || (adding_new && index == all_tabs.length - 1)" class="tab-contents"
         type="text">
     </button>
     <button v-if="!static && !props.disabled" @click="add" class="last">+</button>
@@ -119,7 +122,6 @@ const all_tabs = computed(() => {
   border-color: var(--color-text);
   padding-right: .5rem;
   padding-left: .5rem;
-  max-width: 100px;
   height: 100%;
   text-wrap: nowrap;
   overflow: hidden;
@@ -157,5 +159,11 @@ input {
   /* background-color: red; */
   color: var(--vt-c-white);
   width: 8rem;
+}
+.small{
+  max-width: 100px;
+}
+.large{
+  font-size: large;
 }
 </style>

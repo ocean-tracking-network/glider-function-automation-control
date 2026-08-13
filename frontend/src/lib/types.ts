@@ -175,3 +175,8 @@ export type Boat = {
 export type ShortestDistance = {
 
 }
+
+export type Tab = {
+  text: string
+  colour: string
+}

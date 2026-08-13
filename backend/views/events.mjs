@@ -34,6 +34,7 @@ const post_events = async (req, res) => {
     // we can only have a single script at a time, replace the old one if it exists, delete many just in case
     const old_script = await collection.deleteMany({
       geofence: new_doc.geofence,
+      glider: new_doc.glider,
       event_type: new_doc.event_type,
       script: { $exists: true },
     })

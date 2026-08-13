@@ -10,7 +10,7 @@ import { useEventsStore } from '@/stores/events';
 import { storeToRefs } from 'pinia';
 import { useGlidersStore } from '@/stores/gliders';
 import { useUserStore } from '@/stores/user';
-import type { FileBoxType, Geofence, Glider } from '@/lib/types';
+import type { FileBoxType, Geofence, Glider, Tab } from '@/lib/types';
 import DropDownComponent from './DropDownComponent.vue';
 
 const store = useGeoFencesStore()
@@ -29,8 +29,7 @@ const geofence_is_dirty = ref(false)
 const pending_fence_key = ref<string | null>(null)
 const pending_from_map = ref(false)
 const pending_delete_element = ref<FileBoxType<Geofence> | null>(null)
-const tabs: string[] = ["Geofences", "Ships"]
-const selected_tab = ref<string>(tabs[0] as string)
+const selected_tab = ref<string>("")
 const offset_time_ref = ref<number>(0)
 
 const emit = defineEmits<{
@@ -42,6 +41,22 @@ const { selected_glider } = storeToRefs(gliderStore)
 
 //GET USER ROLE FROM STORED USER
 const { isAdmin } = storeToRefs(userStore)
+
+const tabs = computed<Tab[]>(() =>{
+  let ship_colour = ""
+  let geofence_colour = ""
+  if(selected_glider.value && geofences.value){
+    if (eventsStore.glider_has_geofence_event(selected_glider.value._id, "ship")){
+      ship_colour = "red"
+    }
+    Object.keys(geofences.value).forEach((key) => {
+      if(eventsStore.glider_has_geofence_event(selected_glider.value?._id as string, key)){
+        geofence_colour = "red"
+      }
+    })
+  }
+  return [{text: "Geofences", colour: geofence_colour}, {text: "Ships", colour: ship_colour}]
+})
 
 //CLOSE DRAWER ON LOGOUT
 watch(() => userStore.loggedin, (new_val) => {
@@ -363,6 +378,7 @@ onMounted(() => {
   document.addEventListener('click', handle_outside_click)
   store.setSelectGeofenceHandler(handle_geofence_selection)
   store.setDoubleClickGeofenceHandler(handle_geofence_double_click)
+  selected_tab.value = tabs.value[0]?.text as string
 })
 
 onBeforeUnmount(() => {
@@ -375,7 +391,7 @@ onBeforeUnmount(() => {
 
 function tab_select(tab: string){
   selected_tab.value = tab
-  is_geofence_tab_selected.value = tab == tabs[0]
+  is_geofence_tab_selected.value = tab == tabs.value[0]?.text
 }
 
 watch(selected_glider, (() =>{
@@ -415,6 +431,7 @@ const show_offset_time_update = computed(() => {
           :add_btn="isAdmin"
           tab_sort_key="type"
           :tabs_static="true"
+          :tab_text_large="true"
           @add_btn="add_geo"
           @tab_select="tab_select"
         />
@@ -428,7 +445,7 @@ const show_offset_time_update = computed(() => {
           @edit="open_selected_geofence_editor"
         />
         <div class="footer">
-          <div v-if="selected_tab == tabs[1]" id="boats-text" class="center-div">
+          <div v-if="selected_tab == tabs[1]?.text" id="boats-text" class="center-div">
             <div style="text-align: center;">
               <h2 class="unselected-text">Files/script changes for when a glider is in the path of a ship</h2>
               <div class="center-div">
