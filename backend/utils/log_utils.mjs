@@ -1,5 +1,5 @@
 import db from '../db/conn.mjs'
-import { gliders_sse } from '../views/sse/gliders.mjs'
+import { broadcast_new_logs } from '../views/sse/logs.mjs'
 
 async function purge_old_logs() {
   const collection = await db.collection('logs')
@@ -88,7 +88,7 @@ const create_log = async (message, level, glider = '', glider_connection=undefin
     new_doc.glider_connection = glider_connection
   }
   const result = await collection.insertOne(new_doc)
-  gliders_sse.broadcast_new_logs({ ...new_doc, _id: result.insertedId })
+  broadcast_new_logs({ ...new_doc, _id: result.insertedId })
   console.log(`${level} - ${new Date().toISOString()} - ${glider} - ${message}`)
   purge_old_logs()
   return result

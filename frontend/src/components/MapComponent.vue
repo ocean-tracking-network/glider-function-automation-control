@@ -12,6 +12,7 @@ import { useUserStore } from "@/stores/user";
 import apiClient from "@/apiClient";
 import type { Boat, BoatLocation, BoatPrediction, Glider, Latlon } from '@/lib/types';
 import type { GeoJsonObject, GeoJsonTypes } from 'geojson'
+import { getEventSource } from "@/apiClient";
 
 const store = useGeoFencesStore();
 const gliderStore = useGlidersStore();
@@ -64,6 +65,24 @@ const shortest_distance = shallowRef<L.Polyline>()
 const { selected_idx, force_map_update, geofences, interactive_map, selected_fence } = storeToRefs(store)
 const { selected_glider, gliders } = storeToRefs(gliderStore)
 const { isAdmin, loggedin } = storeToRefs(userStore)
+
+
+function register_sse() {
+  const eventSource = getEventSource()
+
+  eventSource.addEventListener('boats.new', ({data}) => {
+    const new_boats = JSON.parse(data)
+    for(const new_boat of new_boats){
+      boats.value.map((boat) => {
+        if(boat._id == new_boat._id){
+          return new_boat
+        }
+        return boat
+      })
+    }
+  })
+}
+
 
 function get_boats() {
   apiClient.get(`/boats/${ais_offset_amount}`)

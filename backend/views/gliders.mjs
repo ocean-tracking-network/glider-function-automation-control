@@ -34,6 +34,7 @@ const post_gliders = async (req, res) => {
     sfmc_id: sfmc_json.id,
     track: [],
     enabled: false,
+    currentScriptName: sfmc_json.currentScriptName,
   }
   let result = await collection.insertOne(new_doc)
   // subscribe to SFMC events for this new glider so it receives connections/dialogs

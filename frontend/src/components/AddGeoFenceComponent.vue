@@ -29,7 +29,7 @@ const emit = defineEmits<{
 }>()
 
 const fence_key = ref("")
-const lock_fence = ref(true)
+const lock_fence = ref(false)
 const initial_snapshot = ref('')
 const pressed_handle_index = ref<number | null>(null)
 const is_dragging_latlon = ref(false)
@@ -232,6 +232,7 @@ function create_snapshot() {
     name: selected_fence.value?.name ?? '',
     notify: selected_fence.value?.notify ?? false,
     latlons: normalize_latlons(selected_fence.value?.latlons),
+    safe_zone: selected_fence.value?.safe_zone ?? false
   })
 }
 
@@ -351,8 +352,8 @@ onBeforeMount(() => {
     </div>
     <div class="controls-container">
       <div>
-        <input :disabled="!props.canEdit" v-model="lock_fence" id="lock" type="checkbox">
-        <label for="lock" class="label">Lock</label>
+        <input :disabled="lock_fence" v-model="selected_fence!.safe_zone" id="safe-zone" type="checkbox">
+        <label for="safe-zone" class="label">Safe Zone</label>
       </div>
       <div>
         <input :disabled="lock_fence || !props.canEdit" v-model="selected_fence!.notify" id="notify" type="checkbox">

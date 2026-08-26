@@ -148,7 +148,7 @@ function convert_gps(val) {
   return ret
 }
 
-const update_geofences = async () => {
+async function _update_gliders_in_geofences(){
   // Checks each event object to see if it should be activated
   let glider_collection = await db.collection('gliders')
   let geofence_collection = await db.collection('geofences')
@@ -168,9 +168,10 @@ const update_geofences = async () => {
         last_glider_point.lat = convert_gps(last_glider_point.lat)
         last_glider_point.lng = convert_gps(last_glider_point.lng)
       }
+      const geofence_latlon_map = geofence.latlons.map((ele) => [ele.lat,ele.lng])
       const in_geofence = is_in_polygon(
         [last_glider_point.lat, last_glider_point.lng],
-        [...geofence.latlons, [null]] //Yeah, no idea why it needs [null] right now, temp fix
+        [...geofence_latlon_map, [null]] //Yeah, no idea why it needs [null] right now, temp fix
       )
       let last_in_geofence = false
       let gliders_in_geofence = []
@@ -206,10 +207,59 @@ const update_geofences = async () => {
           )
         }
       }
-
       updateOne('geofences', geofence._id.toHexString(), { gliders_inside: gliders_in_geofence })
     }
   }
+}
+
+async function _update_boats_in_safe_geofences(){
+  let boat_collection = await db.collection('boats')
+  let geofence_collection = await db.collection('geofences')
+
+  const boats = await boat_collection.find({}).toArray()
+  const geofences = await geofence_collection.find({safe_zone:true}).toArray()
+
+  for (const geofence of geofences) {
+    console.log(`Using geofence: ${geofence.name}`)
+    for (const boat of boats) {
+      const last_location = boat.locations[boat.locations.length - 1];
+
+      const geofence_latlon_map = geofence.latlons.map((ele) => [ele.lat,ele.lng])
+      const in_geofence = is_in_polygon(
+        [last_location.LATITUDE, last_location.LONGITUDE],
+        [...geofence_latlon_map, [null]] //Yeah, no idea why it needs [null] right now, temp fix
+      )
+      let last_in_geofence = false
+      let boats_in_geofence = []
+      const boat_id = boat._id.toHexString()
+      if (geofence.boats_inside != undefined || geofence.boats_inside != null) {
+        last_in_geofence = geofence.boats_inside.includes(boat_id)
+        boats_in_geofence = geofence.boats_inside
+      }
+      console.log(boat.NAME)
+      console.log(last_in_geofence)
+      console.log(in_geofence)
+      if (in_geofence != last_in_geofence) {
+        //the boat either entered or exited
+          if (in_geofence) {
+            console.log("BOAT IN GEO")
+            //glider entered
+            boats_in_geofence.push(boat_id)
+          } else {
+            console.log("BOAT OUT OF GEO")
+            //glider exited
+            const idx = boats_in_geofence.indexOf(boat_id)
+            boats_in_geofence.splice(idx, 1)
+          }
+      }
+      updateOne('geofences', geofence._id.toHexString(), { boats_inside: boats_in_geofence })
+    }
+  }
+}
+
+const update_geofences = async () => {
+  _update_gliders_in_geofences()
+  _update_boats_in_safe_geofences()
 }
 
 export { update_geofences, convert_gps, is_in_polygon }

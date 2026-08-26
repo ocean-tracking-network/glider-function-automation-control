@@ -3,6 +3,7 @@ import multer from 'multer'
 import { scheduleJob } from 'node-schedule'
 import cors from 'cors'
 import { update_geofences } from './utils/geofence_utils.mjs'
+import { sse_broadcast } from './views/sse/base.mjs'
 
 
 import {
@@ -43,7 +44,6 @@ import {
   subscribe_sfmc_gliders,
 } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
-import { gliders_sse } from './views/sse/gliders.mjs'
 import { update_boat_locations, update_gliders_inside_boat_paths } from './utils/boat_utils.mjs'
 
 const app = express()
@@ -98,7 +98,7 @@ app.get('/logs', authenticateToken, get_logs)
 app.post('/logs', authenticateToken, requireAdmin, post_logs)
 
 // sse
-app.get('/sse', authenticateToken, gliders_sse.listen)
+app.get('/sse', authenticateToken, sse_broadcast)
 
 
 // boats

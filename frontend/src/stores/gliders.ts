@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import apiClient, { getEvenSource } from '@/apiClient'
+import apiClient, { getEventSource } from '@/apiClient'
 import type { Glider } from '@/lib/types'
 
 export const useGlidersStore = defineStore('gliders', () => {
@@ -8,7 +8,7 @@ export const useGlidersStore = defineStore('gliders', () => {
   const selected_glider_id = ref<string | null>(null)
 
   const register_sse = () => {
-    const eventSource = getEvenSource()
+    const eventSource = getEventSource()
 
     eventSource.addEventListener('gliders.tracks.new', ({ data }) => {
       // console.log('gliders.tracks.new: ', data)

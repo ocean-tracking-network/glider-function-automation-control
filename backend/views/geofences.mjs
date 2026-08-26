@@ -35,7 +35,9 @@ const post_geofences = async (req, res, next) => {
     name: name,
     latlons: latlons,
     gliders_inside: [],
+    boats_inside: [],
     notify: notify,
+    safe_zone: req.body.safe_zone
   }
   const result = await collection.insertOne(newdocument)
 

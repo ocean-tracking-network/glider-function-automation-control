@@ -1,5 +1,5 @@
 import db from '../db/conn.mjs'
-import { gliders_sse } from '../views/sse/gliders.mjs'
+import { broadcast_new_tracks } from '../views/sse/gliders.mjs'
 import { add_dialog_to_log, close_connection_on_log, create_log } from './log_utils.mjs'
 import {
   get_active_deployment_details,
@@ -82,10 +82,10 @@ async function update_glider_position(glider, collection = undefined) {
     tracks.push(track)
     const filter = { _id: glider._id }
     const _update_result = await collection.updateOne(filter, {
-      $set: { track: tracks },
+      $set: { track: tracks, currentScriptName: sfmc_json.currentScriptName },
     })
 
-    gliders_sse.broadcast_new_tracks(glider._id, track)
+    broadcast_new_tracks(glider._id, track)
     console.log('updated track')
     create_log(`${glider.name} as a new GPS position`, 'info', glider._id)
     return true

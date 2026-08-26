@@ -21,6 +21,7 @@ export type Geofence = {
   name: string
   notify: boolean
   selected?: boolean
+  safe_zone: boolean
 }
 
 export type kmlGeoJson = {
@@ -127,6 +128,7 @@ export type BoatPrediction = {
 
 // Boat type inferred from boat_utils
 export type Boat = {
+  _id: string
   locations: BoatLocation[]
   prediction: BoatPrediction
   prediction_range: {

@@ -1,6 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import apiClient, { getEvenSource } from '@/apiClient'
+import apiClient, { getEventSource } from '@/apiClient'
 import type { GliderLog } from '@/lib/types';
 
 export const useLogsStore = defineStore('logs', () => {
@@ -15,10 +15,10 @@ export const useLogsStore = defineStore('logs', () => {
   }
 
   const register_sse = () => {
-    const eventSource = getEvenSource()
+    const eventSource = getEventSource()
 
-    eventSource.addEventListener('gliders.logs.new', ({ data }) => {
-      console.log('gliders.logs.new: ', data)
+    eventSource.addEventListener('logs.new', ({ data }) => {
+      console.log('logs.new: ', data)
       add_log(JSON.parse(data))
     })
   }

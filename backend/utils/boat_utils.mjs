@@ -4,6 +4,7 @@ import db from '../db/conn.mjs'
 import axios from "axios";
 import { is_in_polygon, convert_gps } from "./geofence_utils.mjs";
 import { send_slack_message } from "./slack.mjs";
+import { broadcast_delete_boats, broadcast_new_boats, broadcast_update_boats } from "../views/sse/boats.mjs";
 
 async function _fetch_ais() {
   const url = process.env.AIS_API_URL;
@@ -50,6 +51,7 @@ async function _clean_boats() {
   const time_cutoff = 3; //hours (this could be configurable, open to either)
   const col = await db.collection("boats");
   const boats = col.find({}); //No way this couldn't be a mongo filter, right?
+  let deleted_boats_arr = []
   for await (const boat of boats) {
     const time_offset =
       (new Date().getTime() -
@@ -58,11 +60,13 @@ async function _clean_boats() {
     console.log(time_offset);
     if (time_offset >= time_cutoff) {
       console.log(`Deleting, over ${time_cutoff} hours`);
-      await col.deleteOne({ _id: boat._id });
+      const deleted_boat = await col.deleteOne({ _id: boat._id });
+      deleted_boats_arr.push(deleted_boat)
     } else {
       console.log("Still got time");
     }
   }
+  broadcast_delete_boats(deleted_boats_arr)
 }
 
 function _TIMESTAMP_to_date(TIMESTAMP) {
@@ -85,16 +89,19 @@ function _get_new_location_obj(ais_data) {
 
 async function _insert_or_update_current_boats(ais_data_list) {
   const col = await db.collection("boats");
+  let update_boats_arr = []
+  let new_boats_arr = []
   for (const ele of ais_data_list) {
     const ais_data = ele.AIS;
     const boat = await col.findOne({ MMSI: ais_data.MMSI });
     if (boat == null) {
-      await col.insertOne({
+      const new_boat = await col.insertOne({
         MMSI: ais_data.MMSI,
         gliders_inside: [],
         NAME: ais_data.NAME,
         locations: [_get_new_location_obj(ais_data)],
       });
+      new_boats_arr.push(new_boat)
     } else {
       const last_timestamp =
         boat.locations[boat.locations.length - 1].TIMESTAMP;
@@ -110,14 +117,18 @@ async function _insert_or_update_current_boats(ais_data_list) {
         if (new_locations.length > 10) {
           new_locations = new_locations.slice(-9);
         }
-        await updateOne("boats", boat._id, {
+        const update_boat = await updateOne("boats", boat._id, {
           locations: new_locations,
         });
+        update_boats_arr.push(update_boat)
       } else {
         console.log("No New Timestamp");
       }
     }
   }
+  //This hard coded 180 needs to be moved, frontend get_boats function also has a hard coded 180
+  broadcast_new_boats(serialize_boats(180, new_boats_arr))
+  broadcast_update_boats(serialize_boats(180, update_boats_arr))
 }
 
 function _predict_ship_movement(AIS, key, angle_offset = 0, distance = 50) {
@@ -263,7 +274,7 @@ async function get_glider_list_inside_all() {
 async function update_glider_boat_paths(glider){
   const glider_id = glider._id.toHexString()
   const boats_col = await db.collection("boats");
-  const gliders_col = await db.collection("gliders");
+  const geofence_col = await db.collection("geofences")
   
   let glider_was_in_a_path = false
   let glider_now_in_a_path = false
@@ -274,6 +285,8 @@ async function update_glider_boat_paths(glider){
       glider_was_in_a_path = true
       glider_was_in_this_path = true
     }
+    // Check if boat is in a safe zone
+    // If the boat and glider isn't in a safe zone, trigger the script
     const currently_in_this_path = await is_glider_in_boat_path(glider, boat)
     if(currently_in_this_path && !glider_was_in_this_path){
       const gliders_inside = [...boat.gliders_inside, glider_id]
@@ -347,10 +360,6 @@ async function update_boat_locations() {
   await insert_ais_historic_data(new_ais);
   await _insert_or_update_current_boats(new_ais);
   await _clean_boats();
-  
-  
-
-
 }
 
 function get_boat_polygon(last_pos, hours_diff) {
@@ -370,6 +379,14 @@ async function is_glider_in_boat_path(glider, boat){
     console.log(`Using hour offset: ${final_hour_offset} for glider ${glider.name}`)
     const boat_poly = get_boat_polygon(last_location, final_hour_offset);
     if (is_in_polygon(glider_pos, [...boat_poly, [null]])) {
+      // check if boat is in a safe zone, if so that's not very safe
+      const geofence_col = await db.collection("geofences")
+      const boat_in_safe_zone = geofence_col.findOne({safe_zone: true, boats_inside: boat._id.toHexString()})
+      const glider_in_safe_zone = geofence_col.findOne({safe_zone: true, gliders_inside: glider._id.toHexString()})
+    if(glider_in_safe_zone && !boat_in_safe_zone){
+      send_slack_message(`Glider ${glider.name} is in the path of a ship, but is also in a safe zone`)
+      return false
+    }
     return true
     }
   }
@@ -391,22 +408,28 @@ async function gliders_in_boat_path(boat) {
   return ret_gliders;
 }
 
-async function serialize_boats(minute_range) {
+async function serialize_boat(minute_range, boat){
+  const last_location_time = boat.locations.at(-1).TIMESTAMP;
+  const minute_offset =
+    (new Date().getTime() - last_location_time.getTime()) /
+    (1000 * 60)
+  let min_minutes = Math.floor(minute_offset)
+  const max_minutes = Math.floor(minute_offset + minute_range)
+  if (min_minutes < 0){
+    min_minutes = 0
+  }
+  boat["prediction"] = await predict_boat_movement_single(minute_offset/60, {boat_id: boat._id});
+  boat["prediction_range"] = await predict_boat_movement_range(boat._id, min_minutes,max_minutes,1, minute_offset);
+  boat["minute_offset"] = minute_offset;
+  return boat
+}
+
+async function serialize_boats(minute_range, boats=undefined) {
   const col = await db.collection("boats");
-  const boats = await col.find({}).toArray();
-  for (const boat of boats) {
-    const last_location_time = boat.locations.at(-1).TIMESTAMP;
-    const minute_offset =
-      (new Date().getTime() - last_location_time.getTime()) /
-      (1000 * 60)
-    let min_minutes = Math.floor(minute_offset)
-    const max_minutes = Math.floor(minute_offset + minute_range)
-    if (min_minutes < 0){
-      min_minutes = 0
-    }
-    boat["prediction"] = await predict_boat_movement_single(minute_offset/60, {boat_id: boat._id});
-    boat["prediction_range"] = await predict_boat_movement_range(boat._id, min_minutes,max_minutes,1, minute_offset);
-    boat["minute_offset"] = minute_offset;
+  boats = boats ?? await col.find({}).toArray();
+  for(let i=0; i<boats.length; i++){
+    boats[i] = await serialize_boat(minute_range, boats[i])
+    console.log(boats[i])
   }
   return boats;
 }

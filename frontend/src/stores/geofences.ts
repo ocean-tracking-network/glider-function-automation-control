@@ -147,6 +147,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
           name: ele.name,
           selected: false,
           notify: ele.notify,
+          safe_zone: ele.safe_zone
         }
       })
       set_force_map_update(true)
@@ -163,6 +164,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       name: geofence.name ? geofence.name : 'Untitled',
       latlons: geofence.latlons,
       notify: geofence.notify,
+      safe_zone: geofence.safe_zone
     }
     return apiClient.post(url, data).then(() => {
       return getGeofences()
@@ -194,6 +196,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       latlons: geofence.latlons,
       name: geofence.name,
       notify: geofence.notify,
+      safe_zone: geofence.safe_zone
     }
     console.log(data)
     const url = '/geofence/' + selected_fence_key.value
@@ -238,6 +241,7 @@ export const useGeoFencesStore = defineStore('geofences', () => {
       selected: false,
       latlons: [] as Latlon[],
       notify: false,
+      safe_zone: false
     }
     return temp_fence_key
   }

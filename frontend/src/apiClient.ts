@@ -25,7 +25,7 @@ export const createEventSource = () => {
   return eventSource
 }
 
-export const getEvenSource = () => eventSource ?? createEventSource()
+export const getEventSource = () => eventSource ?? createEventSource()
 
 export const getToken = () => localStorage.getItem('GFAC_token')
 
