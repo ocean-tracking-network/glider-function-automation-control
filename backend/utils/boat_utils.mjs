@@ -95,13 +95,14 @@ async function _insert_or_update_current_boats(ais_data_list) {
     const ais_data = ele.AIS;
     const boat = await col.findOne({ MMSI: ais_data.MMSI });
     if (boat == null) {
-      const new_boat = await col.insertOne({
+      const new_doc = {
         MMSI: ais_data.MMSI,
         gliders_inside: [],
         NAME: ais_data.NAME,
         locations: [_get_new_location_obj(ais_data)],
-      });
-      new_boats_arr.push(new_boat)
+      }
+      await col.insertOne(new_doc);
+      new_boats_arr.push(new_doc)
     } else {
       const last_timestamp =
         boat.locations[boat.locations.length - 1].TIMESTAMP;
@@ -117,10 +118,10 @@ async function _insert_or_update_current_boats(ais_data_list) {
         if (new_locations.length > 10) {
           new_locations = new_locations.slice(-9);
         }
-        const update_boat = await updateOne("boats", boat._id, {
+        await updateOne("boats", boat._id, {
           locations: new_locations,
         });
-        update_boats_arr.push(update_boat)
+        update_boats_arr.push({...boat, locations: new_locations})
       } else {
         console.log("No New Timestamp");
       }
