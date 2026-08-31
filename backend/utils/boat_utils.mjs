@@ -430,7 +430,7 @@ async function serialize_boats(minute_range, boats=undefined) {
   boats = boats ?? await col.find({}).toArray();
   for(let i=0; i<boats.length; i++){
     boats[i] = await serialize_boat(minute_range, boats[i])
-    console.log(boats[i])
+    // console.log(boats[i])
   }
   return boats;
 }

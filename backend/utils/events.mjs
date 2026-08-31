@@ -50,7 +50,7 @@ async function trigger_glider_event(glider, geofence, event_type) {
   }
   let geofence_filter = geofence
   if(typeof geofence !== 'string' ){
-    geofence_filter = geofence.toHexString()
+    geofence_filter = geofence._id.toHexString()
   }
   let collection = await db.collection('events')
   let events = await collection
@@ -62,6 +62,7 @@ async function trigger_glider_event(glider, geofence, event_type) {
     .toArray()
   if (events.length > 0) {
     for (const event of events) {
+      
       trigger_event(event, geofence, glider)
     }
   } else {
