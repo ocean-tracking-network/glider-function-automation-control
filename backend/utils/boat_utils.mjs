@@ -18,31 +18,35 @@ async function _fetch_ais() {
   }
 }
 
-async function _ais_exists(ais_data) {
+async function _get_existing_historic_mmsis(ais_data_arr){
   const col = await db.collection("historic_ais");
-  const ais = await col.findOne({
+  const or_query_map = ais_data_arr.map(ais_data => ({
     "AIS.TIMESTAMP": ais_data.AIS.TIMESTAMP,
-    "AIS.MMSI": ais_data.AIS.MMSI,
-  });
-  // console.log(ais);
-  if (ais == null) {
-    console.log("Historic DNE");
-    return false;
-  } else {
-    console.log("Historic Exists");
-    return true;
-  }
+    "AIS.MMSI": ais_data.AIS.MMSI
+  }))
+  const existing_docs = await col.find(
+    {$or : or_query_map},
+    {projection: {_id: 0, "AIS.MMSI": 1}}
+  ).toArray()
+  console.log(existing_docs)
+  return existing_docs.map(ais => ais.AIS.MMSI)
 }
 
 async function insert_ais_historic_data(ais_data_list) {
+  console.log(ais_data_list)
   const historic_col = await db.collection("historic_ais");
+  console.log("MULTI START")
+  const existing_mmsis = await _get_existing_historic_mmsis(ais_data_list)
+  console.log("MULTI END")
   for (const ais of ais_data_list) {
-    const exists = await _ais_exists(ais);
-    if (!exists) {
+    if(!existing_mmsis.includes(ais.AIS.MMSI)){
+      console.log("Historic DNE")
       await historic_col.insertOne({
         AIS: ais.AIS,
         api_time: new Date(),
       });
+    } else {
+      console.log("Historic Exists")
     }
   }
 }
