@@ -7,12 +7,12 @@ const broadcast_new_boats = (boats) => {
 
 const broadcast_update_boats = (boats) => {
     sse_channel.broadcast(boats, 'boats.update')
-    console.log('[boats.new]: sent')
+    console.log('[boats.update]: sent')
 }
 
 const broadcast_delete_boats = (boats) => {
     sse_channel.broadcast(boats, 'boats.delete')
-    console.log('[boats.new]: sent')
+    console.log('[boats.delete]: sent')
 }
 
 export {broadcast_new_boats, broadcast_update_boats, broadcast_delete_boats}
