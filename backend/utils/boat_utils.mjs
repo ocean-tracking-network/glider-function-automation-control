@@ -132,10 +132,9 @@ async function _insert_or_update_current_boats(ais_data_list) {
     }
   }
   //This hard coded 180 needs to be moved, frontend get_boats function also has a hard coded 180
-  broadcast_new_boats(serialize_boats(180, new_boats_arr))
-  console.log("UPDATING BOATS")
-  console.log(update_boats_arr)
-  broadcast_update_boats(serialize_boats(180, update_boats_arr))
+
+  broadcast_new_boats(await serialize_boats(180, new_boats_arr))
+  broadcast_update_boats(await serialize_boats(180, update_boats_arr))
 }
 
 function _predict_ship_movement(AIS, key, angle_offset = 0, distance = 50) {
