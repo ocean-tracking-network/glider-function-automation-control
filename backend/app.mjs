@@ -30,7 +30,7 @@ import {
   post_events,
   trigger_events,
 } from './views/events.mjs'
-import { get_boats, get_boat_predict, check_gliders_safe } from './views/boats.mjs'
+import { get_boats, get_boat_predict } from './views/boats.mjs'
 import { login, create_user, get_deletable_users, delete_user, user_exists, get_all_users } from './views/user.mjs'
 
 import { authenticateToken, requireAdmin, hashPassword } from './utils/auth.mjs'
@@ -44,7 +44,7 @@ import {
   subscribe_sfmc_gliders,
 } from './utils/glider_utils.mjs'
 import './loadEnvironment.mjs'
-import { update_boat_locations, update_gliders_inside_boat_paths } from './utils/boat_utils.mjs'
+import { update_boat_locations } from './utils/boat_utils.mjs'
 
 const app = express()
 app.use(cors())
