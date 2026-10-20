@@ -7,6 +7,7 @@ import {
   subscribe_for_glider_dialog,
 } from './sfmc_api.mjs'
 import {update_glider_boat_paths} from './boat_utils.mjs'
+import { add_glider_position_stat } from './iugc_stats.mjs'
 
 async function update_glider_waypoint(glider, sfmc_json) {
   const next_waypoint = {lat: sfmc_json.nextWaypointLat, lng: sfmc_json.nextWaypointLon}
@@ -80,6 +81,7 @@ async function update_glider_position(glider, collection = undefined) {
     }
 
     tracks.push(track)
+    add_glider_position_stat(glider, track)
     const filter = { _id: glider._id }
     const _update_result = await collection.updateOne(filter, {
       $set: { track: tracks, currentScriptName: sfmc_json.currentScriptName },
