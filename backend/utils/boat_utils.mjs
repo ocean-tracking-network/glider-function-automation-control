@@ -5,6 +5,7 @@ import axios from "axios";
 import { is_in_polygon, convert_gps } from "./geofence_utils.mjs";
 import { send_slack_message } from "./slack.mjs";
 import { broadcast_delete_boats, broadcast_new_boats, broadcast_update_boats } from "../views/sse/boats.mjs";
+import { add_boat_enter_stat } from "./iugc_stats.mjs";
 
 async function _fetch_ais() {
   const url = process.env.AIS_API_URL;
@@ -281,6 +282,7 @@ async function update_glider_boat_paths(glider){
   const glider_id = glider._id.toHexString()
   const boats_col = await db.collection("boats");
   const geofence_col = await db.collection("geofences")
+  let boat_in_path = null
   
   let glider_was_in_a_path = false
   let glider_now_in_a_path = false
@@ -304,6 +306,7 @@ async function update_glider_boat_paths(glider){
     }
     if(currently_in_this_path){
       glider_now_in_a_path = true
+      boat_in_path = boat
     }
   }
 
@@ -314,6 +317,7 @@ async function update_glider_boat_paths(glider){
   else if(!glider_was_in_a_path && glider_now_in_a_path){
     send_slack_message(`${glider.name} is in the path of a ship! :slocum_glider: :ship:`)
     await trigger_glider_event(glider, "ship", "enter")
+    add_boat_enter_stat(boat_in_path, glider)
   }
 
 }
