@@ -2,8 +2,8 @@ import { updateOne } from './db_utils.mjs'
 import db from '../db/conn.mjs'
 import { create_log } from './log_utils.mjs'
 import { send_slack_message } from './slack.mjs'
-import { trigger_event, trigger_glider_event } from './events.mjs'
 import { add_glider_geofence_change_stat } from './iugc_stats.mjs'
+import { trigger_glider_event } from './events.mjs'
 
 function is_in_polygon(point, polygon) {
   let in_polygon = false

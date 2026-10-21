@@ -23,14 +23,22 @@ async function trigger_file_event(event, glider, geofence) {
     try {
       console.log('trying to upload file')
       await upload_file(glider.name, 'to-glider', temp_file_location, file.category)
-      if (geofence) {
-        await create_log(
+      if (geofence === "ship") {
+        create_log(
+          `${glider.name} has ${event.event_type}ed a ship's path. Sent file: ${file.filename}`,
+          'info',
+          glider._id
+        )
+      }
+      else if(geofence){
+        create_log(
           `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Sent file: ${file.filename}`,
           'info',
           glider._id
         )
-      } else {
-        await create_log(`Sent file: ${file.filename} to ${glider.name}`, 'info', glider._id)
+      } 
+      else {
+        create_log(`Sent file: ${file.filename} to ${glider.name}`, 'info', glider._id)
       }
     } catch (error) {
       console.log(error)
@@ -72,14 +80,22 @@ async function trigger_glider_event(glider, geofence, event_type) {
 async function trigger_script_event(event, glider, geofence) {
   const generic_message_text = `Switched script: ${event.script} for ${glider.name}`
   await set_script(glider.name, event.script, event.script_type)
-  if (geofence) {
-    await create_log(
+  if (geofence === "ship"){
+      create_log(
+        `${glider.name} has ${event.event_type}ed a ship's path. Swapped script to: ${event.script}`,
+        'info',
+        glider._id
+      )
+  }
+  else if (geofence) {
+    create_log(
       `${glider.name} has ${event.event_type}ed the geofence ${geofence.name}. Swapped script to: ${event.script}`,
       'info',
       glider._id
     )
-  } else {
-    await create_log(generic_message_text, 'info', glider._id)
+  } 
+  else {
+    create_log(generic_message_text, 'info', glider._id)
   }
   send_slack_message(generic_message_text)
 }

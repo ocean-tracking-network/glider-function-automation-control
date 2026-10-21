@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import db from '../db/conn.mjs'
 import {
   predict_boat_movement_range,
-  update_gliders_inside_boat_paths,
   serialize_boats,
 } from "../utils/boat_utils.mjs";
 
@@ -31,21 +30,6 @@ const get_boat_predict = async (req, res) => {
     parseInt(interval)
   );
   return res.send(pred_move).status(200);
-};
-
-const check_gliders_safe = async (req, res) => {
-  await update_gliders_inside_boat_paths();
-  const col = await db.collection("boats");
-  const boats = await col.find({}).toArray();
-  let ret = {};
-  for (const boat of boats) {
-    const gliders_in_path = await gliders_in_boath_path(boat);
-    console.log(gliders_in_path);
-    if (gliders_in_path.length) {
-      ret[boat.MMSI] = gliders_in_path;
-    }
-  }
-  return res.send(ret).status(200);
 };
 
 export { get_boats, get_boat_predict, check_gliders_safe };

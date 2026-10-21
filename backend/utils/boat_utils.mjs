@@ -322,43 +322,6 @@ async function update_glider_boat_paths(glider){
 
 }
 
-async function update_gliders_inside_boat_paths(glider_id=undefined){
-  const gliders_that_were_in_path = await get_glider_list_inside_all()
-  console.log("Gliders that were in path:")
-  console.log(gliders_that_were_in_path)
-
-  const boats_col = await db.collection("boats");
-  const gliders_col = await db.collection("gliders");
-  const gliders_now_in_path = await get_gliders_inside_current_all()
-  console.log("Gliders now in path:")
-  console.log(gliders_now_in_path)
-
-  const boats = boats_col.find({})
-  for await (const boat of boats){
-    let new_gliders_inside = []
-    const gliders_inside = await gliders_in_boat_path(boat)
-    for(const glider of gliders_inside){}
-    updateOne('boats', boat._id.toHexString(), { gliders_inside: gliders_inside })
-  }
-  const gliders = gliders_col.find(glider_filter)
-  for await (const glider of gliders){
-    const glider_id_str = glider._id.toHexString() 
-    const glider_was_in = gliders_that_were_in_path.includes(glider_id_str)
-    const glider_is_in = gliders_now_in_path.includes(glider_id_str)
-    if(glider_was_in != glider_is_in){
-      if(glider_is_in){
-        send_slack_message(`${glider.name} is in the path of a ship! :slocum_glider: :ship:`)
-        await trigger_glider_event(glider, "ship", "enter")
-      }
-      else{
-        send_slack_message(`${glider.name} is no longer in the path of a ship :)`)
-        await trigger_glider_event(glider, "ship", "exit")
-      }
-    }
-  }
-
-}
-
 // There is going to be an assumption that boats that are about to leave the AIS area wont have a glider in their path
 // Because if a glider is in a ships path, then it gets cleaned, and the glider is in a ships path again, it will send
 // the glider enter again. Which isn't bad, but isn't expected.
@@ -449,6 +412,5 @@ export {
   gliders_in_boat_path as gliders_in_boath_path,
   serialize_boats,
   update_boat_locations,
-  update_gliders_inside_boat_paths,
   update_glider_boat_paths
 };
