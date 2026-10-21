@@ -3,6 +3,7 @@ import db from '../db/conn.mjs'
 import { create_log } from './log_utils.mjs'
 import { send_slack_message } from './slack.mjs'
 import { trigger_event, trigger_glider_event } from './events.mjs'
+import { add_glider_geofence_change_stat } from './iugc_stats.mjs'
 
 function is_in_polygon(point, polygon) {
   let in_polygon = false
@@ -189,6 +190,7 @@ async function _update_gliders_in_geofences(){
               send_slack_message(`${glider.name} has entered geofence ${geofence.name}`)
             }
             await trigger_glider_event(glider, geofence, 'enter')
+            add_glider_geofence_change_stat(glider, geofence, 'enter')
             gliders_in_geofence.push(glider_id)
           } else {
             //glider exited
@@ -197,6 +199,7 @@ async function _update_gliders_in_geofences(){
             }
             const idx = gliders_in_geofence.indexOf(glider_id)
             await trigger_glider_event(glider, geofence, 'exit')
+            add_glider_geofence_change_stat(glider, geofence, 'exit')
             gliders_in_geofence.splice(idx, 1)
           }
         } catch (error) {

@@ -19,7 +19,18 @@ async function add_glider_position_stat(glider, track){
     })
 }
 
+async function add_glider_geofence_change_stat(glider, geofence, event_type){
+    let collection = await db.collection('iugc_stats_glider_geofence_change')
+    collection.insertOne({
+        date: new Date(),
+        glider_name: glider.name,
+        geofence_name: geofence.name,
+        event_type: event_type
+    })
+}
+
 export {
     add_boat_enter_stat,
-    add_glider_position_stat
+    add_glider_position_stat,
+    add_glider_geofence_change_stat
 }
