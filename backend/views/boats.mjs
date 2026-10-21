@@ -32,4 +32,4 @@ const get_boat_predict = async (req, res) => {
   return res.send(pred_move).status(200);
 };
 
-export { get_boats, get_boat_predict, check_gliders_safe };
+export { get_boats, get_boat_predict };
